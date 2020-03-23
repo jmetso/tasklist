@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Task List</title>
+  <meta charset="UTF-8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <link rel="icon" type="image/svg" href="./fontawesome-free-5.10.2-web/svgs/solid/tasks.svg" />
+  <link rel="stylesheet" href="./css/todolist.css">
+  <link rel="stylesheet" href="./css/patternfly.css">
+  <link rel="stylesheet" href="./css/patternfly-addons.css">
+  <link rel="stylesheet" href="./fontawesome-free-5.10.2-web/css/all.css">
+  <script src="./js/vue-2.6.10.min.js"></script>
+  <script src="./js/jquery-3.4.1.min.js"></script>
+</head>
+<body>
+  <div class="pf-c-background-image" id="content">
+    <div class="pf-c-page">
+      <header role="banner" class="pf-c-page__header">
+        <div class="pf-c-page__header-brand">
+          <a class="pf-c-page__header-brand-link" href="./">
+            <i class="fas fa-tasks"></i><div>&nbsp;Task List</div>
+          </a>
+        </div>
+        <div class="pf-c-page__header-tools">
+          <div v-on:click="showAbout"><i class="far fa-question-circle"></i></div>
+          <div class="pf-c-dropdown" id="user-menu">
+              <button class="pf-c-dropdown__toggle pf-m-plain" id="dropdown-user-menu-button" aria-expanded="false"  v-on:click="userMenuClick">
+                <span class="pf-c-dropdown__toggle-text">
+                  &nbsp;&nbsp;{{ data.user }}
+                </span>
+                <i class="fas fa-caret-down pf-c-dropdown__toggle-icon" aria-hidden="true"></i>
+              </button>
+              <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="dropdown-align-right-button" hidden>
+                <li>
+                  <a class="pf-c-dropdown__menu-item" href="#" v-on:click="logout">Sign out</a>
+                </li>
+              </ul>
+          </div>
+          <img class="pf-c-avatar" src="./images/img_avatar.svg" alt="Avatar image">
+        </div>
+      </header>
+      <main role="main" class="pf-c-page__main" tabindex="-1">
+        <section class="pf-c-page__main-section pf-m-fill pf-m-light">
+          <ul class="pf-c-alert-group pf-m-toast" id="alerts" v-on:click="clickOnAlert">
+          </ul>
+          <h1 class="pf-c-title pf-m-xl" v-if="activeItems.length > 0">Active</h1>
+          <div id="active" v-if="activeItems.length > 0">
+            <ul class="pf-c-data-list" role="list" aria-label="Active items" v-on:click="activeItemClick">
+              <todoitem v-for="item in activeItems" v-bind:item="item" v-bind:id="item.id" v-bind:key="item.id"></todoitem>
+            </ul>
+          </div>
+          <h1 class="pf-c-title pf-m-xl" v-if="inactiveItems.length > 0"><br/>Completed/Inactive</h1>
+          <div id="completed" v-if="inactiveItems.length > 0">
+            <ul class="pf-c-data-list" role="list" aria-label="Completed items" v-on:click="inactiveItemClick">
+              <todoitem v-for="item in inactiveItems" v-bind:item="item" v-bind:id="item.id" v-bind:key="item.id"></todoitem>
+            </ul>
+          </div>
+          <div class="pf-c-empty-state" v-if="data.todoItems.length == 0">
+            <i class="fas fa-cubes pf-c-empty-state__icon" aria-hidden="true"></i>
+            <h1 class="pf-c-title pf-m-lg">No todo items</h1>
+            <div class="pf-c-empty-state__body"></div>
+            <button class="pf-c-button pf-m-primary" type="button" v-on:click="startNewItemWizard">Add first todo item</button>
+          </div>
+        </section>
+        <section class="pf-c-page__main-section pf-m-light pf-m-no-fill" v-if="data.todoItems.length > 0">
+          <button class="pf-c-button pf-m-primary" type="button" id="add-item" v-on:click="startNewItemWizard">
+            <!--<i class="fas fa-plus"></i>-->
+            <i class="fas fa-plus-circle"></i>
+          </button>
+        </section>
+      </main>
+    </div>
+    <div class="pf-c-backdrop" id="new-todo-wizard">
+      <div class="pf-l-bullseye">
+        <div class="pf-c-wizard">
+          <div class="pf-c-wizard__header">
+            <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="closeWizard">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">New Todo</h1>
+            <p class="pf-c-wizard__description">New todo item wizard</p>
+          </div>
+          <button aria-label="Wizard Header Toggle" class="pf-c-wizard__toggle" aria-expanded="false">
+            <ol class="pf-c-wizard__toggle-list">
+              <li class="pf-c-wizard__toggle-list-item" v-if="data.newItemWizardPage==1">
+                <span class="pf-c-wizard__toggle-num">1</span>Basic Info
+              </li>
+              <li class="pf-c-wizard__toggle-list-item" v-if="data.newItemWizardPage==2">
+                <span class="pf-c-wizard__toggle-num">2</span>Scheduling
+              </li>
+              <li class="pf-c-wizard__toggle-list-item" v-if="data.newItemWizardPage==3">
+                <span class="pf-c-wizard__toggle-num">3</span>Review
+              </li>
+            </ol>
+            <i class="fas fa-caret-down pf-c-wizard__toggle-icon" aria-hidden="true"></i>
+          </button>
+          <div class="pf-c-wizard__outer-wrap">
+            <div class="pf-c-wizard__inner-wrap">
+              <nav class="pf-c-wizard__nav" aria-label="Steps">
+                <ol class="pf-c-wizard__nav-list">
+                  <li class="pf-c-wizard__nav-item">
+                    <a href="#" class="pf-c-wizard__nav-link " v-bind:class="{'pf-m-current': newItemWizardPage==1}">Basic Info</a>
+                  </li>
+                  <li class="pf-c-wizard__nav-item">
+                    <a href="#" class="pf-c-wizard__nav-link" v-bind:class="{'pf-m-current': newItemWizardPage==2}">Scheduling</a>
+                  </li>
+                  <li class="pf-c-wizard__nav-item">
+                    <a href="#" class="pf-c-wizard__nav-link" aria-disabled="true" tabindex="-1" v-bind:class="{'pf-m-current': newItemWizardPage==3, 'pf-m-disabled': newItemWizardPage<3}">Review</a>
+                  </li>
+                </ol>
+              </nav>
+              <div class="pf-c-wizard__main">
+                <div class="pf-c-wizard__main-body"  v-if="data.newItemWizardPage == 1">
+                  <p>Basic information</p>
+                  <br />
+                  <form novalidate class="pf-c-form pf-m-horizontal">
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="new-item-title">
+                        <span class="pf-c-form__label-text">Title</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <input class="pf-c-form-control" type="text" id="new-item-title" name="new-item-title" aria-invalid="false" required v-model="data.newItem.title" placeholder="new item title"/>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="new-item-desc">
+                        <span class="pf-c-form__label-text">Description</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <textarea class="pf-c-form-control" type="text" id="new-item-desc" name="new-item-desc" aria-label="textarea example" v-model="data.newItem.description" placeholder="new item description"></textarea>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="pf-c-wizard__main-body" v-if="data.newItemWizardPage == 2">
+                  <p>Scheduling</p>
+                  <br />
+                  <form novalidate class="pf-c-form pf-m-horizontal">
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="new-item-scheduled-checkbox">
+                        <span class="pf-c-form__label-text">Scheduled</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-check">
+                          <input class="pf-c-check__input" type="checkbox" type="checkbox" id="new-item-scheduled-checkbox" name="new-item-scheduled-checkbox"  v-model="data.newItem.scheduled"/>
+                          <label class="pf-c-check__label" for="new-item-scheduled-checkbox"></label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.newItem.scheduled">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="new-item-duedate-date">
+                        <span class="pf-c-form__label-text">Due Date</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-form__group">
+                          <label class="pf-c-form__label" for="new-item-duedate-date">
+                            <span class="pf-c-form__label-text">Date</span>
+                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                          </label>
+                          <div class="pf-c-form__horizontal-group">
+                            <input class="pf-c-form-control" type="text" id="new-item-duedate-date" name="new-item-duedate-date" required v-model="data.newItem.dueDate" placeholder="yyyy-mm-hh" maxlength="10"/>
+                          </div>
+                        </div>
+                      </div>
+                      <br />
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-form__group">
+                          <label class="pf-c-form__label" for="new-item-duedate-time">
+                            <span class="pf-c-form__label-text">Time</span>
+                          </label>
+                          <div class="pf-c-form__horizontal-group">
+                            <input class="pf-c-form-control" type="text" id="new-item-duedate-time" name="new-item-duedate-time" v-model="data.newItem.dueTime" placeholder="HH:MM" maxlength="5"/>
+                          </div>
+                        </div>
+                      </div>
+                      <br />
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-form__group">
+                          <label class="pf-c-form__label" for="new-item-duedate-tz">
+                            <span class="pf-c-form__label-text">Timezone</span>
+                          </label>
+                          <div class="pf-c-form__horizontal-group">
+                            <input class="pf-c-form-control" type="text" id="new-item-duedate-tz" name="new-item-duedate-tz" v-model="data.newItem.dueTimezone" placeholder="+02:00" maxlength="6"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.newItem.scheduled">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="new-item-repeating-radio-default">
+                        <span class="pf-c-form__label-text">Repeating</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-default" name="exampleRadioSimple" value="No" v-model="data.newItem.repeating"/>
+                          <label class="pf-c-radio__label" for="new-item-repeating-radio-default">No</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-daily" name="exampleRadioSimple" value="Daily"  v-model="data.newItem.repeating"/>
+                          <label class="pf-c-radio__label" for="new-item-repeating-radio-daily">Daily</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-weekly" name="exampleRadioSimple" value="Weekly"  v-model="data.newItem.repeating"/>
+                          <label class="pf-c-radio__label" for="new-item-repeating-radio-weekly">Weekly</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-monthly" name="exampleRadioSimple" value="Monthly"  v-model="data.newItem.repeating"/>
+                          <label class="pf-c-radio__label" for="new-item-repeating-radio-monthly">Montly</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.newItem.repaeting"/>
+                          <label class="pf-c-radio__label" for="new-item-repeating-radio-yearly">Yearly</label>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="pf-c-wizard__main-body" v-if="data.newItemWizardPage == 3">
+                  <p>Overiew</p>
+                  <br />
+                  <form novalidate class="pf-c-form pf-m-horizontal">
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="new-item-title-overview">
+                        <span class="pf-c-form__label-text">Title</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p id="new-item-title-overview" class="pf-c-form-control" name="new-item-title-overview">{{ data.newItem.title }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="new-item-desc-overview">
+                        <span class="pf-c-form__label-text">Description</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="new-item-desc-overview" name="new-item-desc-overview">{{ data.newItem.description }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="new-item-scheduled-overview">
+                        <span class="pf-c-form__label-text">Scheduled</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="new-item-scheduled-overview" name="new-item-scheduled-overview">{{ data.newItem.scheduled }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.newItem.scheduled">
+                      <label class="pf-c-form__label" for="new-item-duedate-overview">
+                        <span class="pf-c-form__label-text">Due date</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="new-item-duedate-overview" name="new-item-duedate-overview">{{ data.newItem.dueDate }} {{ data.newItem.dueTime }} {{ data.newItem.dueTimezone }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.newItem.scheduled">
+                      <label class="pf-c-form__label" for="new-item-repeating-overview">
+                        <span class="pf-c-form__label-text">Repeating</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="new-item-repeating-overview" name="new-item-repeating-overview">{{ data.newItem.repeating }}</p>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <footer class="pf-c-wizard__footer">
+              <button class="pf-c-button pf-m-primary" type="submit" v-if="newItemWizardPage < 3" v-on:click="newWizardNext">Next</button>
+              <button class="pf-c-button pf-m-primary" type="submit" v-else v-on:click="newWizardSave">Save</button>
+              <button class="pf-c-button pf-m-secondary pf-m-disabled" type="button" disabled v-if="newItemWizardPage==1">Back</button>
+              <button class="pf-c-button pf-m-secondary" type="button" v-else v-on:click="newWizardBack">Back</button>
+              <button class="pf-c-button pf-m-link" type="button" v-on:click="wizardCancel">Cancel</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pf-c-backdrop" id="edit-todo-wizard">
+      <div class="pf-l-bullseye">
+        <div class="pf-c-wizard">
+          <div class="pf-c-wizard__header">
+            <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="closeWizard">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+            <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">Edit Todo</h1>
+            <p class="pf-c-wizard__description">Edit todo item wizard</p>
+          </div>
+          <button aria-label="Wizard Header Toggle" class="pf-c-wizard__toggle" aria-expanded="false">
+            <ol class="pf-c-wizard__toggle-list">
+              <li class="pf-c-wizard__toggle-list-item" v-if="data.editItemWizardPage==1">
+                <span class="pf-c-wizard__toggle-num">1</span>Basic Info
+              </li>
+              <li class="pf-c-wizard__toggle-list-item" v-if="data.editItemWizardPage==2">
+                <span class="pf-c-wizard__toggle-num">2</span>Scheduling
+              </li>
+              <li class="pf-c-wizard__toggle-list-item" v-if="data.editItemWizardPage==3">
+                <span class="pf-c-wizard__toggle-num">3</span>Review
+              </li>
+            </ol>
+            <i class="fas fa-caret-down pf-c-wizard__toggle-icon" aria-hidden="true"></i>
+          </button>
+          <div class="pf-c-wizard__outer-wrap">
+            <div class="pf-c-wizard__inner-wrap">
+              <nav class="pf-c-wizard__nav" aria-label="Steps">
+                <ol class="pf-c-wizard__nav-list">
+                  <li class="pf-c-wizard__nav-item">
+                    <a href="#" class="pf-c-wizard__nav-link " v-bind:class="{'pf-m-current': editItemWizardPage==1}">Basic Info</a>
+                  </li>
+                  <li class="pf-c-wizard__nav-item">
+                    <a href="#" class="pf-c-wizard__nav-link" v-bind:class="{'pf-m-current': editItemWizardPage==2}">Scheduling</a>
+                  </li>
+                  <li class="pf-c-wizard__nav-item">
+                    <a href="#" class="pf-c-wizard__nav-link" aria-disabled="true" tabindex="-1" v-bind:class="{'pf-m-current': editItemWizardPage==3, 'pf-m-disabled': editItemWizardPage<3}">Review</a>
+                  </li>
+                </ol>
+              </nav>
+              <div class="pf-c-wizard__main">
+                <div class="pf-c-wizard__main-body"  v-if="data.editItemWizardPage == 1">
+                  <p>Basic information</p>
+                  <br />
+                  <form novalidate class="pf-c-form pf-m-horizontal">
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="edit-item-id">
+                        <span class="pf-c-form__label-text">ID</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p id="edit-item-id" class="pf-c-form-control" name="edit-item-id">{{ data.editItem.id }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="edit-item-title">
+                        <span class="pf-c-form__label-text">Title</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <input class="pf-c-form-control" type="text" id="edit-item-title" name="edit-item-title" aria-invalid="false" required v-model="data.editItem.title" placeholder="new item title"/>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="edit-item-desc">
+                        <span class="pf-c-form__label-text">Description</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <textarea class="pf-c-form-control" type="text" id="edit-item-desc" name="edit-item-desc" aria-label="textarea example" v-model="data.editItem.description" placeholder="new item description"></textarea>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="pf-c-wizard__main-body" v-if="data.editItemWizardPage == 2">
+                  <p>Scheduling</p>
+                  <br />
+                  <form novalidate class="pf-c-form pf-m-horizontal">
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="edit-item-scheduled-checkbox">
+                        <span class="pf-c-form__label-text">Scheduled</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-check">
+                          <input class="pf-c-check__input" type="checkbox" type="checkbox" id="edit-item-scheduled-checkbox" name="edit-item-scheduled-checkbox"  v-model="data.editItem.scheduled"/>
+                          <label class="pf-c-check__label" for="edit-item-scheduled-checkbox"></label>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.editItem.scheduled">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="edit-item-duedate-date">
+                        <span class="pf-c-form__label-text">Due Date</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-form__group">
+                          <label class="pf-c-form__label" for="edit-item-duedate-date">
+                            <span class="pf-c-form__label-text">Date</span>
+                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                          </label>
+                          <div class="pf-c-form__horizontal-group">
+                            <input class="pf-c-form-control" type="text" id="edit-item-duedate-date" name="edit-item-duedate-date" required v-model="data.editItem.dueDate" placeholder="yyyy-mm-hh" maxlength="10"/>
+                          </div>
+                        </div>
+                      </div>
+                      <br />
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-form__group">
+                          <label class="pf-c-form__label" for="edit-item-duedate-time">
+                            <span class="pf-c-form__label-text">Time</span>
+                          </label>
+                          <div class="pf-c-form__horizontal-group">
+                            <input class="pf-c-form-control" type="text" id="edit-item-duedate-time" name="edit-item-duedate-time" v-model="data.editItem.dueTime" placeholder="HH:MM" maxlength="5"/>
+                          </div>
+                        </div>
+                      </div>
+                      <br />
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-form__group">
+                          <label class="pf-c-form__label" for="edit-item-duedate-tz">
+                            <span class="pf-c-form__label-text">Timezone</span>
+                          </label>
+                          <div class="pf-c-form__horizontal-group">
+                            <input class="pf-c-form-control" type="text" id="edit-item-duedate-tz" name="edit-item-duedate-tz" v-model="data.editItem.dueTimezone" placeholder="+02:00" maxlength="6"/>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.editItem.scheduled">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="edit-item-repeating-radio-default">
+                        <span class="pf-c-form__label-text">Repeating</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-default" name="exampleRadioSimple" value="No" v-model="data.editItem.repeating"/>
+                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-default">No</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-daily" name="exampleRadioSimple" value="Daily"  v-model="data.editItem.repeating"/>
+                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-daily">Daily</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-weekly" name="exampleRadioSimple" value="Weekly"  v-model="data.editItem.repeating"/>
+                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-weekly">Weekly</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-monthly" name="exampleRadioSimple" value="Monthly"  v-model="data.editItem.repeating"/>
+                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-monthly">Montly</label>
+                        </div>
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.editItem.repaeting"/>
+                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-yearly">Yearly</label>
+                        </div>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+                <div class="pf-c-wizard__main-body" v-if="data.editItemWizardPage == 3">
+                  <p>Overiew</p>
+                  <br />
+                  <form novalidate class="pf-c-form pf-m-horizontal">
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="edit-item-id-overview">
+                        <span class="pf-c-form__label-text">ID</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p id="edit-item-id-overview" class="pf-c-form-control" name="edit-item-id-overview">{{ data.editItem.id }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="edit-item-title-overview">
+                        <span class="pf-c-form__label-text">Title</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p id="edit-item-title-overview" class="pf-c-form-control" name="edit-item-title-overview">{{ data.editItem.title }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.editItem.description != null && data.editItem.description.length > 0">
+                      <label class="pf-c-form__label" for="edit-item-desc-overview">
+                        <span class="pf-c-form__label-text">Description</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="edit-item-desc-overview" name="edit-item-desc-overview">{{ data.editItem.description }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group">
+                      <label class="pf-c-form__label" for="edit-item-scheduled-overview">
+                        <span class="pf-c-form__label-text">Scheduled</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="edit-item-scheduled-overview" name="edit-item-scheduled-overview">{{ data.editItem.scheduled }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.editItem.scheduled">
+                      <label class="pf-c-form__label" for="edit-item-duedate-overview">
+                        <span class="pf-c-form__label-text">Due date</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="edit-item-duedate-overview" name="edit-item-duedate-overview">{{ data.editItem.dueDate }} {{ data.editItem.dueTime }} {{ data.editItem.dueTimezone }}</p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__group" v-if="data.editItem.scheduled">
+                      <label class="pf-c-form__label" for="edit-item-repeating-overview">
+                        <span class="pf-c-form__label-text">Repeating</span>
+                      </label>
+                      <div class="pf-c-form__horizontal-group">
+                        <p class="pf-c-form-control" id="edit-item-repeating-overview" name="edit-item-repeating-overview">{{ data.editItem.repeating }}</p>
+                      </div>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+            <footer class="pf-c-wizard__footer">
+              <button class="pf-c-button pf-m-primary" type="submit" v-on:click="editWizardSave">Save</button>
+              <button class="pf-c-button pf-m-secondary" type="submit" v-if="editItemWizardPage < 3" v-on:click="editWizardNext">Next</button>
+              <button class="pf-c-button pf-m-secondary pf-m-disabled" type="button" v-else>Next</button>
+              <button class="pf-c-button pf-m-tertiary pf-m-disabled" type="button" disabled v-if="editItemWizardPage==1">Back</button>
+              <button class="pf-c-button pf-m-tertiary" type="button" v-else v-on:click="editWizardBack">Back</button>
+              <button class="pf-c-button pf-m-link" type="button" v-on:click="wizardCancel">Cancel</button>
+            </footer>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="pf-c-backdrop" id="about">
+      <div class="pf-l-bullseye">
+        <div class="pf-c-about-modal-box" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+          <div class="pf-c-about-modal-box__close" v-on:click="closeAbout">
+            <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog">
+              <i class="fas fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+          <div class="pf-c-about-modal-box__header">
+            <h1 class="pf-c-title pf-m-4xl" id="about-modal-title">Todo List</h1>
+          </div>
+          <div class="pf-c-about-modal-box__content">
+            <div class="pf-c-about-modal-box__body">
+              Version: {{ data.version }}<br />
+              License: <a href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache License v2.0</a>
+            </div>
+            <p class="pf-c-about-modal-box__strapline">&copy 2019 Janne Metso</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="./js/todolist.js"></script>
+</body>
+</html>

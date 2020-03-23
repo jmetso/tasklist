@@ -1,0 +1,51 @@
+@charset "UTF-8";
+body {
+  --pf-global--BackgroundColor--100: #eee;
+  --pf-global--BackgroundColor--150: #e5e5e5;
+  --pf-global--BackgroundColor--200: #eaeaea;
+  --pf-global--BackgroundColor--300: #dddddd;
+  --pf-global--BackgroundColor--light-100: #eee;
+  --pf-global--BackgroundColor--light-200: #eaeaea;
+  --pf-global--BackgroundColor--light-300: #dddddd;
+}
+
+.item-title {
+    max-width: 20ex;
+}
+
+.due-date {
+    max-width: 21ex;
+}
+.repeat-type {
+    max-width: 7ex;
+}
+.over-due-alert, .next-due {
+    max-width: 28ex;
+}
+h1#completed-header {
+    padding-top: 1.5ex;
+}
+.pf-c-data-list__cell {
+    margin-top: .8ex;
+}
+
+/* wizard shit */
+#new-todo-wizard {
+    display: none;
+}
+
+#edit-todo-wizard {
+    display: none;
+}
+
+#about {
+    display: none;
+}
+
+#about > div.pf-l-bullseye > div.pf-c-about-modal-box {
+    --pf-c-about-modal-box__close--PaddingTop: 1rem;
+    --pf-c-about-modal-box__close--PaddingRight: 1rem;
+    --pf-c-about-modal-box__close--PaddingBottom: 1rem;
+    max-height: 22rem;
+    max-width: 35rem;
+}
