@@ -13,12 +13,14 @@ public class UserAccount {
     private String username;
     private String password;
     private List<String> roles;
+    private String email;
 
     public UserAccount() {
         this.id = 1;
         this.username = "";
         this.password = "";
         this.roles = new LinkedList<>();
+        this.email = null;
     }
 
     public UserAccount(int id, String username, String password, List<String> roles) {
@@ -26,6 +28,15 @@ public class UserAccount {
         this.username = username;
         this.password = password;
         this.roles = roles;
+        this.email = null;
+    }
+
+    public UserAccount(int id, String username, String password, List<String> roles, String email) {
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.roles = roles;
+        this.email = email;
     }
 
     public int getId() {
@@ -44,4 +55,7 @@ public class UserAccount {
         return roles;
     }
 
+    public String getEmail() {
+        return email;
+    }
 }
