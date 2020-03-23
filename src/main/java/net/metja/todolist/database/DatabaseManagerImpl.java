@@ -239,7 +239,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         final String SELECT = "SELECT Version FROM Settings";
         try {
             int version = this.jdbcTemplate.queryForObject(SELECT, Integer.class);
-            if(version >= this.SCHEMA_VERSION_MIN && version <= this.SCHEMA_VERSION_MIN) {
+            if(version >= this.SCHEMA_VERSION_MIN && version <= this.SCHEMA_VERSION_MAX) {
                 logger.debug("Supported database schema version.");
             } else {
                 logger.error("Unsupported database schema version!");
