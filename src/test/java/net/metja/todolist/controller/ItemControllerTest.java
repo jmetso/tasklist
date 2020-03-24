@@ -38,6 +38,10 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+/**
+ * @author Janne Metso @copy; 2020
+ * @since 2020-03-23
+ */
 @RunWith(SpringJUnit4ClassRunner.class)
 @WebMvcTest(RestController.class)
 @AutoConfigureMockMvc
