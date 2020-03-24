@@ -32,7 +32,7 @@ public class ConfigUtil {
         if(this.file == null) {
             this.file = System.getProperty(CONFIG_FILE_KEY);
         }
-        logger.info("Config file is "+this.file);
+        logger.debug("Config file is "+this.file);
         try {
             Configurations configurations = new Configurations();
             FileBasedConfigurationBuilder<PropertiesConfiguration> builder = configurations.propertiesBuilder(new File(this.file));
