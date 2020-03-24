@@ -2,6 +2,7 @@ package net.metja.todolist.database.bean;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +24,7 @@ public class Todo {
     private boolean done = false;
     private boolean scheduled = false;
     private Repeating repeating;
+    private OffsetDateTime lastNotification;
 
     public Todo() {}
 
@@ -125,6 +127,14 @@ public class Todo {
 
     public void setRepeating(Repeating repeating) {
         this.repeating = repeating;
+    }
+
+    public OffsetDateTime getLastNotification() {
+        return lastNotification;
+    }
+
+    public void setLastNotification(OffsetDateTime lastNotification) {
+        this.lastNotification = lastNotification;
     }
 
 }
