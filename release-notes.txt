@@ -1,3 +1,6 @@
+0.1.0
+- adds capability to send email notifications to user
+
 0.0.1
 - initial version
 
