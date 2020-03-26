@@ -14,6 +14,7 @@ import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,10 +30,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
     static final String CREATE_SCHEMA_VERSION_TABLE = "CREATE TABLE IF NOT EXISTS Settings ( Version INTEGER )";
     static final String CREATE_PERSISTENT_LOGINS_TABLE = "CREATE TABLE IF NOT EXISTS persistent_logins (username varchar(64) not null, series varchar(64) primary key, token varchar(64) not null, last_used timestamp not null)";
     static final String CREATE_TODO_LISTS_TABLE = "CREATE TABLE IF NOT EXISTS TodoLists (ID INTEGER, UserID INTEGER, FOREIGN KEY (UserID) REFERENCES UserAccounts(ID), PRIMARY KEY(ID))";
-    static final String CREATE_TODO_ITEMS_TABLE = "CREATE TABLE IF NOT EXISTS TodoItems (ID INTEGER, ListID INTEGER, ParentID INTEGER, Title TEXT, Description TEXT, Done BOOLEAN, Scheduled BOOLEAN, DueDate TEXT, DueTime TEXT, DueTimezone TEXT, Repeating TEXT, FOREIGN KEY (ListID) REFERENCES TodoList(ID), PRIMARY KEY (ID, ListID))";
-    static final String CREATE_USER_ACCOUNTS_TABLE = "CREATE TABLE IF NOT EXISTS UserAccounts (ID INTEGER PRIMARY KEY, Username VARCHAR(64), Password VARCHAR(60), Roles TEXT)";
+    static final String CREATE_TODO_ITEMS_TABLE = "CREATE TABLE IF NOT EXISTS TodoItems (ID INTEGER, ListID INTEGER, ParentID INTEGER, Title TEXT, Description TEXT, Done BOOLEAN, Scheduled BOOLEAN, DueDate TEXT, DueTime TEXT, DueTimezone TEXT, Repeating TEXT, LastNotification TEXT, FOREIGN KEY (ListID) REFERENCES TodoList(ID), PRIMARY KEY (ID, ListID))";
+    static final String CREATE_USER_ACCOUNTS_TABLE = "CREATE TABLE IF NOT EXISTS UserAccounts (ID INTEGER PRIMARY KEY, Username VARCHAR(64), Password VARCHAR(60), Roles TEXT, Email TEXT)";
     private static final int SCHEMA_VERSION_MIN = 1;
-    private static final int SCHEMA_VERSION_MAX = 1;
+    private static final int SCHEMA_VERSION_MAX = 2;
 
     private JdbcTemplate jdbcTemplate;
 
@@ -45,7 +46,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         int id = this.getNextTodoItemID(listID);
 
         final String SELECT = "SELECT ID FROM TodoLists WHERE ID=?";
-        final String INSERT = "INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        final String INSERT = "INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating, LastNotification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try {
             String dueTimezone = null;
             if(todo.getDueTimezone() != null) {
@@ -54,7 +55,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             this.jdbcTemplate.queryForObject(SELECT, Integer.class, listID);
             this.jdbcTemplate.update(INSERT, id, listID, todo.getParentId(), todo.getTitle(), todo.getDescription(),
                     todo.isDone(), todo.isScheduled(), todo.getDueDate(), todo.getDueTime(), dueTimezone,
-                    todo.getRepeating());
+                    todo.getRepeating(), todo.getLastNotification());
             return id;
         } catch(org.springframework.dao.DataAccessException e) {
             logger.warn("Unable to add list item "+todo.getTitle()+" to list "+listID, e);
@@ -172,6 +173,42 @@ public class DatabaseManagerImpl implements DatabaseManager {
         return null;
     }
 
+    @Override
+    public boolean migrateDatabaseToLatestVersion() {
+        logger.info("Migrating database version ...");
+        final String SELECT = "SELECT Version FROM Settings";
+        boolean success = false;
+        try {
+            int version = this.jdbcTemplate.queryForObject(SELECT, Integer.class);
+            if(version == 1) {
+                success = migrateDatabaseFromV1ToV2();
+            }
+            logger.info("Migrating database version done.");
+            return success;
+        } catch(org.springframework.dao.DataAccessException e) {
+            logger.error("No schema version set, cannot migrate!", e);
+            return false;
+        }
+    }
+
+    private boolean migrateDatabaseFromV1ToV2() {
+        final String ALTER_USER_ACCOUNTS = "ALTER TABLE UserAccounts ADD COLUMN Email TEXT";
+        final String ALTER_TODO_ITEMS = "ALTER TABLE TodoItems ADD COLUMN LastNotification TEXT";
+        final String UPDATE_DATABASE_VERSION = "UPDATE Settings SET Version=2 WHERE Version=1";
+        try {
+            logger.info("Migrating database from V1 to V2 ...");
+            this.jdbcTemplate.execute(ALTER_USER_ACCOUNTS);
+            this.jdbcTemplate.execute(ALTER_TODO_ITEMS);
+            int rows = this.jdbcTemplate.update(UPDATE_DATABASE_VERSION);
+            assert(rows == 1);
+            logger.info("Migrating database from V1 to V2 done");
+            return true;
+        } catch(org.springframework.dao.DataAccessException e) {
+            logger.warn("Unable to migrate database from V1 to V2!", e);
+            return false;
+        }
+    }
+
     private synchronized int getNextTodoItemID(final int listID) {
         final String SELECT_ID = "SELECT ID FROM TodoItems WHERE ListID=? ORDER BY ID DESC LIMIT 1";
         try {
@@ -222,6 +259,9 @@ public class DatabaseManagerImpl implements DatabaseManager {
         if(rs.getString("Repeating") != null) {
             todo.setRepeating(Repeating.getRepeating(rs.getString("Repeating")));
         }
+        if(rs.getString("LastNotification") != null) {
+            todo.setLastNotification(OffsetDateTime.parse(rs.getString("LastNotification")));
+        }
         return todo;
     }
 
@@ -231,7 +271,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         while(st.hasMoreTokens()) {
             roles.add(st.nextToken());
         }
-        return new UserAccount(rs.getInt("ID"), rs.getString("Username"), rs.getString("Password"), roles);
+        return new UserAccount(rs.getInt("ID"), rs.getString("Username"), rs.getString("Password"), roles, rs.getString("Email"));
     }
 
     @PostConstruct
@@ -240,7 +280,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         try {
             int version = this.jdbcTemplate.queryForObject(SELECT, Integer.class);
             if(version >= this.SCHEMA_VERSION_MIN && version <= this.SCHEMA_VERSION_MAX) {
-                logger.debug("Supported database schema version.");
+                logger.info("Supported database schema version: "+version+".");
             } else {
                 logger.error("Unsupported database schema version!");
                 System.exit(1);

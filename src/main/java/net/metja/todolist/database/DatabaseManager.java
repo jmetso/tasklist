@@ -22,4 +22,5 @@ public interface DatabaseManager {
 
     List<UserAccount> getUsers();
 
+    boolean migrateDatabaseToLatestVersion();
 }

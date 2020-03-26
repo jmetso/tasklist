@@ -12,6 +12,7 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
@@ -68,6 +69,7 @@ public class DatabaseManagerImplTest {
         assertNull("DueTime", todo.getDueTime());
         assertNull("DueTimezone", todo.getDueTimezone());
         assertNull("Repeating", todo.getRepeating());
+        assertNull("LastNotification", todo.getLastNotification());
     }
 
     @Test
@@ -85,6 +87,8 @@ public class DatabaseManagerImplTest {
         todo.setDueTime(LocalTime.of(12, 0, 0));
         todo.setDueTimezone(ZoneOffset.of("+02:30"));
         todo.setRepeating(Repeating.Weekly);
+        OffsetDateTime lastNotification = OffsetDateTime.now();
+        todo.setLastNotification(lastNotification);
 
         int id = this.impl.addTodo(1, todo);
         assertEquals("ID", 2, id);
@@ -100,13 +104,15 @@ public class DatabaseManagerImplTest {
         assertEquals("DueTime", LocalTime.of(12, 0, 0), result.getDueTime());
         assertEquals("DueTimezone", ZoneOffset.of("+02:30"), result.getDueTimezone());
         assertEquals("Repeating", Repeating.Weekly, result.getRepeating());
+        assertNotNull("LastNotification", result.getLastNotification());
+        assertEquals("LastNotification", lastNotification.toString(), result.getLastNotification().toString());
     }
 
     @Test
     public void readTodo_AllData() {
         this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'Test')");
         this.jdbcTemplate.execute("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
-        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating) VALUES (1, 1, -1, \"Parent\", \"Description\", 0, 1, '2019-11-23', '14:56', '+02:00', 'No')");
+        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating, LastNotification) VALUES (1, 1, -1, \"Parent\", \"Description\", 0, 1, '2019-11-23', '14:56', '+02:00', 'No', '2020-03-26T16:26:00+02:00')");
 
         Todo todo = this.impl.getTodo(1, 1);
         assertNotNull("Todo", todo);
@@ -120,6 +126,8 @@ public class DatabaseManagerImplTest {
         assertEquals("DueTime", LocalTime.of(14, 56, 0), todo.getDueTime());
         assertEquals("DueTimezone", ZoneOffset.of("+02:00"), todo.getDueTimezone());
         assertEquals("Repeating", Repeating.No, todo.getRepeating());
+        assertNotNull("LastNotification", todo.getLastNotification());
+        assertEquals("LastNotification", "2020-03-26T16:26+02:00", todo.getLastNotification().toString());
     }
     @Test
     public void addTodo_IDClash() {
@@ -339,17 +347,19 @@ public class DatabaseManagerImplTest {
 
     @Test
     public void getUsers() {
-        this.jdbcTemplate.execute("INSERT INTO UserAccounts (Username, Password, Roles) VALUES ('user', 'user', 'ADMIN,USER')");
+        this.jdbcTemplate.execute("INSERT INTO UserAccounts (ID, Username, Password, Roles, Email) VALUES (1, 'user', 'user', 'ADMIN,USER', 'test@example.com')");
 
         List<UserAccount> users = this.impl.getUsers();
         assertNotNull("Users", users);
         assertEquals("Size", 1, users.size());
+        assertEquals("ID", 1, users.get(0).getId());
         assertEquals("Username", "user", users.get(0).getUsername());
         assertEquals("Password", "user", users.get(0).getPassword());
         assertNotNull("Roles", users.get(0).getRoles());
         assertEquals("Roles size", 2, users.get(0).getRoles().size());
         assertEquals("Role one", "ADMIN", users.get(0).getRoles().get(0));
         assertEquals("Role two", "USER", users.get(0).getRoles().get(1));
+        assertEquals("Email", "test@example.com", users.get(0).getEmail());
     }
 
     private Todo mapTodoItem(ResultSet rs, int rowNum) throws java.sql.SQLException {
@@ -373,7 +383,56 @@ public class DatabaseManagerImplTest {
         if(rs.getString("Repeating") != null) {
             todo.setRepeating(Repeating.getRepeating(rs.getString("Repeating")));
         }
+        if(rs.getString("LastNotification") != null) {
+            todo.setLastNotification(OffsetDateTime.parse(rs.getString("LastNotification")));
+        }
         return todo;
+    }
+
+    @Test
+    public void migrateV1toLatest() {
+        final String CREATE_SCHEMA_VERSION_TABLE_V1 = "CREATE TABLE IF NOT EXISTS Settings ( Version INTEGER )";
+        final String CREATE_PERSISTENT_LOGINS_TABLE_V1 = "CREATE TABLE IF NOT EXISTS persistent_logins (username varchar(64) not null, series varchar(64) primary key, token varchar(64) not null, last_used timestamp not null)";
+        final String CREATE_TODO_LISTS_TABLE_V1 = "CREATE TABLE IF NOT EXISTS TodoLists (ID INTEGER, UserID INTEGER, FOREIGN KEY (UserID) REFERENCES UserAccounts(ID), PRIMARY KEY(ID))";
+        final String CREATE_TODO_ITEMS_TABLE_V1 = "CREATE TABLE IF NOT EXISTS TodoItems (ID INTEGER, ListID INTEGER, ParentID INTEGER, Title TEXT, Description TEXT, Done BOOLEAN, Scheduled BOOLEAN, DueDate TEXT, DueTime TEXT, DueTimezone TEXT, Repeating TEXT, FOREIGN KEY (ListID) REFERENCES TodoList(ID), PRIMARY KEY (ID, ListID))";
+        final String CREATE_USER_ACCOUNTS_TABLE_V1 = "CREATE TABLE IF NOT EXISTS UserAccounts (ID INTEGER PRIMARY KEY, Username VARCHAR(64), Password VARCHAR(60), Roles TEXT)";
+        final String INSERT_VERSION = "INSERT INTO Settings (Version) VALUES (?)";
+        final String SELECT_VERSION = "SELECT Version FROM Settings";
+
+        SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
+        dataSource.setDriverClassName("org.sqlite.JDBC");
+        dataSource.setUrl("jdbc:sqlite:file::memory:");
+
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+        this.jdbcTemplate.execute(CREATE_SCHEMA_VERSION_TABLE_V1);
+        this.jdbcTemplate.execute(CREATE_USER_ACCOUNTS_TABLE_V1);
+        this.jdbcTemplate.execute(CREATE_PERSISTENT_LOGINS_TABLE_V1);
+        this.jdbcTemplate.execute(CREATE_TODO_ITEMS_TABLE_V1);
+        this.jdbcTemplate.execute(CREATE_TODO_LISTS_TABLE_V1);
+        this.jdbcTemplate.update(INSERT_VERSION, 1);
+
+        assertEquals("Version number", 1, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class));
+        this.impl = new DatabaseManagerImpl();
+        this.impl.setDataSource(dataSource);
+        this.impl.migrateDatabaseToLatestVersion();
+
+        final String INSERT_USER = "INSERT INTO UserAccounts (ID, Username, Password, Roles, Email) VALUES (?, ?, ?, ?, ?)";
+        final String INSERT_TODO_ITEM = "INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, LastNotification) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+        final String SELECT_LAST_NOTIFICATION = "SELECT LastNotification FROM TodoItems WHERE ID=?";
+        final String SELECT_EMAIL = "SELECT Email FROM UserAccounts WHERE ID=?";
+
+        assertEquals("Version number", 2, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class));
+        assertEquals("User insert", 1, this.jdbcTemplate.update(INSERT_USER, 1, "user", "pwd", "ADMIN, USER", "test@example.com"));
+        assertEquals("Todo item insert", 1, this.jdbcTemplate.update(INSERT_TODO_ITEM, 1, 1, -1, "Title", "Description", 0, 0, "2020-03-26T16:10:00+0200"));
+        assertEquals("Email", "test@example.com", this.jdbcTemplate.queryForObject(SELECT_EMAIL, String.class, 1));
+        assertEquals("Last notification", "2020-03-26T16:10:00+0200", this.jdbcTemplate.queryForObject(SELECT_LAST_NOTIFICATION, String.class, 1));
+    }
+
+    @Test
+    public void checkDatabaseVersion() {
+        final String SELECT_VERSION = "SELECT Version FROM Settings";
+        this.impl.checkDatabaseVersion();
+        assertEquals("Version", 2, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class));
     }
 
 }
