@@ -1,5 +1,9 @@
 package net.metja.todolist;
 
+import net.metja.todolist.configuration.ConfigUtil;
+import net.metja.todolist.notification.NotificationClient;
+import net.metja.todolist.notification.EmailClient;
+import net.metja.todolist.notification.NotificationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +30,14 @@ public class TodoList {
     private SingleConnectionDataSource dataSource;
     private static Logger logger = LoggerFactory.getLogger(TodoList.class);
 
+    @Value("${ENABLE_NOTIFICATIONS:false}")
+    private boolean enableNotifications;
+    private NotificationClient emailClient;
+
+    private NotificationManager notificationManager;
+
+    private ConfigUtil configUtil;
+
     public static void main(String... args) {
         SpringApplication.run(TodoList.class, args);
     }
@@ -51,6 +63,31 @@ public class TodoList {
             }
         }
         return this.dataSource;
+    }
+
+    @Bean
+    public synchronized NotificationClient emailClient() {
+        if(this.enableNotifications && this.emailClient == null) {
+            logger.debug("Creating email client");
+            this.emailClient = new EmailClient();
+        }
+        return this.emailClient;
+    }
+
+    @Bean(initMethod = "init")
+    public synchronized NotificationManager notificationManager() {
+        if(this.notificationManager == null) {
+            this.notificationManager = new NotificationManager();
+        }
+        return this.notificationManager;
+    }
+
+    @Bean(initMethod = "init")
+    public synchronized ConfigUtil configUtil() {
+        if(this.configUtil == null) {
+            this.configUtil = new ConfigUtil();
+        }
+        return this.configUtil;
     }
 
 }
