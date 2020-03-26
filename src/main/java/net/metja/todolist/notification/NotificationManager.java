@@ -61,7 +61,7 @@ public class NotificationManager {
                     logger.debug("Found "+todos.size()+" task items.");
                     for(Todo todo: todos) {
                         logger.debug("Task "+todo.getId()+" - "+todo.getTitle()+" - scheduled: "+todo.isScheduled());
-                        if(todo.isScheduled() && !todo.isDone()) {
+                        if(todo.isScheduled() && !todo.isDone() && user.getEmail() != null) {
                             logger.debug("Task "+todo.getId()+" is scheduled and not done.");
                             if(sendAlert(user, todo, now)) {
                                 logger.debug("Updating todo "+todo.getId()+" with last notification date");

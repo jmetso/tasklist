@@ -6,7 +6,6 @@ import net.metja.todolist.database.bean.UserAccount;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.security.core.userdetails.User;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -302,6 +301,43 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+    }
+
+    @Test
+    public void testTaskWithDueDateTodayAndUserWithNoEmail() {
+        userAccounts = new LinkedList<>();
+        UserAccount user = new UserAccount(1, "user", "pwd", Arrays.asList("user"));
+        userAccounts.add(user);
+
+        List<Todo> todos = new LinkedList<>();
+        Todo todo = new Todo(3, -1, "Nine");
+        todo.setScheduled(true);
+        todo.setDueDate(LocalDate.now());
+        todos.add(todo);
+
+        DatabaseManager databaseManager = mock(DatabaseManager.class);
+        when(databaseManager.getUsers()).thenReturn(userAccounts);
+        when(databaseManager.getUserList("user")).thenReturn(1);
+        when(databaseManager.getTodos(1)).thenReturn(todos);
+        when(databaseManager.updateTodo(1, todo)).thenReturn(true);
+
+        AtomicInteger sentNotifications = new AtomicInteger();
+        this.notificationManager.setEmailClient((subject, text, user1) -> {
+            sentNotifications.getAndIncrement();
+            assertEquals("user", user1.getUsername(), "Username");
+            assertEquals("Task Three is due today!", subject, "Subject");
+            assertEquals("Task Three is due today!", text, "Body");
+        });
+        this.notificationManager.setDatabaseManager(databaseManager);
+        this.notificationManager.init();
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(0, sentNotifications.get(), "Notifications");
     }
 
 }
