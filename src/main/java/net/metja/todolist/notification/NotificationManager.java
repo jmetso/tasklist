@@ -52,21 +52,21 @@ public class NotificationManager {
                 logger.info("Checking notifications ...");
                 OffsetDateTime now = OffsetDateTime.now();
                 List<UserAccount> users = databaseManager.getUsers();
-                logger.info("Found "+users.size()+" users.");
+                logger.debug("Found "+users.size()+" users.");
                 for(UserAccount user: users) {
-                    logger.info("User "+user.getId()+" - "+user.getUsername());
+                    logger.debug("User "+user.getId()+" - "+user.getUsername());
                     int listID = databaseManager.getUserList(user.getUsername());
-                    logger.info("User list id: "+listID);
+                    logger.debug("User list id: "+listID);
                     List<Todo> todos = databaseManager.getTodos(listID);
-                    logger.info("Found "+todos.size()+" task items.");
+                    logger.debug("Found "+todos.size()+" task items.");
                     for(Todo todo: todos) {
-                        logger.info("Task "+todo.getId()+" - "+todo.getTitle()+" - scheduled: "+todo.isScheduled());
+                        logger.debug("Task "+todo.getId()+" - "+todo.getTitle()+" - scheduled: "+todo.isScheduled());
                         if(todo.isScheduled() && !todo.isDone()) {
-                            logger.info("Task "+todo.getId()+" is scheduled and not done.");
+                            logger.debug("Task "+todo.getId()+" is scheduled and not done.");
                             if(sendAlert(user, todo, now)) {
-                                logger.info("Updating todo "+todo.getId()+" with last notification date");
+                                logger.debug("Updating todo "+todo.getId()+" with last notification date");
                                 boolean success = databaseManager.updateTodo(listID, todo);
-                                logger.info("Updated todo: "+success);
+                                logger.debug("Updated todo: "+success);
                             }
                         }
                     }
@@ -79,15 +79,46 @@ public class NotificationManager {
 
     private boolean sendAlert(final UserAccount user, Todo todo, final OffsetDateTime now) {
         OffsetDateTime lastNotificationDate = todo.getLastNotification();
-        logger.info("Last notification date: "+lastNotificationDate);
+        logger.debug("Last notification date: "+lastNotificationDate);
         if(this.isDueToday(now, todo) && (lastNotificationDate == null
                 || !hasAlreadyBeenNotifiedToday(now, lastNotificationDate))) {
-            logger.info("Sending notification");
-            this.emailClient.sendNotification("Task " + todo.getTitle() + " due.", "Task " + todo.getTitle() + "is due today!\n\n" + todo.getDescription(), user);
+            logger.debug("Sending notification for today");
+            if(todo.getDescription() != null) {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due today!", "Task " + todo.getTitle() + " is due today!\n\n" + todo.getDescription(), user);
+            } else {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due today!", "Task " + todo.getTitle() + " is due today!", user);
+            }
             todo.setLastNotification(OffsetDateTime.now());
+            return true;
+        } else if(this.isDueTomorrow(now, todo) && (lastNotificationDate == null
+                || !hasAlreadyBeenNotifiedToday(now, lastNotificationDate))) {
+            logger.debug("Sending notification for tomorrow");
+            if(todo.getDescription() != null) {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due tomorrow!", "Task " + todo.getTitle() + " is due tomorrow!\n\n" + todo.getDescription(), user);
+            } else {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due tomorrow!", "Task " + todo.getTitle() + " is due tomorrow!", user);
+            }
+            return true;
+        } else if(this.isDueWithinSevenDays(now, todo) && (lastNotificationDate == null
+                || !hasAlreadyBeenNotifiedThisWeek(now, lastNotificationDate))) {
+            logger.debug("Sending notification for next 7 days");
+            if(todo.getDescription() != null) {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due in next 7 days", "Task " + todo.getTitle() + " is due in next 7 days!\n\n" + todo.getDescription(), user);
+            } else {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due in next 7 days", "Task " + todo.getTitle() + " is due in next 7 days", user);
+            }
             return true;
         }
         return false;
+    }
+
+    private boolean hasAlreadyBeenNotifiedThisWeek(final OffsetDateTime now, final OffsetDateTime notificationDate) {
+        OffsetDateTime adjusted = now.minusDays(7);
+        boolean result = (notificationDate.getYear() >= adjusted.getYear()
+                && notificationDate.getMonthValue() >= adjusted.getMonthValue()
+                && notificationDate.getDayOfMonth() >= adjusted.getDayOfMonth());
+        logger.debug("Has already been notified this week: "+result);
+        return result;
     }
 
     private boolean hasAlreadyBeenNotifiedToday(final OffsetDateTime now, final OffsetDateTime notificationDate) {
@@ -96,9 +127,54 @@ public class NotificationManager {
                 && notificationDate.getDayOfMonth() == now.getDayOfMonth());
     }
 
+    private boolean isDueWithinSevenDays(final OffsetDateTime now, final Todo todo) {
+        if(!todo.isScheduled()) {
+            logger.debug("Todo is not scheduled!");
+            return false;
+        } else {
+            LocalDate dueDate = todo.getDueDate();
+            ZoneOffset zoneOffset = now.getOffset();
+            if(todo.getDueTimezone() != null) {
+                zoneOffset = todo.getDueTimezone();
+            }
+            logger.debug("Now: "+now);
+            long adjustment = zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS);
+            logger.debug("Adjustment: "+adjustment);
+            OffsetDateTime adjustedNow;
+            if(adjustment > 0) {
+                adjustedNow = now.plusSeconds(adjustment);
+            }  else {
+                adjustedNow = now.minusSeconds(adjustment);
+            }
+            adjustedNow = adjustedNow.plusDays(7);
+            logger.debug("Adjusted: "+adjustedNow);
+            return  (adjustedNow.getYear() >= dueDate.getYear()
+                    && adjustedNow.getMonthValue() >= dueDate.getMonthValue()
+                    && adjustedNow.getDayOfMonth() >= dueDate.getDayOfMonth());
+        }
+    }
+
+    private boolean isDueTomorrow(final OffsetDateTime now, final Todo todo) {
+        if(!todo.isScheduled()) {
+            logger.debug("Todo is not scheduled!");
+            return false;
+        } else {
+            LocalDate dueDate = todo.getDueDate();
+            ZoneOffset zoneOffset = now.getOffset();
+            if(todo.getDueTimezone() != null) {
+                zoneOffset = todo.getDueTimezone();
+            }
+            OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
+            adjustedNow = adjustedNow.plusDays(1);
+            return (adjustedNow.getYear() <= dueDate.getYear()
+                    && adjustedNow.getMonthValue() <= dueDate.getMonthValue()
+                    && adjustedNow.getDayOfMonth() <= dueDate.getDayOfMonth());
+        }
+    }
+
     private boolean isDueToday(final OffsetDateTime now, final Todo todo) {
         if(!todo.isScheduled()) {
-            logger.info("Todo is not scheduled!");
+            logger.debug("Todo is not scheduled!");
             return false;
         } else {
             LocalDate dueDate = todo.getDueDate();
