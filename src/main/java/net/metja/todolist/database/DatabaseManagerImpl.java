@@ -280,7 +280,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
         try {
             int version = this.jdbcTemplate.queryForObject(SELECT, Integer.class);
             if(version >= this.SCHEMA_VERSION_MIN && version <= this.SCHEMA_VERSION_MAX) {
-                logger.info("Supported database schema version: "+version+".");
+                logger.info("Found supported database schema version: "+version+".");
+                if(version != this.SCHEMA_VERSION_MAX) {
+                    if(!this.migrateDatabaseToLatestVersion()) {
+                        logger.error("Unable to migrate database, terminating!");
+                    }
+                }
             } else {
                 logger.error("Unsupported database schema version!");
                 System.exit(1);
