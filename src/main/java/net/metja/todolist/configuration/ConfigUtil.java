@@ -14,11 +14,10 @@ import java.io.File;
  * @author Janne Metso @copy; 2020
  * @since 2020-03-23
  */
-@Component
 public class ConfigUtil {
 
     public static final String CONFIG_FILE_KEY = "CONFIG_FILE";
-    @Value("#{systemProperties['CONFIG_FILE'] ?: 'my default system property value'}")
+    @Value("#{systemProperties['CONFIG_FILE'] ?: 'conf/tasklist.config'}")
     private String file;
 
     private static Logger logger = LoggerFactory.getLogger(ConfigUtil.class);

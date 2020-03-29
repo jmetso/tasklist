@@ -20,7 +20,6 @@ import java.util.TimerTask;
  * @author Janne Metso @copy; 2020
  * @since 2020-03-23
  */
-@Component
 public class NotificationManager {
 
     private NotificationClient emailClient;
