@@ -1,3 +1,11 @@
+0.1.1
+- dependencies
+    - jquery from 3.4.1 to 3.5.0
+    - spring boot from 2.2.5 to 2.2.6
+    - spring security from 5.3.0 to 5.3.1
+    - spring jdbc from 5.2.4 to 5.2.5
+    - spring test from 5.2.4 to 5.2.5
+
 0.1.0
 - adds capability to send email notifications to user
 
