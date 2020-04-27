@@ -1,0 +1,6 @@
+[tasklist]
+localhost
+
+[tasklist:vars]
+install_dir=/opt/tasklist
+service_user=root
