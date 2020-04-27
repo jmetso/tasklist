@@ -1,0 +1,31 @@
+# roles/copy_jar/tasks/main.yml
+- name: Find jar
+  delegate_to: localhost
+  find:
+    paths: "{{ playbook_dir }}/../target"
+    patterns: "TaskList-*.jar"
+  register: target_jar
+
+- name: Fail if no jar
+  fail:
+    msg: "No binary to copy!"
+  when: target_jar.matched < 1
+
+- name: Parse source jar name
+  set_fact:
+    target_jar_name: "{{ target_jar.files[0].path | regex_replace('.*Task', 'Task') }}"
+
+- name: Copy jar to remote
+  debug:
+    msg: "Copy jar! {{ target_jar_name }}"
+
+- name: Copy jar to remote
+  copy:
+    src: "{{ target_jar.files[0].path }}"
+    dest: "{{ install_dir }}/{{ target_jar_name }}"
+
+- name: Create symbolic link to jar
+  file:
+    src: "{{ install_dir }}/{{ target_jar_name }}"
+    dest: "{{ install_dir }}/tasklist.jar"
+    state: link

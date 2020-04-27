@@ -1,0 +1,2 @@
+# roles/copy_jar/defaults/main.yml
+install_dir: /opt/tasklist
