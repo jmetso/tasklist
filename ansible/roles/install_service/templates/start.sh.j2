@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd {{ install_dir }}
+
+java -DconfigFile=config.xml -jar shoppinglist.jar &
+PID=$!
+
+echo $PID > {{ install_dir }}/pidfile
+

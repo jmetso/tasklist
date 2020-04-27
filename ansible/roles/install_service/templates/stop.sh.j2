@@ -1,0 +1,9 @@
+#!/bin/bash
+
+cd {{ install_dir }}
+
+PID=$(cat {{ install_dir }}/pidfile)
+kill $PID
+
+echo "" > {{ install_dir }}/pidfile
+
