@@ -17,6 +17,21 @@
       path: "{{ install_dir }}/bin"
       state: directory
 
+  - name: Create db directory into install directory
+    file:
+      path: "{{ install_dir }}/db"
+      state: directory
+
+  - name: Create conf directory into install directory
+    file:
+      path: "{{ install_dir }}/conf"
+      state: directory
+
+  - name: Create conf directory into install directory
+    file:
+      path: "{{ install_dir }}/log"
+      state: directory
+
   - name: Create service
     include_role:
       name: install_service
