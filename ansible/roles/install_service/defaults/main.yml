@@ -1,3 +1,4 @@
 # roles/install_service/defaults/main.yml
 install_dir: /opt/tasklist
 service_user: root
+cors_hosts: https://localhost,http://localhost
