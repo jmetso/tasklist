@@ -1,9 +1,14 @@
 #!/bin/bash
 
-cd {{ install_dir }}
+INSTALL_DIR={{ install_dir }}
+NAME=tasklist
 
-java -DconfigFile=config.xml -jar shoppinglist.jar &
+cd ${INSTALL_DIR}
+
+java  -DDB_URL=jdbc:sqlite:${INSTALL_DIR}/db/${NAME}.db \
+      -DCORS_HOSTS={{ cors_hosts }} \
+      -DconfigFile=$INSTALL_DIR/conf/config.properties -jar ${NAME}.jar &
+
 PID=$!
 
-echo $PID > {{ install_dir }}/pidfile
-
+echo $PID > ${INSTALL_DIR}/${NAME}.pid
