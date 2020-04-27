@@ -1,0 +1,22 @@
+---
+
+- name: Install Tasklist
+  hosts: tasklist
+  gather_facts: no
+#  connection: local
+  become: true
+
+  tasks:
+  - name: Create install directory
+    file:
+      path: "{{ install_dir }}"
+      state: directory
+
+  - name: Create bin directory into install directory
+    file:
+      path: "{{ install_dir }}/bin"
+      state: directory
+
+  - name: Create service
+    include_role:
+      name: install_service
