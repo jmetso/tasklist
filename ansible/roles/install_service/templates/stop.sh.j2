@@ -1,9 +1,12 @@
 #!/bin/bash
 
-cd {{ install_dir }}
+INSTALL_DIR={{ install_dir }}
+NAME=tasklist
 
-PID=$(cat {{ install_dir }}/pidfile)
+cd ${INSTALL_DIR}
+
+PID=$(cat ${INSTALL_DIR}/${NAME}.pid)
 kill $PID
 
-echo "" > {{ install_dir }}/pidfile
+echo "" > ${INSTALL_DIR}/${NAME}.pid
 
