@@ -1,0 +1,27 @@
+---
+
+- name: Uninstall Tasklist
+  hosts: tasklist
+  gather_facts: no
+  become: true
+
+  tasks:
+  - name: Stop and disable service
+    systemd:
+      name: tasklist
+      state: stoppend
+      enabled: no
+
+  - name: Remove service
+    file:
+      path: /lib/systemd/system/tasklist.service
+      state: absent
+
+  - name: Refresh systemd
+    systemd:
+      daemon_reload: yes
+
+  - name: Delete install directory
+    file:
+      path: "{{ install_dir }}"
+      state: absent
