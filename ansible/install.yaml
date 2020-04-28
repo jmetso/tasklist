@@ -3,7 +3,6 @@
 - name: Install Tasklist
   hosts: tasklist
   gather_facts: no
-#  connection: local
   become: true
 
   tasks:
@@ -32,6 +31,10 @@
       path: "{{ install_dir }}/log"
       state: directory
 
-  - name: Create service
+  - name: Copy jar
+    include_role:
+      name: copy_jar
+
+  - name: Install and start service
     include_role:
       name: install_service
