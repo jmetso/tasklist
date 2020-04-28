@@ -17,7 +17,7 @@ import java.io.File;
 public class ConfigUtil {
 
     public static final String CONFIG_FILE_KEY = "CONFIG_FILE";
-    @Value("#{systemProperties['CONFIG_FILE'] ?: 'conf/tasklist.config'}")
+    @Value("#{systemProperties['CONFIG_FILE'] ?: 'conf/tasklist.properties'}")
     private String file;
 
     private static Logger logger = LoggerFactory.getLogger(ConfigUtil.class);
