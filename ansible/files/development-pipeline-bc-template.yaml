@@ -1,0 +1,154 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: tasklist-development-pipeline-template
+message: Created a Jenkins pipeline deployment config. Generic trigger value is ${GENERIC_TRIGGER_SECRET_VALUE} and Bitbucket trigger value is ${BITBUCKET_TRIGGER_SECRET_VALUE}.
+metadata:
+  annotations:
+    description: Template for creating a deployment config to run a jenkins pipeline from git.
+  creationTimestamp: null
+  name: tasklist-development-pipeline-template
+objects:
+- apiVersion: v1
+  kind: BuildConfig
+  metadata:
+    annotations:
+      openshift.io/generated-by: tasklist-development-pipeline-template
+    creationTimestamp: null
+    labels:
+      app: ${APP_NAME}
+      pipeline: development
+    name: ${APP_NAME}-development-pipeline
+  spec:
+    failedBuildsHistoryLimit: ${FAILED_BUILDS_LIMIT}
+    nodeSelector: null
+    output: {}
+    postCommit: {}
+    resources: {}
+    runPolicy: SerialLatestOnly
+    source:
+      contextDir: ${CONTEXT_DIR}
+      git:
+        ref: ${GIT_BRANCH}
+        uri: ${GIT_URL}
+      type: Git
+    strategy:
+      jenkinsPipelineStrategy:
+        jenkinsfilePath: ${JENKINS_FILENAME}
+        env:
+        - name: GIT_URL
+          value: ${GIT_URL}
+        - name: CLONE_BRANCH
+          value: ${GIT_BRANCH}
+        - name: APP_NAME
+          value: ${APP_NAME}
+        - name: BUILD_NAMESPACE
+          value: ${BUILD_NAMESPACE}
+        - name: DEV_NAMESPACE
+          value: ${DEV_NAMESPACE}
+        - name: BASE_IMAGESTREAM_NAMESPACE
+          value: ${BASE_IMAGESTREAM_NAMESPACE}
+        - name: BASE_IMAGESTREAM
+          value: ${BASE_IMAGESTREAM_NAME}
+        - name: BASE_IMAGE_TAG
+          value: ${BASE_IMAGE_TAG}
+        - name: TARGET_IMAGESTREAM_NAME
+          value: ${TARGET_IMAGESTREAM_NAME}
+        - name: APP_DOMAIN
+          value: ${APP_DOMAIN}
+        - name: BUILD_TIMEOUT
+          value: ${BUILD_TIMEOUT}
+        - name: DEPLOYMENT_TIMEOUT
+          value: ${DEPLOYMENT_TIMEOUT}
+      type: JenkinsPipeline
+    successfulBuildsHistoryLimit: ${SUCCESS_BUILDS_LIMIT}
+    triggers:
+    - generic:
+        secret: ${GENERIC_TRIGGER_SECRET_VALUE}
+      type: Generic
+    - type: "Bitbucket"
+      bitbucket:
+        secret: ${BITBUCKET_TRIGGER_SECRET_VALUE}
+    - type: "GitHub"
+      github:
+        secretReference:
+          name: github-trigger
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: github-trigger
+  data:
+    WebHookSecretKey: ${GITHUB_TRIGGER_SECRET_VALUE}
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: bitbucket-trigger
+  data:
+    WebHookSecretKey: ${BITBUCKET_TRIGGER_SECRET_VALUE}
+- kind: Secret
+  apiVersion: v1
+  metadata:
+    name: generic-trigger
+  data:
+    WebHookSecretKey: ${GENERIC_TRIGGER_SECRET_VALUE}
+parameters:
+- name: GIT_URL
+  required: true
+  description: URL to git repository.
+- name: CONTEXT_DIR
+  required: true
+  description: Name of folder inside git repository where the jenkins file is.
+- name: GIT_BRANCH
+  value: development
+- name: JENKINS_FILENAME
+  required: true
+  description: Name of jenkinsfile.
+- name: FAILED_BUILDS_LIMIT
+  value: "5"
+  description: Number of failed builds to keep.
+- name: SUCCESS_BUILDS_LIMIT
+  value: "5"
+  description: Number of successful builds to keep.
+- name: RUN_POLICY
+  value: SerialLatestOnly
+  description: Run policy for the build config.
+- name: APP_NAME
+  required: true
+  description: Value for app-label
+- name: GENERIC_TRIGGER_SECRET_VALUE
+  generate: expression
+  from: "[A-Za-z0-9]{20}"
+  required: true
+- name: BITBUCKET_TRIGGER_SECRET_VALUE
+  generate: expression
+  from: "[A-Za-z0-9]{20}"
+  required: true
+- name: BUILD_NAMESPACE
+  description: build and CI/CD namespace
+  required: true
+- name: DEV_NAMESPACE
+  description: development namespace
+  required: true
+- name: BASE_IMAGESTREAM_NAMESPACE
+  description: namespace for base imagestream for build
+  required: true
+- name: BASE_IMAGESTREAM_NAME
+  description: base imagestream name for build
+  required: true
+- name: BASE_IMAGE_TAG
+  description: base image tag for build
+  required: true
+- name: TARGET_IMAGESTREAM_NAME
+  description: Target imagestream name
+  required: true
+- name: APP_DOMAIN
+  description: Openshift application domain
+  required: true
+- name: BUILD_TIMEOUT
+  description:
+  value: '10'
+  required: true
+- name: DEPLOYMENT_TIMEOUT
+  description:
+  value: '10'
+  required: true
