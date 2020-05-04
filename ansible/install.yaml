@@ -6,6 +6,7 @@
   become: true
   vars:
     service_group: "{{ service_user }}"
+    smtp_password: "{{ vault_smtp_password }}"
 
   tasks:
   - name: Create install directory
