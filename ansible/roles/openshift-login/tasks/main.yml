@@ -1,0 +1,25 @@
+# roles/openshift-login/tasks/main.yml
+---
+- name: Check if logged in
+  command: "oc whoami"
+  register: logged_check_result
+  ignore_errors: true
+  no_log: true
+
+- name: Prompt openshift username
+  pause:
+    prompt: What is your openshift username?
+  register: openshift_username
+  when: logged_check_result.rc == 1
+
+- name: Prompt openshift password
+  pause:
+    prompt: What is your openshift password?
+    echo: no
+  register: openshift_password
+  when: logged_check_result.rc == 1
+
+- name: Openshift login
+  command: "oc login {{ master_url }} -u {{ openshift_username.user_input }} -p {{ openshift_password.user_input }} --insecure-skip-tls-verify"
+  no_log: true
+  when: logged_check_result.rc == 1
