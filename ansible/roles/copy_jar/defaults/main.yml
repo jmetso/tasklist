@@ -1,2 +1,4 @@
 # roles/copy_jar/defaults/main.yml
 install_dir: /opt/tasklist
+service_user: root
+service_group: root
