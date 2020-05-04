@@ -1,0 +1,10 @@
+# roles/create-namespace/tasks/main.yml
+---
+- name: Check namespace exists
+  shell: oc projects
+  register: namespace_check_result
+  ignore_errors: true
+
+- name: Create namespace
+  command: oc new-project {{ namespace_name }}
+  when: 'namespace_name not in namespace_check_result.stdout'
