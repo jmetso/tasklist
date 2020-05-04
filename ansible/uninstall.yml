@@ -1,6 +1,6 @@
 ---
 
-- name: Uninstall Tasklist
+- name: Uninstall Task List
   hosts: tasklist
   gather_facts: no
   become: true
@@ -9,7 +9,7 @@
   - name: Stop and disable service
     systemd:
       name: tasklist
-      state: stoppend
+      state: stopped
       enabled: no
 
   - name: Remove service
