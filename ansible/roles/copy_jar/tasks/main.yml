@@ -5,6 +5,7 @@
     paths: "{{ playbook_dir }}/../target"
     patterns: "TaskList-*.jar"
   register: target_jar
+  become: false
 
 - name: Fail if no jar
   fail:
@@ -23,9 +24,14 @@
   copy:
     src: "{{ target_jar.files[0].path }}"
     dest: "{{ install_dir }}/{{ target_jar_name }}"
+    mode: 0660
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
 
 - name: Create symbolic link to jar
   file:
     src: "{{ install_dir }}/{{ target_jar_name }}"
     dest: "{{ install_dir }}/tasklist.jar"
     state: link
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
