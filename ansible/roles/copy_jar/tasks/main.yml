@@ -35,3 +35,4 @@
     state: link
     owner: "{{ service_user }}"
     group: "{{ service_group }}"
+  become: false
