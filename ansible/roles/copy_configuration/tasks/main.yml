@@ -1,0 +1,8 @@
+# roles/copy_configuration/tasks/main.yml
+- name: Create configuration file
+  template:
+    src: templates/tasklist.properties.j2
+    dest: "{{ install_dir }}/conf/tasklist.properties"
+    mode: 0660
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"

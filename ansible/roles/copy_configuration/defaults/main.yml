@@ -1,0 +1,7 @@
+# roles/copy_configuration/defaults/main.yml
+install_dir: /opt/tasklist
+smtp_host: ''
+smtp_port: ''
+smtp_from: ''
+smtp_username: ''
+smtp_password: ''
