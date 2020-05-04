@@ -1,35 +1,56 @@
 ---
 
-- name: Install Tasklist
+- name: Install Task List
   hosts: tasklist
   gather_facts: no
   become: true
+  vars:
+    service_group: "{{ service_user }}"
 
   tasks:
   - name: Create install directory
     file:
       path: "{{ install_dir }}"
       state: directory
+      owner: "{{ service_user }}"
+      group: "{{ service_group }}"
+      mode: 0770
 
   - name: Create bin directory into install directory
     file:
       path: "{{ install_dir }}/bin"
       state: directory
+      owner: "{{ service_user }}"
+      group: "{{ service_group }}"
+      mode: 0770
 
   - name: Create db directory into install directory
     file:
       path: "{{ install_dir }}/db"
       state: directory
+      owner: "{{ service_user }}"
+      group: "{{ service_group }}"
+      mode: 0770
 
   - name: Create conf directory into install directory
     file:
       path: "{{ install_dir }}/conf"
       state: directory
+      owner: "{{ service_user }}"
+      group: "{{ service_group }}"
+      mode: 0770
 
   - name: Create conf directory into install directory
     file:
       path: "{{ install_dir }}/log"
       state: directory
+      owner: "{{ service_user }}"
+      group: "{{ service_group }}"
+      mode: 0770
+
+  - name: Copy configuration file
+    include_role:
+      name: copy_configuration
 
   - name: Copy jar
     include_role:
