@@ -5,9 +5,9 @@ NAME=tasklist
 
 cd ${INSTALL_DIR}
 
-java  -DDB_URL=jdbc:sqlite:${INSTALL_DIR}/db/${NAME}.db \
-      -DCORS_HOSTS={{ cors_hosts }} \
-      -DconfigFile=$INSTALL_DIR/conf/config.properties -jar ${NAME}.jar &
+/usr/bin/java  -DDB_URL=jdbc:sqlite:${INSTALL_DIR}/db/${NAME}.db \
+               -DCORS_HOSTS={{ cors_hosts }} \
+               -DconfigFile=$INSTALL_DIR/conf/config.properties -jar ${NAME}.jar &
 
 PID=$!
 
