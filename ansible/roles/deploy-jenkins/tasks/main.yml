@@ -1,0 +1,44 @@
+# roles/deploy-jenkins/tasks/main.yml
+---
+- name: Switch to Jenkins namespace
+  command: "oc project {{ jenkins_namespace }}"
+
+- name: Check if Jenkins exists
+  shell: "oc get dc -n {{ jenkins_namespace }}"
+  register: jenkins_check_result
+
+- name: Create PVC for Jenkins Maven worker
+  command: oc apply --overwrite -f {{ role_dir }}/files/pvc-maven.json -n {{ jenkins_namespace }}
+  ignore_errors: true
+  when: '"jenkins" not in jenkins_check_result.stdout'
+
+- name: Create Maven pod template for Jenkins
+  command: oc apply --overwrite -f {{ role_dir }}/files/configmap-mvn-pod-template.yaml -n {{ jenkins_namespace }}
+  when: '"jenkins" not in jenkins_check_result.stdout'
+
+- name: Deploy Jenkins
+  command: "oc new-app --template jenkins-persistent -p VOLUME_CAPACITY={{ volume_capacity }} -p MEMORY_LIMIT={{ memory_limit }} -n {{ jenkins_namespace }}"
+  ignore_errors: true
+  when: '"jenkins" not in jenkins_check_result.stdout'
+
+- name: Verify Jenkins pod is Running
+  action: shell oc get pods -n {{ jenkins_namespace }} | grep jenkins | grep -v deploy | awk '{ print $2" "$3 }'
+  register: result
+  until: "'1/1 Running' in result.stdout"
+  retries: "{{ pod_poll_retries }}"
+  delay: "{{ pod_poll_delay }}"
+  changed_when: False
+  when: '"jenkins" not in jenkins_check_result.stdout'
+
+- name: Remove automatic triggers from Jenkins deployment config
+  command: oc patch dc/jenkins --patch '{"spec":{"triggers":[]}}'
+  when: '"jenkins" not in jenkins_check_result.stdout'
+
+- name: Verify Jenkins pod is running
+  action: shell oc get pods -n {{ jenkins_namespace }} | grep jenkins | grep -v deploy | awk '{ print $2" "$3 }'
+  register: result
+  until: "'1/1 Running' in result.stdout"
+  retries: "{{ pod_poll_retries }}"
+  delay: "{{ pod_poll_delay }}"
+  changed_when: False
+  when: '"jenkins" not in jenkins_check_result.stdout'

@@ -1,0 +1,6 @@
+# roles/deploy-jenkins/defaults/main.yml
+jenkins_namespace: jenkins
+pod_poll_retries: 60
+pod_poll_delay: 15
+volume_capacity: 5Gi
+memory_limit: 2Gi
