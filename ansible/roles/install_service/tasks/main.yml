@@ -3,19 +3,25 @@
   template:
     src: templates/start.sh.j2
     dest: "{{ install_dir }}/bin/start.sh"
-    mode: u+rwx
+    mode: 0700
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
 
 - name: Copy stop script
   template:
     src: templates/stop.sh.j2
     dest: "{{ install_dir }}/bin/stop.sh"
-    mode: u+rwx
+    mode: 0700
+    owner: "{{ service_user }}"
+    group: "{{ service_group }}"
 
 - name: Copy service file
   template:
     src: templates/tasklist.service.j2
     dest: /lib/systemd/system/tasklist.service
     mode: 0644
+    owner: root
+    group: root
 
 - name: Enable and start service
   systemd:
