@@ -5,8 +5,8 @@ After=multi-user.target
 [Service]
 Type=simple
 User={{ service_user }}
-ExecStart=/bin/sh {{ install_dir }}/bin/start.sh
-ExecStop=/bin/sh {{ install_dir }}/bin/stop.sh
+ExecStart=/bin/bash {{ install_dir }}/bin/start.sh
+ExecStop=/bin/bash {{ install_dir }}/bin/stop.sh
 Restart=on-abort
  
 [Install]
