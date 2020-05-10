@@ -6,8 +6,8 @@ import net.metja.todolist.database.bean.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
@@ -76,7 +76,7 @@ public class NotificationManager {
         logger.info("Configuring email notifications done");
     }
 
-    private boolean sendAlert(final UserAccount user, Todo todo, final OffsetDateTime now) {
+    private boolean sendAlert(final UserAccount user, @NotNull Todo todo, final OffsetDateTime now) {
         OffsetDateTime lastNotificationDate = todo.getLastNotification();
         logger.debug("Last notification date: "+lastNotificationDate);
         if(this.isDueToday(now, todo) && (lastNotificationDate == null
@@ -165,9 +165,9 @@ public class NotificationManager {
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
             adjustedNow = adjustedNow.plusDays(1);
-            return (adjustedNow.getYear() <= dueDate.getYear()
-                    && adjustedNow.getMonthValue() <= dueDate.getMonthValue()
-                    && adjustedNow.getDayOfMonth() <= dueDate.getDayOfMonth());
+            return (adjustedNow.getYear() >= dueDate.getYear()
+                    && adjustedNow.getMonthValue() >= dueDate.getMonthValue()
+                    && adjustedNow.getDayOfMonth() >= dueDate.getDayOfMonth());
         }
     }
 
