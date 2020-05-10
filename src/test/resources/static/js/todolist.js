@@ -636,7 +636,7 @@ function checkOverdueItems() {
                         '</li>'
 
                 publishAlert(alert, 'alertw'+data.todoItems[i].id, 0)
-            } else if(tomorrowDate = dueDate){
+            } else if(tomorrowDate == dueDate){
                 console.log("Due tomorrow!");
 
                 var alert =  '<li class="pf-c-alert-group__item" id=alerti'+data.todoItems[i].id+'>'+
