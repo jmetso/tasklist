@@ -1,0 +1,8 @@
+# roles/create-image-pull-secret/defaults/main.yml
+namespace: build
+username: ""
+password: ""
+email: ""
+auth: "{{ username }}:{{ password }}"
+docker_config: "{\"auths\":{\"registry.redhat.io\":{\"username\":\"{{ username }}\",\"password\":\"{{ password }}\",\"auth\":\"{{ auth | b64encode }}\",\"email\":\"{{ email }}\"}}}"
+docker_config_value: "{{ docker_config | to_json | b64encode }}"

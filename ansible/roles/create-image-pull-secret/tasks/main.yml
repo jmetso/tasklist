@@ -1,0 +1,15 @@
+# roles/create-image-pull-secret/tasks/main.yml
+---
+
+- name: Create image pull secret file
+  template:
+    src: secret-image-pull.yaml.j2
+    dest: /tmp/secret-image-pull.yaml
+
+- name: Create image pull secret
+  shell: "oc apply -f /tmp/secret-image-pull.yaml --overwrite -n {{ namespace }}"
+
+- name: Remove image pull secret file
+  file:
+    path: /tmp/secret-image-pull.yaml
+    state: absent
