@@ -4,12 +4,8 @@
   include_role:
     name: create-namespace
   vars:
-    namespace: "{{ namespace }}"
+    namespace: "{{ namespace_name }}"
 
 - name: Give Jenkins edit access to namespace
-  include_role:
-    name: set-user-role-for-namespace
-  vars:
-    role: edit
-    user: "system:serviceaccount:{{ jenkins_namespace }}:jenkins"
-    target_namespace: "{{ namespace }}"
+  command: oc policy add-role-to-user edit system:serviceaccount:{{ jenkins_namespace }}:jenkins -n {{ namespace_name }}
+  ignore_errors: true
