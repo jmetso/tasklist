@@ -1,0 +1,18 @@
+kind: ImageStream
+apiVersion: image.openshift.io/v1
+metadata:
+  name: openjdk-11-rhel8
+  labels:
+    app: tasklist
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - name: openjdk-11-rhel8
+      from:
+        kind: DockerImage
+        name: 'registry.redhat.io/openjdk/openjdk-11-rhel8:1.3'
+      generation: 1
+      importPolicy: {}
+      referencePolicy:
+        type: Source
