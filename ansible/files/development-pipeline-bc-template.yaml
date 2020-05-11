@@ -38,20 +38,18 @@ objects:
         env:
         - name: GIT_URL
           value: ${GIT_URL}
+        - name;: GIT_CREDENTIALS_ID
+          value: ${GIT_CREDENTIALS_ID}
         - name: CLONE_BRANCH
           value: ${GIT_BRANCH}
+        - name: PIPELINE_BRANCH
+          value: ${PIPELINE_GIT_BRANCH}
         - name: APP_NAME
           value: ${APP_NAME}
         - name: BUILD_NAMESPACE
           value: ${BUILD_NAMESPACE}
         - name: DEV_NAMESPACE
           value: ${DEV_NAMESPACE}
-        - name: BASE_IMAGESTREAM_NAMESPACE
-          value: ${BASE_IMAGESTREAM_NAMESPACE}
-        - name: BASE_IMAGESTREAM
-          value: ${BASE_IMAGESTREAM_NAME}
-        - name: BASE_IMAGE_TAG
-          value: ${BASE_IMAGE_TAG}
         - name: TARGET_IMAGESTREAM_NAME
           value: ${TARGET_IMAGESTREAM_NAME}
         - name: APP_DOMAIN
@@ -64,11 +62,13 @@ objects:
     successfulBuildsHistoryLimit: ${SUCCESS_BUILDS_LIMIT}
     triggers:
     - generic:
-        secret: ${GENERIC_TRIGGER_SECRET_VALUE}
+        secretReference:
+          name: generic-trigger
       type: Generic
     - type: "Bitbucket"
       bitbucket:
-        secret: ${BITBUCKET_TRIGGER_SECRET_VALUE}
+        secretReference:
+          name: bitbucket-trigger
     - type: "GitHub"
       github:
         secretReference:
@@ -95,11 +95,18 @@ parameters:
 - name: GIT_URL
   required: true
   description: URL to git repository.
+- name: GIT_CREDENTIALS_ID
+  required: false
+  description: Credentials id for git clone
+  value: ""
 - name: CONTEXT_DIR
   required: true
   description: Name of folder inside git repository where the jenkins file is.
 - name: GIT_BRANCH
+  description: Git branch to clone code from
   value: development
+- name: PIPELINE_GIT_BRANCH
+  value: master
 - name: JENKINS_FILENAME
   required: true
   description: Name of jenkinsfile.
@@ -128,15 +135,6 @@ parameters:
   required: true
 - name: DEV_NAMESPACE
   description: development namespace
-  required: true
-- name: BASE_IMAGESTREAM_NAMESPACE
-  description: namespace for base imagestream for build
-  required: true
-- name: BASE_IMAGESTREAM_NAME
-  description: base imagestream name for build
-  required: true
-- name: BASE_IMAGE_TAG
-  description: base image tag for build
   required: true
 - name: TARGET_IMAGESTREAM_NAME
   description: Target imagestream name
