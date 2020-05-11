@@ -1,0 +1,33 @@
+# roles/create-source-clone-secret/tasks/main.yml
+---
+- name: Create ssh source clone secret yaml file
+  template:
+    src: secret-ssh-git-clone.yaml.j2
+    dest: /tmp/secret-ssh-git-clone.yaml
+  when: ssh_private_key_value is defined and ( ssh_private_key_value | length > 0 )
+
+- name: Create ssh source clone secret
+  shell: "oc apply -f /tmp/secret-ssh-git-clone.yaml -n {{ namespace }} --overwrite"
+  when: ssh_private_key_value is defined and ( ssh_private_key_value | length > 0 )
+
+- name: Remove ssh clone secret file
+  file:
+    path: /tmp/secret-git-clone.yaml
+    state: absent
+  when: ssh_private_key_value is defined and ( ssh_private_key_value | length > 0 )
+
+- name: Create http clone secret yaml file
+  template:
+    src: secret-http-git-clone.yaml.j2
+    dest: /tmp/secret-http-git-clone.yaml
+  when: source_clone_password is defined and ( source_clone_password | length > 0 )
+
+- name: Create http source clone secret
+  shell: "oc apply -f /tmp/secret-http-git-clone.yaml -n {{ namespace }} --overwrite"
+  when: source_clone_password is defined and ( source_clone_password | length > 0 )
+
+- name: Remove http clone secret file
+  file:
+    path: /tmp/secret-http-git-clone.yaml
+    state: absent
+  when: source_clone_password is defined and ( source_clone_password | length > 0 )
