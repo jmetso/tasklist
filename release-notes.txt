@@ -1,3 +1,6 @@
+0.2.0
+- adds ansible playbooks for installation and uninstallation
+
 0.1.1
 - dependencies
     - jquery from 3.4.1 to 3.5.0
