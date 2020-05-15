@@ -7,3 +7,4 @@ password: ''
 ssh_key_value: "{{ ssh_key | b64encode }}"
 username_value: "{{ username | b64encode }}"
 password_value: "{{ password | b64encode }}"
+application_label: tasklist
