@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Template
 labels:
   template: tasklist-development-pipeline-template
-message: Created a Jenkins pipeline deployment config. Generic trigger value is ${GENERIC_TRIGGER_SECRET_VALUE} and Bitbucket trigger value is ${BITBUCKET_TRIGGER_SECRET_VALUE}.
+message: Created a Jenkins pipeline deployment config.
 metadata:
   annotations:
     description: Template for creating a deployment config to run a jenkins pipeline from git.
@@ -20,7 +20,7 @@ objects:
       pipeline: development
     name: ${APP_NAME}-development-pipeline
   spec:
-    failedBuildsHistoryLimit: ${FAILED_BUILDS_LIMIT}
+    failedBuildsHistoryLimit: ${{FAILED_BUILDS_LIMIT}}
     nodeSelector: null
     output: {}
     postCommit: {}
@@ -38,7 +38,7 @@ objects:
         env:
         - name: GIT_URL
           value: ${GIT_URL}
-        - name;: GIT_CREDENTIALS_ID
+        - name: GIT_CREDENTIALS_ID
           value: ${GIT_CREDENTIALS_ID}
         - name: CLONE_BRANCH
           value: ${GIT_BRANCH}
@@ -59,38 +59,16 @@ objects:
         - name: DEPLOYMENT_TIMEOUT
           value: ${DEPLOYMENT_TIMEOUT}
       type: JenkinsPipeline
-    successfulBuildsHistoryLimit: ${SUCCESS_BUILDS_LIMIT}
+    successfulBuildsHistoryLimit: ${{SUCCESS_BUILDS_LIMIT}}
     triggers:
-    - generic:
+    - type: Generic
+      generic:
         secretReference:
-          name: generic-trigger
-      type: Generic
-    - type: "Bitbucket"
-      bitbucket:
-        secretReference:
-          name: bitbucket-trigger
-    - type: "GitHub"
+          name: ${GENERIC_TRIGGER_SECRET_NAME}
+    - type: GitHub
       github:
         secretReference:
-          name: github-trigger
-- kind: Secret
-  apiVersion: v1
-  metadata:
-    name: github-trigger
-  data:
-    WebHookSecretKey: ${GITHUB_TRIGGER_SECRET_VALUE}
-- kind: Secret
-  apiVersion: v1
-  metadata:
-    name: bitbucket-trigger
-  data:
-    WebHookSecretKey: ${BITBUCKET_TRIGGER_SECRET_VALUE}
-- kind: Secret
-  apiVersion: v1
-  metadata:
-    name: generic-trigger
-  data:
-    WebHookSecretKey: ${GENERIC_TRIGGER_SECRET_VALUE}
+          name: ${GITHUB_TRIGGER_SECRET_NAME}
 parameters:
 - name: GIT_URL
   required: true
@@ -111,10 +89,10 @@ parameters:
   required: true
   description: Name of jenkinsfile.
 - name: FAILED_BUILDS_LIMIT
-  value: "5"
+  value: '5'
   description: Number of failed builds to keep.
 - name: SUCCESS_BUILDS_LIMIT
-  value: "5"
+  value: '5'
   description: Number of successful builds to keep.
 - name: RUN_POLICY
   value: SerialLatestOnly
@@ -122,14 +100,6 @@ parameters:
 - name: APP_NAME
   required: true
   description: Value for app-label
-- name: GENERIC_TRIGGER_SECRET_VALUE
-  generate: expression
-  from: "[A-Za-z0-9]{20}"
-  required: true
-- name: BITBUCKET_TRIGGER_SECRET_VALUE
-  generate: expression
-  from: "[A-Za-z0-9]{20}"
-  required: true
 - name: BUILD_NAMESPACE
   description: build and CI/CD namespace
   required: true
@@ -150,3 +120,11 @@ parameters:
   description:
   value: '10'
   required: true
+- name: GENERIC_TRIGGER_SECRET_NAME
+  description: Name of generic trigger secret
+  value: dev-generic-trigger-secret
+  required: false
+- name: GITHUB_TRIGGER_SECRET_NAME
+  description: Name of Github trigger secret
+  value: dev-github-trigger-secret
+  required: false
