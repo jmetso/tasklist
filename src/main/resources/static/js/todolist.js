@@ -100,7 +100,7 @@ var app = new Vue({
             }
         },
         logout: function(event) {
-            $.get('./api/v1/logout', function(result) {
+            $.post('./api/v1/logout', function(result) {
                 data.user = ""
                 location.reload()
             }).fail(function(jqXHR, textStatus, errorThrown) {
