@@ -115,23 +115,23 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject(DEV_NAMESPACE) {
                             openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
-
+                            echo 1
                             createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
-
+                            echo 2
                             def devDc = openshift.selector('dc', APP_NAME)
                             openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
-
+                            echo 3
                             // patch image
                             dcmap = devDc.object()
                             dcmap.spec.template.spec.containers[0].image = "image-registry.openshift-image-registry.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
                             openshift.apply(dcmap)
-
+                            echo 4
                             timeout(DEPLOYMENT_TIMEOUT.toInteger()) {
                                 def rm = devDc.rollout()
                                 rm.latest()
                                 rm.status()
                             } // timeout
-
+                            echo 5
                             def devSvc = openshift.selector('svc', APP_NAME)
                             openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/svc.yaml")
 
