@@ -78,12 +78,7 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject(BUILD_NAMESPACE) {
 
-                            def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}")
-                            if(!is.exists()) {
-                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
-                            } else {
-                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
-                            }
+                            openshift.apply('-f', , "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
 
                             def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
                             if(!bc.exists()) {
@@ -101,7 +96,7 @@ pipeline {
                                 }
                             } // timeout
 
-                            openshift.tag("${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:latest", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
+                            openshift.tag("${BUILD_NAMESPACE}/dev-tasklist-s2i-build:latest", "${BUILD_NAMESPACE}/dev-tasklist-s2i-build:${TARGET_IMAGE_TAG}")
                         } // withProject
                     } // withCluster
                 } // script
@@ -113,7 +108,7 @@ pipeline {
                 script {
                     openshift.withCluster() {
                         openshift.withProject(DEV_NAMESPACE) {
-                            openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}", "${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev")
+                            openshift.tag("${BUILD_NAMESPACE}/dev-tasklist-s2i-build:${TARGET_IMAGE_TAG}", "${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev")
                         }
                     } // withCluster
                 } // script
