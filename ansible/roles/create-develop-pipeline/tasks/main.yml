@@ -1,0 +1,36 @@
+# roles/create-develop-pipeline/tasks/main.yml
+---
+- name: Setup generic webhook trigger secret with existing value for develop pipeline
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-generic-trigger-secret -p APP_NAME={{ application_name }} -p SECRET_VALUE={{ vault_generic_trigger_value }} | oc apply -f - -n {{ build_namespace }} "
+  when: '"dev-generic-trigger-secret" not in existing_build_project_secrets.stdout and vault_generic_trigger_value is defined'
+
+- name: Setup generic webhook trigger secret with random value for develop pipeline
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-generic-trigger-secret -p APP_NAME={{ application_name }} | oc create -f - -n {{ build_namespace }} "
+  when: '"dev-generic-trigger-secret" not in existing_build_project_secrets.stdout and vault_generic_trigger_value is not defined'
+
+- name: Setup Github webhook trigger secret with existing value for develop pipeline
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-github-trigger-secret -p APP_NAME={{ application_name }} -p SECRET_VALUE={{ vault_github_trigger_value }} | oc apply -f - -n {{ build_namespace }} "
+  when: '"dev-github-trigger-secret" not in existing_build_project_secrets.stdout and vault_github_trigger_value is defined'
+
+- name: Setup Github webhook trigger secret with random value for develop pipeline
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-github-trigger-secret -p APP_NAME={{ application_name }} | oc apply -f - -n {{ build_ns }} "
+  when: '"dev-github-trigger-secret" not in existing_build_project_secrets.stdout and vault_github_trigger_value is not defined'
+
+- name: Setup development pipeline
+  shell: "oc process --local -f {{ playbook_dir }}/files/development-pipeline-bc-template.yaml -p APP_NAME={{ application_name }} -p GIT_URL={{ git_url }} -p GIT_CREDENTIALS_ID={{ dev_ns }}-git-clone-secret -p GIT_BRANCH={{ development_branch }} -p PIPELINE_GIT_BRANCH={{ development_branch }} -p CONTEXT_DIR={{ context_dir }} -p JENKINS_FILENAME={{ development_pipeline_file }} -p BUILD_TIMEOUT={{ build_timeout }} -p DEPLOYMENT_TIMEOUT={{ deployment_timeout }} -p BUILD_NAMESPACE={{ build_ns }} -p DEV_NAMESPACE={{ dev_ns }} -p APP_DOMAIN={{ app_domain }} -p TARGET_IMAGESTREAM_NAME={{ target_is_name }} | oc apply -f - -n {{ build_ns }}"
+
+- name: Get github trigger secret value
+  shell: "oc get secret dev-github-trigger-secret -o yaml -n tasklist-build | grep WebHookSecretKey | awk '{ print $2 }' | base64 -d"
+  register: develop_github_trigger_secret_value
+
+- name: Get github trigger secret url
+  shell: "oc describe bc tasklist-development-pipeline -n {{ build_ns }} | grep -A 1 'Webhook GitHub' | awk '{ if(NR==2) print $2 }' | sed 's/<secret>/{{ develop_github_trigger_secret_value.stdout }}/'"
+  register: develop_github_trigger_url
+
+- name: Get generic trigger secret value
+  shell: "oc get secret dev-generic-trigger-secret -o yaml -n tasklist-build | grep WebHookSecretKey | awk '{ print $2 }' | base64 -d"
+  register: develop_generic_trigger_secret_value
+
+- name: Get generic trigger secret url
+  shell: "oc describe bc tasklist-development-pipeline -n {{ build_ns }} | grep -A 1 'Webhook Generic' | awk '{ if(NR==2) print $2 }' | sed 's/{{ develop_generic_trigger_secret_value.stdout }}/blahblah/'"
+  register: develop_generic_trigger_url
