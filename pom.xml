@@ -15,10 +15,10 @@
     </parent>
 
     <scm>
-        <connection>scm:svn:http://127.0.0.1/dummy</connection>
-        <developerConnection>scm:svn:https://127.0.0.1/dummy</developerConnection>
-        <tag>NONE</tag>
-        <url>http://127.0.0.1/dummy</url>
+        <connection>scm:svn:https://github.com/jmetso/tasklist.git</connection>
+        <developerConnection>scm:svn:https://github.com/jmetso/tasklist.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/jmetso/tasklist</url>
     </scm>
 
     <dependencies>
