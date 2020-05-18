@@ -32,18 +32,18 @@ pipeline {
             steps {
                 dir('src') {
                     echo "Clone sources: ${CLONE_BRANCH} - ${GIT_URL}"
-                    if("${GIT_CREDENTIALS_ID}" != "") {
-                        git branch: "${CLONE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
-                    } else {
+                    if("${GIT_CREDENTIALS_ID}" == "") {
                         git branch: "${CLONE_BRANCH}", url: "${GIT_URL}"
+                    } else {
+                        git branch: "${CLONE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
                     }
                 }
                 dir('cicd') {
                     echo "Clone pipeline: ${PIPELINE_BRANCH} - ${GIT_URL}"
-                    if("${GIT_CREDENTIALS_ID}" != "") {
-                        git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
-                    } else {
+                    if("${GIT_CREDENTIALS_ID}" == "") {
                         git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}"
+                    } else {
+                        git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
                     }
                 }
             } // steps
@@ -75,16 +75,16 @@ pipeline {
 
                         def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}");
                         if(!is.exists()) {
-                            openshift.create('-f', 'cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml')
+                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
                         } else {
-                            openshift.replace('-f', 'cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml')
+                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
                         }
 
                         def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
                         if(!bc.exists()) {
-                            openshift.create('-f', 'cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml')
+                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
                         } else {
-                            openshift.replace('-f', 'cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml')
+                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
                         } // if
 
                         bc.startBuild("--from-dir=src/target")
@@ -123,10 +123,10 @@ pipeline {
                         def devDc = openshift.selector('dc', APP_NAME)
                         if(devDc.exists()) {
                             // apply from file
-                            openshift.replace('-f', 'cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml')
+                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
                         } else {
                             // create from file
-                            openshift.create('-f', 'cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml')
+                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
                         }
                         // patch image
                         dcmap = devDc.object()
@@ -141,9 +141,9 @@ pipeline {
 
                         def devSvc = openshift.selector('svc', APP_NAME)
                         if(devSvc.exists()) {
-                            openshift.replace('-f', 'cicd/${OBJECTS_FOLDER}/dev-svc.yaml')
+                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
                         } else {
-                            openshift.create('-f', 'cicd/${OBJECTS_FOLDER}/dev-svc.yaml')
+                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
                         }
 
                         createSecureRoute(DEV_NAMESPACE, APP_NAME, '/csv', APP_DOMAIN)
@@ -198,15 +198,7 @@ def testEndpointResponse(url, text, wait=10, pollInterval=30) {
  */
 def createPvc(namespace, name, appName, size) {
     openshift.withProject(namespace) {
-        def pvc = openshift.selector('pvc', name)
-        if(!pvc.exists()) {
-            def pvcObj = openshift.process(readFile(file:'src/openshift/templates/pvc-template.yaml'),
-                    '-p', "NAME=${name}",
-                    '-p', "APP_NAME=${appName}",
-                    '-p', "REVISION=development",
-                    '-p', "SIZE=${size}")
-            openshift.create(pvcObj)
-        }
+        openshift.apply("cicd/${OBJECTS_FOLDER}/pvc.yaml")
     } // withProject
 }
 
