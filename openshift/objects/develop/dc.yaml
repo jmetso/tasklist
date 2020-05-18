@@ -39,7 +39,7 @@ spec:
             - name: OPENSHIFT_ENV_VAR
               value: DEV
           image: >-
-            docker-registry.default.svc:5000/tasklist-dev/dev-tasklist-s2i-build:latest
+            image-registry.openshift-image-registry.svc:5000/tasklist-dev/dev-tasklist-s2i-build:latest
           imagePullPolicy: Always
 #          livenessProbe:
 #            failureThreshold: 3
