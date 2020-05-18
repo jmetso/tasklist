@@ -14,7 +14,6 @@
 
 - name: Create Maven pod template for Jenkins
   command: oc apply --overwrite -f {{ role_dir }}/files/configmap-mvn-pod-template.yaml -n {{ jenkins_namespace }}
-  when: '"jenkins" not in jenkins_check_result.stdout'
 
 - name: Deploy Jenkins
   command: "oc new-app --template jenkins-persistent -p VOLUME_CAPACITY={{ volume_capacity }} -p MEMORY_LIMIT={{ memory_limit }} -n {{ jenkins_namespace }}"
