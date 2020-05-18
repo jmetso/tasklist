@@ -78,7 +78,7 @@ pipeline {
                     openshift.withCluster() {
                         openshift.withProject(BUILD_NAMESPACE) {
 
-                            openshift.apply('-f', , "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
+                            openshift.apply('-f' , "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
 
                             def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
                             openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
