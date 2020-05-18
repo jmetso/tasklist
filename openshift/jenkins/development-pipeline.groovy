@@ -72,11 +72,11 @@ pipeline {
             } // steps
         } // stage
 
-        stage('BAKE - Bake application image') {
+        stage('BUILD - Bake application image') {
             steps {
                 script {
                     openshift.withCluster() {
-                        openshift.withProject(DEV_NAMESPACE) {
+                        openshift.withProject(BUILD_NAMESPACE) {
 
                             def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}")
                             if(!is.exists()) {
