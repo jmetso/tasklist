@@ -67,7 +67,7 @@ pipeline {
         stage('BUILD - Maven build') {
             steps {
                 dir('src') {
-                    sh 'mvn clean package -P ocp'
+                    sh 'mvn clean package -P openshift'
                 }
             } // steps
         } // stage
@@ -75,33 +75,35 @@ pipeline {
         stage('BAKE - Bake application image') {
             steps {
                 script {
-                    openshift.withProject(DEV_NAMESPACE) {
+                    openshift.withCluster() {
+                        openshift.withProject(DEV_NAMESPACE) {
 
-                        def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}")
-                        if(!is.exists()) {
-                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
-                        } else {
-                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
-                        }
-
-                        def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
-                        if(!bc.exists()) {
-                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
-                        } else {
-                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
-                        } // if
-
-                        bc.startBuild("--from-dir=src/target")
-                        def builds = bc.related('builds')
-                        // wait at most BUILD_TIMEOUT minutes for the build to complete
-                        timeout(BUILD_TIMEOUT.toInteger()) {
-                            builds.untilEach(1) {
-                                return it.object().status.phase == 'Complete'
+                            def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}")
+                            if(!is.exists()) {
+                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
+                            } else {
+                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
                             }
-                        } // timeout
 
-                        openshift.tag("${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:latest", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
-                    } // withProject
+                            def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
+                            if(!bc.exists()) {
+                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
+                            } else {
+                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
+                            } // if
+
+                            bc.startBuild("--from-dir=src/target")
+                            def builds = bc.related('builds')
+                            // wait at most BUILD_TIMEOUT minutes for the build to complete
+                            timeout(BUILD_TIMEOUT.toInteger()) {
+                                builds.untilEach(1) {
+                                    return it.object().status.phase == 'Complete'
+                                }
+                            } // timeout
+
+                            openshift.tag("${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:latest", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
+                        } // withProject
+                    } // withCluster
                 } // script
             } // steps
         } // stage
@@ -109,9 +111,11 @@ pipeline {
         stage('BUILD - Promote to DEV') {
             steps {
                 script {
-                    openshift.withProject(DEV_NAMESPACE) {
-                        openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}", "${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev")
-                    }
+                    openshift.withCluster() {
+                        openshift.withProject(DEV_NAMESPACE) {
+                            openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}", "${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev")
+                        }
+                    } // withCluster
                 } // script
             } // steps
         } // stage
@@ -119,39 +123,41 @@ pipeline {
         stage('DEV - Deploy') {
             steps {
                 script {
-                    openshift.withProject(DEV_NAMESPACE) {
-                        openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
+                    openshift.withCluster() {
+                        openshift.withProject(DEV_NAMESPACE) {
+                            openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
 
-                        createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
+                            createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
 
-                        def devDc = openshift.selector('dc', APP_NAME)
-                        if(devDc.exists()) {
-                            // apply from file
-                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
-                        } else {
-                            // create from file
-                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
-                        }
-                        // patch image
-                        dcmap = devDc.object()
-                        dcmap.spec.template.spec.containers[0].image = "docker-registry.default.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
-                        openshift.apply(dcmap)
+                            def devDc = openshift.selector('dc', APP_NAME)
+                            if(devDc.exists()) {
+                                // apply from file
+                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
+                            } else {
+                                // create from file
+                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
+                            }
+                            // patch image
+                            dcmap = devDc.object()
+                            dcmap.spec.template.spec.containers[0].image = "docker-registry.default.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
+                            openshift.apply(dcmap)
 
-                        timeout(DEPLOYMENT_TIMEOUT.toInteger()) {
-                            def rm = devDc.rollout()
-                            rm.latest()
-                            rm.status()
-                        } // timeout
+                            timeout(DEPLOYMENT_TIMEOUT.toInteger()) {
+                                def rm = devDc.rollout()
+                                rm.latest()
+                                rm.status()
+                            } // timeout
 
-                        def devSvc = openshift.selector('svc', APP_NAME)
-                        if(devSvc.exists()) {
-                            openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
-                        } else {
-                            openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
-                        }
+                            def devSvc = openshift.selector('svc', APP_NAME)
+                            if(devSvc.exists()) {
+                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
+                            } else {
+                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
+                            }
 
-                        createSecureRoute(DEV_NAMESPACE, APP_NAME, '/csv', APP_DOMAIN)
-                    } // withProject
+                            createSecureRoute(DEV_NAMESPACE, APP_NAME, '/csv', APP_DOMAIN)
+                        } // withProject
+                    } // withCluster
                 } // script
             } // steps
         } // stage
