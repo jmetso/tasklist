@@ -67,7 +67,7 @@ pipeline {
         stage('BUILD - Maven build') {
             steps {
                 dir('src') {
-                    sh 'mvn clean package'
+                    sh 'mvn clean package -P ocp'
                 }
             } // steps
         } // stage
@@ -77,7 +77,7 @@ pipeline {
                 script {
                     openshift.withProject(DEV_NAMESPACE) {
 
-                        def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}");
+                        def is = openshift.selector('is', "${TARGET_IMAGESTREAM_NAME}")
                         if(!is.exists()) {
                             openshift.create('-f', "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
                         } else {
@@ -216,7 +216,7 @@ def createPvc(namespace, name, appName, size) {
  */
 def createSecureRoute(namespace, applicationName, contextRoot, appDomain) {
     openshift.withProject(namespace) {
-        def route = openshift.selector('route', "${applicationName}-secure");
+        def route = openshift.selector('route', "${applicationName}-secure")
         if(!route.exists()) {
             def routeObj = openshift.process(readFile(file:'src/openshift/templates/secure-route-template.yaml'),
                     '-p', "APP_NAME=${applicationName}",
