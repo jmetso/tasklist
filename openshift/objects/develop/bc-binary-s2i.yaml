@@ -21,6 +21,8 @@ spec:
   source:
     binary: {}
     type: Binary
+  successfulBuildsHistoryLimit: 5
+  failedBuildsHistoryLimit: 5
   strategy:
     sourceStrategy:
       from:
