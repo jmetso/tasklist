@@ -6,6 +6,10 @@
   vars:
     namespace: "{{ namespace_name }}"
 
+- name: Create rolebinding yaml file
+  template:
+    src: rb-jenkins-access.yaml.j2
+    dest: /tmp/rb-jenkins-access.yaml
+
 - name: Give Jenkins edit access to namespace
-  command: oc policy add-role-to-user edit system:serviceaccount:{{ jenkins_namespace }}:jenkins -n {{ namespace_name }}
-  ignore_errors: true
+  shell: "oc apply -f /tmp/rb-jenkins-access.yaml --overwrite -n {{ namespace_name }}"
