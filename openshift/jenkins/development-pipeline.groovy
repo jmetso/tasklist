@@ -87,11 +87,7 @@ pipeline {
                             timeout(BUILD_TIMEOUT.toInteger()) {
 
                                 bc.startBuild("--from-file=src/target/TaskList-${APP_VERSION}.jar")
-                                sleep 10
-                                def builds = bc.related('builds')
-                                builds.untilEach(1) {
-                                    return it.object().status.phase == 'Complete'
-                                }
+                                bc.logs('-f')
                             } // timeout
 
                             openshift.tag("${BUILD_NAMESPACE}/dev-tasklist-s2i-build:latest", "${BUILD_NAMESPACE}/dev-tasklist-s2i-build:${TARGET_IMAGE_TAG}")
