@@ -145,7 +145,7 @@
             </build>
         </profile>
         <profile>
-            <id>ocp</id>
+            <id>openshift</id>
             <build>
                 <finalName>${project.artifactId}-${project.version}</finalName>
             </build>
