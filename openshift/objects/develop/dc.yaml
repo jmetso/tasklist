@@ -1,0 +1,86 @@
+apiVersion: apps.openshift.io/v1
+kind: DeploymentConfig
+metadata:
+  labels:
+    app: dev-tasklist
+    pipeline: development
+  name: dev-tasklist
+spec:
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    app: dev-tasklist
+    deploymentconfig: dev-tasklist
+    pipeline: development
+  strategy:
+    activeDeadlineSeconds: 21600
+    resources: {}
+    rollingParams:
+      intervalSeconds: 1
+      maxSurge: 25%
+      maxUnavailable: 25%
+      timeoutSeconds: 600
+      updatePeriodSeconds: 1
+    type: Rolling
+  template:
+    metadata:
+      annotations:
+        openshift.io/generated-by: OpenShiftNewApp
+      creationTimestamp: null
+      labels:
+        app: dev-tasklist
+        deploymentconfig: dev-tasklist
+        pipeline: development
+    spec:
+      containers:
+        - env:
+            - name: DB_URL
+              value: jdbc:sqlite:/data/tasklist.db
+            - name: OPENSHIFT_ENV_VAR
+              value: DEV
+          image: >-
+            docker-registry.default.svc:5000/tasklist-dev/dev-tasklist-s2i-build:latest
+          imagePullPolicy: Always
+          livenessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 40
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          name: dev-tasklist
+          ports:
+            - containerPort: 8778
+              protocol: TCP
+            - containerPort: 8100
+              protocol: TCP
+          readinessProbe:
+            failureThreshold: 3
+            httpGet:
+              path: /tasklist/api/v1/hello/readinessProbe
+              port: 8100
+              scheme: HTTP
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources: {}
+          terminationMessagePath: /dev/termination-log
+          terminationMessagePolicy: File
+          volumeMounts:
+            - mountPath: /data
+              name: data-volume
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+      volumes:
+        - name: data-volume
+          persistentVolumeClaim:
+            claimName: dev-tasklist-data
+  test: false
+  triggers: []

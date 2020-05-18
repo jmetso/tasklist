@@ -1,0 +1,30 @@
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  annotations:
+    openshift.io/generated-by: binary-s2i-template
+  creationTimestamp: null
+  labels:
+    app: dev-tasklist
+    pipeline: development
+    template: binary-s2i-template
+  name: dev-tasklist-s2i-build
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: dev-tasklist-s2i-build:latest
+  postCommit: {}
+  resources: {}
+  runPolicy: Serial
+  source:
+    binary: {}
+    type: Binary
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: openjdk-11-rhel8:1.2
+    type: Source
+  triggers: []

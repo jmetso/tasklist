@@ -1,0 +1,15 @@
+apiVersion: v1
+items:
+  - apiVersion: image.openshift.io/v1
+    kind: ImageStream
+    metadata:
+      annotations:
+        openshift.io/generated-by: imagestream-template
+      labels:
+        app: dev-tasklist
+        pipeline: development
+        template: imagestream-template
+      name: dev-tasklist-s2i-build
+    spec: {}
+kind: List
+metadata: {}
