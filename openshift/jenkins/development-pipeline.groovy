@@ -197,7 +197,7 @@ def testEndpointResponse(url, text, wait=10, pollInterval=30) {
  */
 def createPvc(namespace, name, appName, size) {
     openshift.withProject(namespace) {
-        openshift.apply("cicd/${OBJECTS_FOLDER}/pvc.yaml")
+        openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/pvc.yaml")
     } // withProject
 }
 
