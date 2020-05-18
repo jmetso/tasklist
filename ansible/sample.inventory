@@ -4,3 +4,14 @@ localhost
 [tasklist:vars]
 install_dir=/opt/tasklist
 service_user=root
+
+[openshift]
+localhost
+
+[openshift:vars]
+ocp_login_url=
+application_name=tasklist
+vault_ssh_clone_key=
+git_uri=
+image_pull_email=example@example.com
+app_domain=apps.example.com
