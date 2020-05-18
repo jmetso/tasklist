@@ -41,16 +41,16 @@ spec:
           image: >-
             docker-registry.default.svc:5000/tasklist-dev/dev-tasklist-s2i-build:latest
           imagePullPolicy: Always
-          livenessProbe:
-            failureThreshold: 3
-            httpGet:
-              path: /health
-              port: 8080
-              scheme: HTTP
-            initialDelaySeconds: 40
-            periodSeconds: 10
-            successThreshold: 1
-            timeoutSeconds: 1
+#          livenessProbe:
+#            failureThreshold: 3
+#            httpGet:
+#              path: /health
+#              port: 9100
+#              scheme: HTTP
+#            initialDelaySeconds: 40
+#            periodSeconds: 10
+#            successThreshold: 1
+#            timeoutSeconds: 1
           name: dev-tasklist
           ports:
             - containerPort: 8778
