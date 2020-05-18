@@ -1,1 +1,1 @@
-{"kind": "PersistentVolumeClaim", "apiVersion": "v1",  "metadata": { "name": "mvn-worker-storage", "labels": {"app": "jenkins-persistent"} }, "spec": { "accessModes": [ "ReadWriteMany" ], "resources": { "requests": { "storage": "5Gi" } } }}
+{"kind": "PersistentVolumeClaim", "apiVersion": "v1",  "metadata": { "name": "mvn-worker-storage", "labels": {"app": "jenkins-persistent"} }, "spec": { "accessModes": [ "ReadWriteOnce" ], "resources": { "requests": { "storage": "5Gi" } } }}
