@@ -5,7 +5,7 @@ metadata:
     app: dev-tasklist
     pipeline: development
   name: dev-tasklist
-  resourceVersion: 1
+  resourceVersion: '1'
 spec:
   replicas: 1
   revisionHistoryLimit: 10
