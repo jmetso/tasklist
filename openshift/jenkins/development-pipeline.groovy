@@ -83,7 +83,7 @@ pipeline {
                             def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
                             openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
 
-                            bc.startBuild("--from-dir=src/target")
+                            bc.startBuild("--from-file=src/target/TaskList-${APP_VERSION}.jar")
                             def builds = bc.related('builds')
                             // wait at most BUILD_TIMEOUT minutes for the build to complete
                             timeout(BUILD_TIMEOUT.toInteger()) {
