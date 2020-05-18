@@ -33,13 +33,13 @@ public class NotificationManager {
     public void init() {
         if(emailClient != null) {
             configureEmailNotifications();
-        }
 
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            logger.info("Cancelling all timers ...");
-            emailNotificationTimer.cancel();
-            logger.info("Cancelling all timers done");
-        }));
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                logger.info("Cancelling all timers ...");
+                emailNotificationTimer.cancel();
+                logger.info("Cancelling all timers done");
+            }));
+        }
     }
 
     private void configureEmailNotifications() {
