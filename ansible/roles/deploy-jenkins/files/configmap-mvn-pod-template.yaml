@@ -35,17 +35,17 @@ data:
         <containers>
         <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
             <name>jnlp</name>
-            <image>registry.redhat.io/openshift3/jenkins-agent-maven-35-rhel7:v3.11</image>
+            <image>registry.redhat.io/openshift4/ose-jenkins-maven:4.1</image>
             <privileged>false</privileged>
             <alwaysPullImage>true</alwaysPullImage>
             <workingDir>/tmp</workingDir>
             <command></command>
             <args>${computer.jnlpmac} ${computer.name}</args>
             <ttyEnabled>false</ttyEnabled>
-            <resourceRequestCpu></resourceRequestCpu>
-            <resourceRequestMemory></resourceRequestMemory>
-            <resourceLimitCpu></resourceLimitCpu>
-            <resourceLimitMemory></resourceLimitMemory>
+            <resourceRequestCpu>1/resourceRequestCpu>
+            <resourceRequestMemory>1Gi</resourceRequestMemory>
+            <resourceLimitCpu>1</resourceLimitCpu>
+            <resourceLimitMemory>2Gi</resourceLimitMemory>
             <envVars/>
             <ports/>
             <livenessProbe>
