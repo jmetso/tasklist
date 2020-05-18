@@ -119,13 +119,8 @@ pipeline {
                             createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
 
                             def devDc = openshift.selector('dc', APP_NAME)
-                            if(devDc.exists()) {
-                                // apply from file
-                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
-                            } else {
-                                // create from file
-                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-deployment-config.yaml")
-                            }
+                            openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml")
+
                             // patch image
                             dcmap = devDc.object()
                             dcmap.spec.template.spec.containers[0].image = "image-registry.openshift-image-registry.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
@@ -138,11 +133,7 @@ pipeline {
                             } // timeout
 
                             def devSvc = openshift.selector('svc', APP_NAME)
-                            if(devSvc.exists()) {
-                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
-                            } else {
-                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/dev-svc.yaml")
-                            }
+                            openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/svc.yaml")
 
                             createSecureRoute(DEV_NAMESPACE, APP_NAME, '/csv', APP_DOMAIN)
                         } // withProject
