@@ -81,11 +81,7 @@ pipeline {
                             openshift.apply('-f', , "cicd/${OBJECTS_FOLDER}/is-binary-s2i.yaml")
 
                             def bc = openshift.selector("bc/${BUILD_CONFIG_NAME}")
-                            if(!bc.exists()) {
-                                openshift.create('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
-                            } else {
-                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
-                            } // if
+                            openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/bc-binary-s2i.yaml")
 
                             bc.startBuild("--from-dir=src/target")
                             def builds = bc.related('builds')
