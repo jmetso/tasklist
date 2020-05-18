@@ -87,7 +87,7 @@ pipeline {
                             timeout(BUILD_TIMEOUT.toInteger()) {
 
                                 bc.startBuild("--from-file=src/target/TaskList-${APP_VERSION}.jar")
-                                sleep 1 SECONDS
+                                sleep 10
                                 def builds = bc.related('builds')
                                 builds.untilEach(1) {
                                     return it.object().status.phase == 'Complete'
