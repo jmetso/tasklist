@@ -45,7 +45,7 @@ objects:
         - name: PIPELINE_BRANCH
           value: ${PIPELINE_GIT_BRANCH}
         - name: APP_NAME
-          value: ${APP_NAME}
+          value: dev-${APP_NAME}
         - name: BUILD_NAMESPACE
           value: ${BUILD_NAMESPACE}
         - name: DEV_NAMESPACE
