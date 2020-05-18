@@ -130,7 +130,7 @@ pipeline {
                             }
                             // patch image
                             dcmap = devDc.object()
-                            dcmap.spec.template.spec.containers[0].image = "docker-registry.default.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
+                            dcmap.spec.template.spec.containers[0].image = "image-registry.openshift-image-registry.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
                             openshift.apply(dcmap)
 
                             timeout(DEPLOYMENT_TIMEOUT.toInteger()) {
