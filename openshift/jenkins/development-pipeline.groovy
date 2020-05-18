@@ -31,19 +31,23 @@ pipeline {
         stage('Clone') {
             steps {
                 dir('src') {
-                    echo "Clone sources: ${CLONE_BRANCH} - ${GIT_URL}"
-                    if("${GIT_CREDENTIALS_ID}" == "") {
-                        git branch: "${CLONE_BRANCH}", url: "${GIT_URL}"
-                    } else {
-                        git branch: "${CLONE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                    script {
+                        echo "Clone sources: ${CLONE_BRANCH} - ${GIT_URL}"
+                        if("${GIT_CREDENTIALS_ID}" == "") {
+                            git branch: "${CLONE_BRANCH}", url: "${GIT_URL}"
+                        } else {
+                            git branch: "${CLONE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                        }
                     }
                 }
                 dir('cicd') {
-                    echo "Clone pipeline: ${PIPELINE_BRANCH} - ${GIT_URL}"
-                    if("${GIT_CREDENTIALS_ID}" == "") {
-                        git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}"
-                    } else {
-                        git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                    script {
+                        echo "Clone pipeline: ${PIPELINE_BRANCH} - ${GIT_URL}"
+                        if("${GIT_CREDENTIALS_ID}" == "") {
+                            git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}"
+                        } else {
+                            git branch: "${PIPELINE_BRANCH}", url: "${GIT_URL}", credentialsId: "${GIT_CREDENTIALS_ID}"
+                        }
                     }
                 }
             } // steps
