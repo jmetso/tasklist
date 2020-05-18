@@ -119,7 +119,7 @@ pipeline {
                             createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
 
                             def devDc = openshift.selector('dc', APP_NAME)
-                            openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml")
+                            openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
 
                             // patch image
                             dcmap = devDc.object()
