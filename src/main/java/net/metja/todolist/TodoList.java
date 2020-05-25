@@ -76,7 +76,7 @@ public class TodoList {
 
     @Bean(initMethod = "init")
     public synchronized NotificationManager notificationManager() {
-        if(this.notificationManager == null) {
+        if(this.notificationManager == null && this.enableNotifications) {
             this.notificationManager = new NotificationManager();
         }
         return this.notificationManager;
