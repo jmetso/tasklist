@@ -1,3 +1,11 @@
+0.2.1
+- cicd setup and jenkins development pipeline
+- bugfixes:
+    - check for due date for tomorrow
+    - notification check for tomorrow
+    - logout not working (issue #9)
+    - only add email notification shutdown hook if email notifications are enabled
+
 0.2.0
 - adds ansible playbooks for installation and uninstallation
 
