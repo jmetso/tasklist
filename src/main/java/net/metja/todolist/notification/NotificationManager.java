@@ -6,6 +6,7 @@ import net.metja.todolist.database.bean.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -22,6 +23,9 @@ import java.util.TimerTask;
  */
 public class NotificationManager {
 
+    @Value("${ENABLE_EMAIL_NOTIFICATIONS:false}")
+    private boolean enableEmailNotifications;
+
     private NotificationClient emailClient;
     private DatabaseManager databaseManager;
 
@@ -31,7 +35,7 @@ public class NotificationManager {
     public NotificationManager() {}
 
     public void init() {
-        if(emailClient != null) {
+        if(this.emailClient != null && this.enableEmailNotifications) {
             configureEmailNotifications();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
