@@ -7,7 +7,7 @@
   - application_name: tasklist
   - build_namespace: "{{ application_name }}-build"
   - dev_namespace: "{{ application_name }}-dev"
-  - build_timeout: '10'
+  - build_timeout: '20'
   - deployment_timeout: '10'
   - development_pipeline_file: development-pipeline.groovy
   - release_pipeline_file: release-pipeline.groovy
