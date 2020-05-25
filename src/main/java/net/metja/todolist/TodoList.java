@@ -28,7 +28,7 @@ public class TodoList {
     @Value("${DB_URL:jdbc:sqlite:db/todolist.db}")
     private String databaseUrl;
     private SingleConnectionDataSource dataSource;
-    private static Logger logger = LoggerFactory.getLogger(TodoList.class);
+    private static final Logger logger = LoggerFactory.getLogger(TodoList.class);
 
     @Value("${ENABLE_NOTIFICATIONS:false}")
     private boolean enableNotifications;
