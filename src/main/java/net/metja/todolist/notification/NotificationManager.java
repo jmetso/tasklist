@@ -30,7 +30,7 @@ public class NotificationManager {
     private DatabaseManager databaseManager;
 
     private Timer emailNotificationTimer;
-    private Logger logger = LoggerFactory.getLogger(NotificationManager.class);
+    private final static Logger logger = LoggerFactory.getLogger(NotificationManager.class);
 
     public NotificationManager() {}
 
