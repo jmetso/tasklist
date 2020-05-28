@@ -31,6 +31,7 @@ class NotificationManagerTest {
     @BeforeEach
     public void setUp() {
         this.notificationManager = new NotificationManager();
+        this.notificationManager.setEnableEmailNotifications(true);
         userAccounts = new LinkedList<>();
         UserAccount user = new UserAccount(1, "user", "pwd", Arrays.asList("user"), "user@example.com");
         userAccounts.add(user);
@@ -56,9 +57,7 @@ class NotificationManagerTest {
 
         AtomicInteger sentNotifications = new AtomicInteger();
 
-        this.notificationManager.setEmailClient((subject, text, user1) -> {
-            sentNotifications.getAndIncrement();
-        });
+        this.notificationManager.setEmailClient((subject, text, user1) -> sentNotifications.getAndIncrement());
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
 
@@ -259,9 +258,7 @@ class NotificationManagerTest {
 
         AtomicInteger sentNotifications = new AtomicInteger();
 
-        this.notificationManager.setEmailClient((subject, text, user1) -> {
-            sentNotifications.getAndIncrement();
-        });
+        this.notificationManager.setEmailClient((subject, text, user1) -> sentNotifications.getAndIncrement());
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
 
@@ -290,9 +287,7 @@ class NotificationManagerTest {
 
         AtomicInteger sentNotifications = new AtomicInteger();
 
-        this.notificationManager.setEmailClient((subject, text, user1) -> {
-            sentNotifications.getAndIncrement();
-        });
+        this.notificationManager.setEmailClient((subject, text, user1) -> sentNotifications.getAndIncrement());
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
 
