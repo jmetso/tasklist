@@ -35,7 +35,7 @@ public class NotificationManager {
     public NotificationManager() {}
 
     public void init() {
-        if(this.emailClient != null && this.enableEmailNotifications) {
+        if(this.enableEmailNotifications && this.emailClient != null) {
             configureEmailNotifications();
 
             Runtime.getRuntime().addShutdownHook(new Thread(() -> {
@@ -202,4 +202,7 @@ public class NotificationManager {
         this.databaseManager = databaseManager;
     }
 
+    protected void setEnableEmailNotifications(boolean enableEmailNotifications) {
+        this.enableEmailNotifications = enableEmailNotifications;
+    }
 }
