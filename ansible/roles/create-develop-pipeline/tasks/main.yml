@@ -1,15 +1,15 @@
 # roles/create-develop-pipeline/tasks/main.yml
 ---
 - name: Setup generic webhook trigger secret with existing value for develop pipeline
-  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-generic-trigger-secret -p APP_NAME={{ application_name }} -p SECRET_VALUE={{ vault_generic_trigger_value }} | oc apply -f - -n {{ build_namespace }} "
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-generic-trigger-secret -p APP_NAME={{ application_name }} -p SECRET_VALUE={{ vault_generic_trigger_value }} | oc apply -f - -n {{ build_ns }} "
   when: '"dev-generic-trigger-secret" not in existing_build_project_secrets.stdout and vault_generic_trigger_value is defined'
 
 - name: Setup generic webhook trigger secret with random value for develop pipeline
-  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-generic-trigger-secret -p APP_NAME={{ application_name }} | oc create -f - -n {{ build_namespace }} "
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-generic-trigger-secret -p APP_NAME={{ application_name }} | oc create -f - -n {{ build_ns }} "
   when: '"dev-generic-trigger-secret" not in existing_build_project_secrets.stdout and vault_generic_trigger_value is not defined'
 
 - name: Setup Github webhook trigger secret with existing value for develop pipeline
-  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-github-trigger-secret -p APP_NAME={{ application_name }} -p SECRET_VALUE={{ vault_github_trigger_value }} | oc apply -f - -n {{ build_namespace }} "
+  shell: "oc process --local -f {{ playbook_dir }}/files/secret-trigger-template.yaml -p NAME=dev-github-trigger-secret -p APP_NAME={{ application_name }} -p SECRET_VALUE={{ vault_github_trigger_value }} | oc apply -f - -n {{ build_ns }} "
   when: '"dev-github-trigger-secret" not in existing_build_project_secrets.stdout and vault_github_trigger_value is defined'
 
 - name: Setup Github webhook trigger secret with random value for develop pipeline
