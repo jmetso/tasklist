@@ -33,6 +33,15 @@
     vars:
       namespace_name: "{{ build_namespace }}"
 
+  - name: Create image pull secret
+    include_role:
+      name: create-image-pull-secret
+    vars:
+      namespace: "{{ build_namespace }}"
+      username: "{{ image_pull_username }}"
+      password: "{{ image_pull_password }}"
+      email: "{{ image_pull_email }}"
+
   - name: Deploy Jenkins to build namespace
     include_role:
       name: deploy-jenkins
@@ -46,15 +55,6 @@
     vars:
       namespace_name: "{{ dev_namespace }}"
       jenkins_namespace: "{{ build_namespace }}"
-
-  - name: Create image pull secret
-    include_role:
-      name: create-image-pull-secret
-    vars:
-      namespace: "{{ build_namespace }}"
-      username: "{{ image_pull_username }}"
-      password: "{{ image_pull_password }}"
-      email: "{{ image_pull_email }}"
 
   - name: Setup base image imagestream
     shell: "oc apply -f {{ playbook_dir }}/files/is-baseimage.yaml -n {{ build_namespace }} --overwrite"
@@ -84,9 +84,14 @@
     include_role:
       name: create-develop-pipeline
     vars:
-      build_namespace: "{{ build_namespace }}"
-      dev_namespace: "{{ dev_namespace }}"
+      build_ns: "{{ build_namespace }}"
+      dev_ns: "{{ dev_namespace }}"
       existing_build_project_secrets: "{{ build_project_secrets }}"
+
+#  - name: Trigger development pipeline
+#    uri:
+#      url: "{{ develop_github_trigger_url.stdout }}"
+#      method: POST
 
   - name: Print github trigger url for development pipeline
     debug:
