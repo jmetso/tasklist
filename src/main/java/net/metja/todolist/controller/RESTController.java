@@ -44,18 +44,6 @@ public class RESTController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER','VIEW')")
-    @RequestMapping(value="/api/v1/logout",produces=MediaType.APPLICATION_JSON_VALUE,method=RequestMethod.POST)
-    public ResponseEntity<Boolean> logout(HttpServletRequest request) {
-        try {
-            request.logout();
-            return new ResponseEntity<>(true, HttpStatus.OK);
-        } catch(javax.servlet.ServletException e) {
-            this.logger.error("Unable to perform logout.", e);
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @RequestMapping(value="/api/v1/password/generate/{password}",produces=MediaType.TEXT_PLAIN_VALUE,method = RequestMethod.GET)
     public ResponseEntity<String> generatePassword(@PathVariable(value="password", required = true)String password) {
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder(12);

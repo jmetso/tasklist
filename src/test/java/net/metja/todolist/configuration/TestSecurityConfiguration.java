@@ -64,6 +64,7 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/items").hasAnyRole("ADMIN","USER","VIEW")
                 .antMatchers("/api/v1/items/**").hasAnyRole("ADMIN","USER")
                 .antMatchers("/api/v1/new").hasAnyRole("ADMIN","USER")
+                .antMatchers("/api/v1/logout").hasAnyRole("ADMIN","USER","VIEW")
                 .anyRequest().authenticated()
                 .and()
             .rememberMe()
