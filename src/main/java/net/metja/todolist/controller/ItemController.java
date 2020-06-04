@@ -25,7 +25,7 @@ import java.util.List;
 public class ItemController {
 
     private DatabaseManager databaseManager;
-    private static Logger logger = LoggerFactory.getLogger(ItemController.class);
+    private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
     @PreAuthorize("hasAnyRole('ADMIN','USER', 'VIEW')")
     @RequestMapping(value = "/api/v1/items", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
