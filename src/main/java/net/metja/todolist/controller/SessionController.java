@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -15,6 +16,7 @@ import javax.servlet.http.HttpServletRequest;
  * @author Janne Metso &copy; 2020
  * @since 2020-06-04
  */
+@RestController
 public class SessionController {
 
     private static final Logger logger = LoggerFactory.getLogger(SessionController.class);
