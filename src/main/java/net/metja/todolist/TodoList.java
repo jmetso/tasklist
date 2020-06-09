@@ -30,7 +30,7 @@ public class TodoList {
     private SingleConnectionDataSource dataSource;
     private static final Logger logger = LoggerFactory.getLogger(TodoList.class);
 
-    @Value("${ENABLE_NOTIFICATIONS:false}")
+    @Value("${ENABLE_NOTIFICATIONS:true}")
     private boolean enableNotifications;
     private NotificationClient emailClient;
 
