@@ -68,6 +68,7 @@ public class NotificationManager {
                             logger.debug("Task "+todo.getId()+" is scheduled and not done.");
                             if(sendAlert(user, todo, now)) {
                                 logger.debug("Updating todo "+todo.getId()+" with last notification date");
+                                todo.setLastNotification(OffsetDateTime.now());
                                 boolean success = databaseManager.updateTodo(listID, todo);
                                 logger.debug("Updated todo: "+success);
                             }
@@ -91,7 +92,6 @@ public class NotificationManager {
             } else {
                 this.emailClient.sendNotification("Task " + todo.getTitle() + " is due today!", "Task " + todo.getTitle() + " is due today!", user);
             }
-            todo.setLastNotification(OffsetDateTime.now());
             return true;
         } else if(this.isDueTomorrow(now, todo) && (lastNotificationDate == null
                 || !hasAlreadyBeenNotifiedToday(now, lastNotificationDate))) {
