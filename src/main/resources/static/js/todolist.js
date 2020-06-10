@@ -367,7 +367,6 @@ function getItems() {
     }).fail(function(jqXHR, textStatus, errorThrown) {
         //console.log("Status: "+jqXHR.status)
         console.error("Failed to get items: "+textStatus)
-        publishDangerAlert('alertdi', 'Failed to get items!', 5000)
         if(jqXHR.status == 404) {
             //console.log("./api/v/new")
             $.getJSON("./api/v1/new", function(result) {
@@ -376,6 +375,8 @@ function getItems() {
                 console.error("Failed to add new list: "+textStatus)
                 publishDangerAlert('alertdn', 'Failed to add new list!', 5000)
             })
+        } else {
+            publishDangerAlert('alertdi', 'Failed to get items!', 5000)
         }
     })
 }
