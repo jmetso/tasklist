@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 
 import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.temporal.ChronoField;
@@ -84,7 +85,16 @@ public class NotificationManager {
     private boolean sendAlert(final UserAccount user, @NotNull Todo todo, final OffsetDateTime now) {
         OffsetDateTime lastNotificationDate = todo.getLastNotification();
         logger.debug("Last notification date: "+lastNotificationDate);
-        if(this.isDueToday(now, todo) && (lastNotificationDate == null
+        if(this.isOverdua(now, todo) && (lastNotificationDate == null
+                || !hasAlreadyBeenNotifiedToday(now, lastNotificationDate))) {
+            logger.debug("Sending notification for overdue");
+            if(todo.getDescription() != null) {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is overdue!", "Task " + todo.getTitle() + " is overdue!\n\nDescription: " + todo.getDescription(), user);
+            } else {
+                this.emailClient.sendNotification("Task " + todo.getTitle() + " is overdue!", "Task " + todo.getTitle() + " is overdue!", user);
+            }
+            return true;
+        } else  if(this.isDueToday(now, todo) && (lastNotificationDate == null
                 || !hasAlreadyBeenNotifiedToday(now, lastNotificationDate))) {
             logger.debug("Sending notification for today");
             if(todo.getDescription() != null) {
@@ -151,9 +161,13 @@ public class NotificationManager {
             }
             adjustedNow = adjustedNow.plusDays(7);
             logger.debug("Adjusted: "+adjustedNow);
-            return  (adjustedNow.getYear() >= dueDate.getYear()
-                    && adjustedNow.getMonthValue() >= dueDate.getMonthValue()
-                    && adjustedNow.getDayOfMonth() >= dueDate.getDayOfMonth());
+            LocalDate nowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
+            int result = nowDate.compareTo(dueDate);
+            if(result < 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -169,9 +183,13 @@ public class NotificationManager {
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
             adjustedNow = adjustedNow.plusDays(1);
-            return (adjustedNow.getYear() >= dueDate.getYear()
-                    && adjustedNow.getMonthValue() >= dueDate.getMonthValue()
-                    && adjustedNow.getDayOfMonth() >= dueDate.getDayOfMonth());
+            LocalDate nowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
+            int result = nowDate.compareTo(dueDate);
+            if(result < 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -186,9 +204,37 @@ public class NotificationManager {
                  zoneOffset = todo.getDueTimezone();
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
-            return (adjustedNow.getYear() == dueDate.getYear()
-                    && adjustedNow.getMonth() == dueDate.getMonth()
-                    && adjustedNow.getDayOfMonth() == dueDate.getDayOfMonth());
+            LocalDate nowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
+            int result = nowDate.compareTo(dueDate);
+            if(result == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    private boolean isOverdua(final OffsetDateTime now, final Todo todo) {
+        if(!todo.isScheduled()) {
+            logger.debug("Todo is not scheduled!");
+            return false;
+        } else {
+            LocalDate dueDate = todo.getDueDate();
+            ZoneOffset zoneOffset = now.getOffset();
+            LocalTime dueTime = todo.getDueTime();
+            if(dueTime == null) {
+                dueTime = LocalTime.of(now.getHour(), now.getMinute(), now.getSecond());
+            }
+            if(todo.getDueTimezone() != null) {
+                zoneOffset = todo.getDueTimezone();
+            }
+            OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
+            int result = adjustedNow.compareTo(OffsetDateTime.of(dueDate, dueTime, zoneOffset));
+            if(result < 0) {
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
