@@ -85,7 +85,7 @@ public class NotificationManager {
     private boolean sendAlert(final UserAccount user, @NotNull Todo todo, final OffsetDateTime now) {
         OffsetDateTime lastNotificationDate = todo.getLastNotification();
         logger.debug("Last notification date: "+lastNotificationDate);
-        if(this.isOverdua(now, todo) && (lastNotificationDate == null
+        if(this.isOverdue(now, todo) && (lastNotificationDate == null
                 || !hasAlreadyBeenNotifiedToday(now, lastNotificationDate))) {
             logger.debug("Sending notification for overdue");
             if(todo.getDescription() != null) {
@@ -214,7 +214,7 @@ public class NotificationManager {
         }
     }
 
-    private boolean isOverdua(final OffsetDateTime now, final Todo todo) {
+    private boolean isOverdue(final OffsetDateTime now, final Todo todo) {
         if(!todo.isScheduled()) {
             logger.debug("Todo is not scheduled!");
             return false;
