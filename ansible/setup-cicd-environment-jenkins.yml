@@ -88,10 +88,11 @@
       dev_ns: "{{ dev_namespace }}"
       existing_build_project_secrets: "{{ build_project_secrets }}"
 
-#  - name: Trigger development pipeline
-#    uri:
-#      url: "{{ develop_github_trigger_url.stdout }}"
-#      method: POST
+  - name: Trigger development pipeline
+    uri:
+      url: "{{ develop_github_trigger_url.stdout }}"
+      method: POST
+      validate_certs: no
 
   - name: Print github trigger url for development pipeline
     debug:
