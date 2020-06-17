@@ -122,9 +122,9 @@ parameters:
   required: true
 - name: GENERIC_TRIGGER_SECRET_NAME
   description: Name of generic trigger secret
-  value: dev-generic-trigger-secret
+  value: dev-generic-trigger
   required: false
 - name: GITHUB_TRIGGER_SECRET_NAME
   description: Name of Github trigger secret
-  value: dev-github-trigger-secret
+  value: dev-github-trigger
   required: false
