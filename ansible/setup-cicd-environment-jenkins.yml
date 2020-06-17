@@ -90,7 +90,7 @@
 
   - name: Trigger development pipeline
     uri:
-      url: "{{ develop_github_trigger_url.stdout }}"
+      url: "{{ develop_generic_trigger_url.stdout }}"
       method: POST
       validate_certs: no
 
