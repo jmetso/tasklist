@@ -120,7 +120,7 @@ pipeline {
                             echo "2"
                             def devDc = openshift.selector('dc', 'dev-tasklist')
                             if(devDc.exists()) {
-                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
+                                openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml")
                             } else {
                                 openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
                             }
