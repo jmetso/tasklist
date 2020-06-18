@@ -27,7 +27,15 @@
     </encoder>
   </appender>
 
-  <root level="info">
-    <appender-ref ref="${logging.appender}"/>
-  </root>
+  <springProfile name="!openshift">
+    <root level="info">
+      <appender-ref ref="FILE"/>
+    </root>
+  </springProfile>
+
+  <springProfile name="openshift">
+    <root level="info">
+      <appender-ref ref="STDOUT"/>
+    </root>
+  </springProfile>
 </configuration>
