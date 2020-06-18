@@ -58,7 +58,7 @@ spec:
           ports:
             - containerPort: 8778
               protocol: TCP
-            - containerPort: 8100
+            - containerPort: 8080
               protocol: TCP
             - containerPort: 9100
               protocol: TCP
