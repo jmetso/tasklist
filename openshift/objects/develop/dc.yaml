@@ -5,7 +5,7 @@ metadata:
     app: dev-tasklist
     pipeline: development
   name: dev-tasklist
-  resourceVersion: '1'
+#  resourceVersion: '1'
 spec:
   replicas: 1
   revisionHistoryLimit: 10
@@ -66,7 +66,7 @@ spec:
             failureThreshold: 3
             httpGet:
               path: /tasklist/api/v1/hello/readinessProbe
-              port: 8100
+              port: 8080
               scheme: HTTP
             initialDelaySeconds: 20
             periodSeconds: 10
