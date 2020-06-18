@@ -117,9 +117,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <properties>
-                <logging.appender>FILE</logging.appender>
-            </properties>
             <build>
                 <plugins>
                     <plugin>
@@ -151,15 +148,8 @@
             <id>openshift</id>
             <properties>
                 <spring.profiles.active>openshift</spring.profiles.active>
-                <logging.appender>STDOUT</logging.appender>
             </properties>
             <build>
-                <resources>
-                    <resource>
-                        <directory>src/main/resources</directory>
-                        <filtering>true</filtering>
-                    </resource>
-                </resources>
                 <finalName>${project.artifactId}-${project.version}</finalName>
             </build>
         </profile>
