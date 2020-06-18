@@ -219,6 +219,26 @@ public class DatabaseManagerImplTest {
         assertEquals("Title", "Task2", todoUpd.getTitle());
     }
 
+    @Test
+    public void updateTodoWithLastNotified() {
+        this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'UserOne')");
+        this.jdbcTemplate.update("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
+        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
+        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (2, 1, 1, \"Child\")");
+
+        OffsetDateTime now = OffsetDateTime.now();
+        Todo todo = new Todo(2, -1, "Task2");
+        todo.setLastNotification(now);
+        boolean result = this.impl.updateTodo(1, todo);
+
+        assertTrue("Result", result);
+        Todo todoUpd = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ListID=1 and ID=2", this::mapTodoItem);
+        assertNotNull("Todo", todoUpd);
+        assertEquals("ParentID", -1, todoUpd.getParentId());
+        assertEquals("Title", "Task2", todoUpd.getTitle());
+        assertEquals("Last updated", now, todoUpd.getLastNotification());
+    }
+
     @Test(expected = org.springframework.dao.EmptyResultDataAccessException.class)
     public void updateTodo_NonExisting() throws Exception {
         this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'UserOne')");

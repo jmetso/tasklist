@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @since 2020-03-23
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@WebMvcTest(RestController.class)
+@WebMvcTest(ItemController.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {TestSecurityConfiguration.class, ItemController.class})
 public class ItemControllerTest {

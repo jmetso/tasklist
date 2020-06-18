@@ -20,12 +20,12 @@ import java.util.Properties;
  * @author Janne Metso @copy; 2020
  * @since 2020-03-23
  */
-public class EmailClient implements NotificationClient {
+public class EmailNotificationClient implements NotificationClient {
 
     private ConfigUtil configUtil;
-    private static Logger logger = LoggerFactory.getLogger(EmailClient.class);
+    private static Logger logger = LoggerFactory.getLogger(EmailNotificationClient.class);
 
-    public EmailClient() {}
+    public EmailNotificationClient() {}
 
     public void sendNotification(final String SUBJECT, final String MESSAGE, final UserAccount USER) {
 

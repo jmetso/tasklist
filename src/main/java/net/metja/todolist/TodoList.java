@@ -2,7 +2,7 @@ package net.metja.todolist;
 
 import net.metja.todolist.configuration.ConfigUtil;
 import net.metja.todolist.notification.NotificationClient;
-import net.metja.todolist.notification.EmailClient;
+import net.metja.todolist.notification.EmailNotificationClient;
 import net.metja.todolist.notification.NotificationManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,7 +30,7 @@ public class TodoList {
     private SingleConnectionDataSource dataSource;
     private static final Logger logger = LoggerFactory.getLogger(TodoList.class);
 
-    @Value("${ENABLE_NOTIFICATIONS:false}")
+    @Value("${ENABLE_NOTIFICATIONS:true}")
     private boolean enableNotifications;
     private NotificationClient emailClient;
 
@@ -66,10 +66,10 @@ public class TodoList {
     }
 
     @Bean
-    public synchronized NotificationClient emailClient() {
+    public synchronized NotificationClient emailNotificationClient() {
         if(this.enableNotifications && this.emailClient == null) {
             logger.debug("Creating email client");
-            this.emailClient = new EmailClient();
+            this.emailClient = new EmailNotificationClient();
         }
         return this.emailClient;
     }

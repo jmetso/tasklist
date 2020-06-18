@@ -28,7 +28,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 @EnableGlobalMethodSecurity(securedEnabled = true)
 public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static Logger logger = LoggerFactory.getLogger(SecurityConfiguration.class);
+    private static final Logger logger = LoggerFactory.getLogger(TestSecurityConfiguration.class);
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -48,7 +48,7 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://metja.net", "https://www.metja.net", "http://localhost", "https://localhost"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost", "https://localhost"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST"));
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -64,6 +64,7 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/v1/items").hasAnyRole("ADMIN","USER","VIEW")
                 .antMatchers("/api/v1/items/**").hasAnyRole("ADMIN","USER")
                 .antMatchers("/api/v1/new").hasAnyRole("ADMIN","USER")
+                .antMatchers("/api/v1/logout").hasAnyRole("ADMIN","USER","VIEW")
                 .anyRequest().authenticated()
                 .and()
             .rememberMe()

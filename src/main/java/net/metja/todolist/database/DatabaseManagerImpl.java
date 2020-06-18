@@ -93,8 +93,8 @@ public class DatabaseManagerImpl implements DatabaseManager {
         final String SELECT = "SELECT * FROM TodoItems WHERE ListID=? AND ID=?";
         try {
             if(this.jdbcTemplate.queryForObject(SELECT, this::mapTodoItem, listId, todo.getId()) != null) {
-                final String UPDATE = "UPDATE TodoItems SET ParentID=?, DueDate=?, DueTime=?, Title=?, Description=?, Done=?, DueTimezone=?, Scheduled=?, Repeating=? WHERE ID=? AND ListID=?";
-                this.jdbcTemplate.update(UPDATE, todo.getParentId(), todo.getDueDate(), todo.getDueTime(), todo.getTitle(), todo.getDescription(), todo.isDone(), todo.getDueTimezone(), todo.isScheduled(), todo.getRepeating(), todo.getId(), listId);
+                final String UPDATE = "UPDATE TodoItems SET ParentID=?, DueDate=?, DueTime=?, Title=?, Description=?, Done=?, DueTimezone=?, Scheduled=?, Repeating=?, LastNotification=? WHERE ID=? AND ListID=?";
+                this.jdbcTemplate.update(UPDATE, todo.getParentId(), todo.getDueDate(), todo.getDueTime(), todo.getTitle(), todo.getDescription(), todo.isDone(), todo.getDueTimezone(), todo.isScheduled(), todo.getRepeating(), todo.getLastNotification(), todo.getId(), listId);
                 return true;
             }
         } catch(org.springframework.dao.DataAccessException e) {

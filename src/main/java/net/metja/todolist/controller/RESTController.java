@@ -27,17 +27,6 @@ public class RESTController {
     private DatabaseManager databaseManager;
     private static Logger logger = LoggerFactory.getLogger(RESTController.class);
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
-    @RequestMapping(value = "/api/v1/new", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
-    public ResponseEntity<Boolean> addList(Principal principal) {
-        int listId = this.databaseManager.addList(principal.getName());
-        if(listId > 0) {
-            return new ResponseEntity<>(true, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(false, HttpStatus.BAD_REQUEST);
-        }
-    }
-
     @PreAuthorize("hasAnyRole('ADMIN','USER', 'VIEW')")
     @RequestMapping(value = "/api/v1/hello/{name}", produces= MediaType.APPLICATION_JSON_VALUE, method= RequestMethod.GET)
     public ResponseEntity<String> hello(@PathVariable(value="name", required=true)String name) {
@@ -52,18 +41,6 @@ public class RESTController {
             return new ResponseEntity<>("{\"user\": \"" + principal.getName() + "\"}", HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @PreAuthorize("hasAnyRole('ADMIN','USER','VIEW')")
-    @RequestMapping(value="/api/v1/logout",produces=MediaType.APPLICATION_JSON_VALUE,method=RequestMethod.POST)
-    public ResponseEntity<Boolean> logout(HttpServletRequest request) {
-        try {
-            request.logout();
-            return new ResponseEntity<>(true, HttpStatus.OK);
-        } catch(javax.servlet.ServletException e) {
-            this.logger.error("Unable to perform logout.", e);
-            return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
