@@ -93,8 +93,8 @@ spec:
           persistentVolumeClaim:
             claimName: dev-tasklist-data
         - name: configuration-volume
-          persistentVolumeClaim:
-            claimName: dev-tasklist-data
+          configMap:
+            name: dev-tasklist-config
             defaultMode: 420
   test: false
   triggers: []
