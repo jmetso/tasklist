@@ -58,10 +58,13 @@ spec:
           ports:
             - containerPort: 8778
               protocol: TCP
+              name: jolokia
             - containerPort: 8080
               protocol: TCP
+              name: app
             - containerPort: 9100
               protocol: TCP
+              name: management
           readinessProbe:
             failureThreshold: 3
             httpGet:
