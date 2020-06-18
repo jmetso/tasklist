@@ -2,6 +2,7 @@
 application_name: dev-tasklist
 build_ns: tasklist-build
 dev_ns: tasklist-dev
+pipeline_branch: develop
 development_branch: develop
 context_dir: openshift/jenkins
 development_pipeline_file: development-pipeline.groovy
