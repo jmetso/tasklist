@@ -86,7 +86,6 @@ pipeline {
 
                             // wait at most BUILD_TIMEOUT minutes for the build to complete
                             timeout(BUILD_TIMEOUT.toInteger()) {
-
                                 bc.startBuild("--from-file=src/target/TaskList-${APP_VERSION}.jar")
                                 bc.logs('-f')
                             } // timeout
@@ -121,7 +120,7 @@ pipeline {
                             echo "2"
                             def devDc = openshift.selector('dc', 'dev-tasklist')
                             echo devDc.exists()
-                            id(devDc.exists()) {
+                            if(devDc.exists()) {
                                 openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
                             } else {
                                 openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
