@@ -32,6 +32,8 @@ objects:
         ref: ${GIT_BRANCH}
         uri: ${GIT_URL}
       type: Git
+    sourceSecret:
+      name: ${SOURCE_SECRET_NAME}
     strategy:
       jenkinsPipelineStrategy:
         jenkinsfilePath: ${JENKINS_FILENAME}
@@ -127,4 +129,8 @@ parameters:
 - name: GITHUB_TRIGGER_SECRET_NAME
   description: Name of Github trigger secret
   value: dev-github-trigger
+  required: false
+- name: SOURCE_SECRET_NAME
+  description: Name of source clone secret
+  value: tasklist-git-clone-secret
   required: false
