@@ -39,6 +39,8 @@ spec:
               value: jdbc:sqlite:/data/tasklist.db
             - name: OPENSHIFT_ENV_VAR
               value: DEV
+            - name: CONFIG_FILE
+              value: /config/tasklist.properties
           image: >-
             image-registry.openshift-image-registry.svc:5000/tasklist-dev/dev-tasklist-s2i-build:latest
           imagePullPolicy: Always
@@ -76,6 +78,8 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data-volume
+            - mountPath: /config
+              name: configuration-volume
       dnsPolicy: ClusterFirst
       restartPolicy: Always
       schedulerName: default-scheduler
@@ -85,5 +89,9 @@ spec:
         - name: data-volume
           persistentVolumeClaim:
             claimName: dev-tasklist-data
+        - name: configuration-volume
+          persistentVolumeClaim:
+            claimName: dev-tasklist-data
+            defaultMode: 420
   test: false
   triggers: []
