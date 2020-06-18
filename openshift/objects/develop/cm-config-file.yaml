@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: dev-tasklist-config
+data:
+  tasklist.properties: |-
+    property=value
