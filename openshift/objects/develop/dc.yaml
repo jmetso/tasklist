@@ -83,7 +83,7 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data-volume
-            - mountPath: /deployments/config
+            - mountPath: /deployments/conf
               name: configuration-volume
       dnsPolicy: ClusterFirst
       restartPolicy: Always
