@@ -93,7 +93,7 @@
       url: "{{ develop_generic_trigger_url.stdout }}"
       method: POST
       validate_certs: no
-    when: trigger_develop_pipeline is defined and trigger_develop_pipeline==true
+    when: trigger_development_pipeline is defined and trigger_development_pipeline
 
   - name: Print github trigger url for development pipeline
     debug:
