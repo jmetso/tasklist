@@ -41,6 +41,8 @@ spec:
               value: DEV
             - name: CONFIG_FILE
               value: /config/tasklist.properties
+            - name: JAVA_OPTS_APPEND
+              value: -Dspring.profiles.active=openshift
           image: >-
             image-registry.openshift-image-registry.svc:5000/tasklist-dev/dev-tasklist-s2i-build:latest
           imagePullPolicy: Always
@@ -81,7 +83,7 @@ spec:
           volumeMounts:
             - mountPath: /data
               name: data-volume
-            - mountPath: /config
+            - mountPath: /deployments/config
               name: configuration-volume
       dnsPolicy: ClusterFirst
       restartPolicy: Always
