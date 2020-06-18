@@ -5,7 +5,7 @@ metadata:
   labels:
     role: jenkins-slave
 data:
-  template1: |-
+  maven: |-
     <org.csanchez.jenkins.plugins.kubernetes.PodTemplate>
         <inheritFrom></inheritFrom>
         <name>maven</name>
