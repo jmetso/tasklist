@@ -119,7 +119,6 @@ pipeline {
                             createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
                             echo "2"
                             def devDc = openshift.selector('dc', 'dev-tasklist')
-                            echo ""+devDc.exists()
                             if(devDc.exists()) {
                                 openshift.replace('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
                             } else {
