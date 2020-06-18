@@ -3,9 +3,11 @@
   <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
     <!-- encoders are assigned the type
          ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
+    <!--
     <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
       <level>ERROR</level>
     </filter>
+    -->
     <encoder>
       <pattern>%d %-5level [%thread] %logger{36} - %msg%n</pattern>
     </encoder>
@@ -27,15 +29,12 @@
     </encoder>
   </appender>
 
-  <springProfile name="!openshift">
-    <root level="info">
+  <root level="info">
+    <springProfile name="!openshift">
       <appender-ref ref="FILE"/>
-    </root>
-  </springProfile>
-
-  <springProfile name="openshift">
-    <root level="info">
-      <appender-ref ref="STDOUT"/>
-    </root>
-  </springProfile>
+    </springProfile>
+    <springProfile name="openshift">
+        <appender-ref ref="STDOUT"/>
+    </springProfile>
+  </root>
 </configuration>
