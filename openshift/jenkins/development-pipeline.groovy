@@ -123,6 +123,7 @@ pipeline {
                             openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/dc.yaml", '--overwrite')
                             echo "3"
                             // patch image
+                            devDc = openshift.selector('dc', APP_NAME)
                             dcmap = devDc.object()
                             dcmap.spec.template.spec.containers[0].image = "image-registry.openshift-image-registry.svc:5000/${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}"
                             openshift.apply(dcmap)
