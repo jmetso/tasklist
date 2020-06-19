@@ -1,0 +1,16 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: dev-tasklist
+  namespace: tasklist-dev
+spec:
+  ports:
+    - protocol: TCP
+      port: 8080
+      targetPort: 8080
+    - protocol: TCP
+      port: 9100
+      targetPort: 9100
+  selector:
+    app: dev-tasklist
+  type: ClusterIP
