@@ -1,6 +1,7 @@
 0.2.3
 - notification for overdue tasks
-- bugfixes - notification sending
+- bugfixes:
+    - notification sending
 - dependencies
     - patternfly4 to 4.10.31
     - spring boot to 2.3.1
