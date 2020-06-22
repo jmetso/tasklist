@@ -23,14 +23,14 @@ data:
         <nodeUsageMode>NORMAL</nodeUsageMode>
         <customWorkspaceVolumeEnabled>false</customWorkspaceVolumeEnabled>
         <workspaceVolume class="org.csanchez.jenkins.plugins.kubernetes.volumes.workspace.EmptyDirWorkspaceVolume">
-        <memory>false</memory>
+          <memory>false</memory>
         </workspaceVolume>
         <volumes>
-        <org.csanchez.jenkins.plugins.kubernetes.volumes.PersistentVolumeClaim>
-            <mountPath>/home/jenkins/.m2</mountPath>
-            <claimName>mvn-worker-storage</claimName>
-            <readOnly>false</readOnly>
-        </org.csanchez.jenkins.plugins.kubernetes.volumes.PersistentVolumeClaim>
+          <org.csanchez.jenkins.plugins.kubernetes.volumes.PersistentVolumeClaim>
+              <mountPath>/home/jenkins/.m2</mountPath>
+              <claimName>mvn-worker-storage</claimName>
+              <readOnly>false</readOnly>
+          </org.csanchez.jenkins.plugins.kubernetes.volumes.PersistentVolumeClaim>
         </volumes>
         <containers>
         <org.csanchez.jenkins.plugins.kubernetes.ContainerTemplate>
