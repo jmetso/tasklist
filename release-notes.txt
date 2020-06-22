@@ -1,3 +1,12 @@
+0.2.3
+- dependencies
+    - patternfly4 to 4.10.31
+    - spring boot to 2.3.1
+    - spring security to 5.3.3
+    - sqlite 3.32.3
+    - spring jdbc 5.2.7
+    - junit to junit.jupiter 5.6.2
+
 0.2.2
 - updates patternfly4 to 2.71.6
 - bugfixes:
