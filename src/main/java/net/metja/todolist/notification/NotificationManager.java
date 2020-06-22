@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -82,7 +81,7 @@ public class NotificationManager {
         logger.info("Configuring email notifications done");
     }
 
-    private boolean sendAlert(final UserAccount user, @NotNull Todo todo, final OffsetDateTime now) {
+    private boolean sendAlert(final UserAccount user, Todo todo, final OffsetDateTime now) {
         OffsetDateTime lastNotificationDate = todo.getLastNotification();
         logger.debug("Last notification date: "+lastNotificationDate);
         if(this.isOverdue(now, todo) && (lastNotificationDate == null
