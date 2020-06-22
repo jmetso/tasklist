@@ -12,6 +12,7 @@
   - development_pipeline_file: development-pipeline.groovy
   - release_pipeline_file: release-pipeline.groovy
   - context_dir: openshift/jenkins
+  - pipeline_branch: master
   - development_branch: develop
   - target_imagestream_name: tasklist
   - ssh_private_key_value: "{{ vault_ssh_private_key_value }}"
