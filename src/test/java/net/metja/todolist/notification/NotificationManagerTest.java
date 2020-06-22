@@ -11,6 +11,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -369,6 +370,39 @@ class NotificationManagerTest {
         }
 
         assertEquals(0, sentNotifications.get(), "Notifications");
+    }
+
+    @Test
+    public void testTaskWithOverdueDueDate() {
+        List<Todo> todos = new LinkedList<>();
+        Todo todo = new Todo(3, -1, "Ten");
+        todo.setScheduled(true);
+        todo.setDueDate(LocalDate.now().minus(1, ChronoUnit.DAYS));
+        todos.add(todo);
+
+        DatabaseManager databaseManager = mock(DatabaseManager.class);
+        when(databaseManager.getUsers()).thenReturn(userAccounts);
+        when(databaseManager.getUserList("user")).thenReturn(1);
+        when(databaseManager.getTodos(1)).thenReturn(todos);
+        when(databaseManager.updateTodo(1, todo)).thenReturn(true);
+
+        AtomicInteger sentNotifications = new AtomicInteger();
+        this.notificationManager.setEmailClient((subject, text, user1) -> {
+            sentNotifications.getAndIncrement();
+            assertEquals("user", user1.getUsername(), "Username");
+            assertEquals("Task Ten is overdue!", subject, "Subject");
+            assertEquals("Task Ten is overdue!", text, "Body");
+        });
+        this.notificationManager.setDatabaseManager(databaseManager);
+        this.notificationManager.init();
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(1, sentNotifications.get(), "Notifications");
     }
 
 }
