@@ -16,6 +16,8 @@
 <body>
   <div class="pf-c-background-image" id="content">
     <div class="pf-c-page">
+      <ul class="pf-c-alert-group pf-m-toast" id="alerts" v-on:click="clickOnAlert">
+      </ul>
       <header role="banner" class="pf-c-page__header">
         <div class="pf-c-page__header-brand">
           <a class="pf-c-page__header-brand-link" href="./">
@@ -42,8 +44,6 @@
       </header>
       <main role="main" class="pf-c-page__main" tabindex="-1">
         <section class="pf-c-page__main-section pf-m-fill pf-m-light">
-          <ul class="pf-c-alert-group pf-m-toast" id="alerts" v-on:click="clickOnAlert">
-          </ul>
           <h1 class="pf-c-title pf-m-xl" v-if="activeItems.length > 0">Active</h1>
           <div id="active" v-if="activeItems.length > 0">
             <ul class="pf-c-data-list" role="list" aria-label="Active items" v-on:click="activeItemClick">
