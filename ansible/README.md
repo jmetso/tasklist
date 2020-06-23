@@ -49,8 +49,6 @@ playbook uses the tasklist variables section in the [sample.inventory](sample.in
 1. Stop and remove service
 2. Delete installation directory and it's contents
 
-**Note** Installation playbook assumes that there is a built jar available in the target folder in the project root.
-
 ### How to run the playbook
 
 ```
