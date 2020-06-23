@@ -46,10 +46,8 @@ playbook uses the tasklist variables section in the [sample.inventory](sample.in
 
 ### Procedure
 
-1. Create installation directory and needed subdirectories
-2. Copy configuration file
-3. Copy jar file
-4. Install and start service
+1. Stop and remove service
+2. Delete installation directory and it's contents
 
 **Note** Installation playbook assumes that there is a built jar available in the target folder in the project root.
 
@@ -58,3 +56,7 @@ playbook uses the tasklist variables section in the [sample.inventory](sample.in
 ```
 ansible-playbook -i <inventory.file> uninstall.yml
 ```
+
+## Setup CI/CD environment with Jenkins
+
+to-be-defined
