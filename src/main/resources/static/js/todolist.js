@@ -6,7 +6,8 @@ var data = {
     newItemWizardPage: 1,
     editItemWizardPage: 1,
     user: "user",
-    version: "n/a"
+    version: "n/a",
+    showAbout: false
 }
 
 Vue.component('todoitem', {
@@ -198,11 +199,9 @@ var app = new Vue({
                 getItems()
             }
         },
-        showAbout: function(event) {
-            document.getElementById('about').style.display = 'block';
-        },
-        closeAbout: function(event) {
-            document.getElementById('about').style.display = 'none';
+        toggleAbout: function(event) {
+            console.log('Toggle about!')
+            data.showAbout = !data.showAbout
         }
     }
 })

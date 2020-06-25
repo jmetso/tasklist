@@ -25,7 +25,7 @@
           </a>
         </div>
         <div class="pf-c-page__header-tools">
-          <div v-on:click="showAbout"><i class="far fa-question-circle"></i></div>
+          <div v-on:click="toggleAbout"><i class="far fa-question-circle"></i></div>
           <div class="pf-c-dropdown" id="user-menu">
               <button class="pf-c-dropdown__toggle pf-m-plain" id="dropdown-user-menu-button" aria-expanded="false"  v-on:click="userMenuClick">
                 <span class="pf-c-dropdown__toggle-text">
@@ -57,10 +57,12 @@
             </ul>
           </div>
           <div class="pf-c-empty-state" v-if="data.todoItems.length == 0">
-            <i class="fas fa-cubes pf-c-empty-state__icon" aria-hidden="true"></i>
-            <h1 class="pf-c-title pf-m-lg">No task items</h1>
-            <div class="pf-c-empty-state__body"></div>
-            <button class="pf-c-button pf-m-primary" type="button" v-on:click="startNewItemWizard">Add first task item</button>
+            <div class="pf-c-empty-state__content">
+              <i class="fas fa-cubes pf-c-empty-state__icon" aria-hidden="true"></i>
+              <h1 class="pf-c-title pf-m-lg">No task items</h1>
+              <div class="pf-c-empty-state__body"></div>
+              <button class="pf-c-button pf-m-primary" type="button" v-on:click="startNewItemWizard">Add first task item</button>
+            </div>
           </div>
         </section>
         <section class="pf-c-page__main-section pf-m-light pf-m-no-fill" v-if="data.todoItems.length > 0">
@@ -504,10 +506,10 @@
         </div>
       </div>
     </div>
-    <div class="pf-c-backdrop" id="about">
+    <div class="pf-c-backdrop" id="about" v-show="showAbout" v-on:click="toggleAbout">
       <div class="pf-l-bullseye">
         <div class="pf-c-about-modal-box" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
-          <div class="pf-c-about-modal-box__close" v-on:click="closeAbout">
+          <div class="pf-c-about-modal-box__close">
             <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog">
               <i class="fas fa-times" aria-hidden="true"></i>
             </button>
@@ -520,9 +522,12 @@
               Version: {{ data.version }}<br />
               User Name: {{ data.user }}<br />
               Home: <a href="https://github.com/jmetso/tasklist">https://github.com/jmetso/tasklist</a><br />
-              License: <a href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache License v2.0</a>
+              License: <a href="https://www.apache.org/licenses/LICENSE-2.0.html">Apache License v2.0</a><br />
             </div>
-            <p class="pf-c-about-modal-box__strapline">&copy 2019-2020 Janne Metso</p>
+            <p class="pf-c-about-modal-box__strapline">
+              &copy 2019-2020 Janne Metso<br />
+              Built with <a href="https://www.patternfly.org/v4/">PatternFly v4</a> and <a href="https://vuejs.org/">Vue.js</a>
+            </p>
           </div>
         </div>
       </div>

@@ -38,14 +38,10 @@ h1#completed-header {
     display: none;
 }
 
-#about {
-    display: none;
-}
-
 #about > div.pf-l-bullseye > div.pf-c-about-modal-box {
     --pf-c-about-modal-box__close--PaddingTop: 1rem;
     --pf-c-about-modal-box__close--PaddingRight: 1rem;
     --pf-c-about-modal-box__close--PaddingBottom: 1rem;
-    max-height: 22rem;
-    max-width: 35rem;
+    max-height: 27rem;
+    max-width: 45rem;
 }
