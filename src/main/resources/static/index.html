@@ -280,11 +280,11 @@
         </div>
       </div>
     </div>
-    <div class="pf-c-backdrop" id="edit-todo-wizard">
+    <div class="pf-c-backdrop" id="edit-todo-wizard" v-show="showEditItemWizard">
       <div class="pf-l-bullseye">
         <div class="pf-c-wizard">
           <div class="pf-c-wizard__header">
-            <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="closeWizard">
+            <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="toggleEditItemWizard">
               <i class="fas fa-times" aria-hidden="true"></i>
             </button>
             <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">Edit Task</h1>

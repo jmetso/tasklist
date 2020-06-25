@@ -7,7 +7,8 @@ var data = {
     editItemWizardPage: 1,
     user: "user",
     version: "n/a",
-    showAbout: false
+    showAbout: false,
+    showEditItemWizard: false
 }
 
 Vue.component('todoitem', {
@@ -113,7 +114,7 @@ var app = new Vue({
             $('#new-todo-wizard').hide()
             data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeating": "No", "dueDate": "", "dueTime": "", "dueTimezone": "" }
             data.newItemWizardPage = 1
-            $('#edit-todo-wizard').hide()
+            data.showEditItemWizard = false
             data.editItemWizardPage = 1
             getItems()
         },
@@ -126,7 +127,7 @@ var app = new Vue({
         startNewItemWizard: function(event) {
             //console.log('New item!')
             data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeating": "No", "dueDate": "", "dueTime": "", "dueTimezone": "" }
-            $('#new-todo-wizard').show()
+            data.showEditItemWizard = true
         },
         editWizardSave: function(event) {
             //console.log("Wizard save!")
@@ -142,7 +143,7 @@ var app = new Vue({
             }
             if(!proceed) return
             saveTodo(data.editItem)
-            $('#edit-todo-wizard').hide()
+            data.showEditItemWizard = false
         },
         editWizardNext: function(event) {
             //console.log("Wizard next!")
@@ -164,8 +165,8 @@ var app = new Vue({
             $('#new-todo-wizard').hide()
             data.newItem = data.newItemBase
             data.newItemWizardPage = 1
-            $('#edit-todo-wizard').hide()
             data.editItemWizardPage = 1
+            data.showEditItemWizard = false
         },
         newWizardBack: function(event) {
             //console.log("Wizard back!")
@@ -200,8 +201,12 @@ var app = new Vue({
             }
         },
         toggleAbout: function(event) {
-            console.log('Toggle about!')
+            console.debug('Toggle about!')
             data.showAbout = !data.showAbout
+        },
+        toggleEditItemWizard: function(event) {
+            console.debug('Toggle edit item wizard!')
+            data.showEditItemWizard = !data.showEditItemWizard
         }
     }
 })

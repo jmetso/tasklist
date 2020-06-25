@@ -34,10 +34,6 @@ h1#completed-header {
     display: none;
 }
 
-#edit-todo-wizard {
-    display: none;
-}
-
 #about > div.pf-l-bullseye > div.pf-c-about-modal-box {
     --pf-c-about-modal-box__close--PaddingTop: 1rem;
     --pf-c-about-modal-box__close--PaddingRight: 1rem;
