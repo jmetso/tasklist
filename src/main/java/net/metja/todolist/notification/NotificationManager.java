@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
@@ -82,7 +81,7 @@ public class NotificationManager {
         logger.info("Configuring email notifications done");
     }
 
-    private boolean sendAlert(final UserAccount user, @NotNull Todo todo, final OffsetDateTime now) {
+    private boolean sendAlert(final UserAccount user, Todo todo, final OffsetDateTime now) {
         OffsetDateTime lastNotificationDate = todo.getLastNotification();
         logger.debug("Last notification date: "+lastNotificationDate);
         if(this.isOverdue(now, todo) && (lastNotificationDate == null
@@ -151,23 +150,12 @@ public class NotificationManager {
                 zoneOffset = todo.getDueTimezone();
             }
             logger.debug("Now: "+now);
-            long adjustment = zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS);
-            logger.debug("Adjustment: "+adjustment);
-            OffsetDateTime adjustedNow;
-            if(adjustment > 0) {
-                adjustedNow = now.plusSeconds(adjustment);
-            }  else {
-                adjustedNow = now.minusSeconds(adjustment);
-            }
+            OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
             adjustedNow = adjustedNow.plusDays(7);
             logger.debug("Adjusted: "+adjustedNow);
-            LocalDate nowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
-            int result = nowDate.compareTo(dueDate);
-            if(result < 0) {
-                return true;
-            } else {
-                return false;
-            }
+            LocalDate plusSevenDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
+            int result = plusSevenDate.compareTo(dueDate);
+            return result >= 0;
         }
     }
 
@@ -183,13 +171,9 @@ public class NotificationManager {
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
             adjustedNow = adjustedNow.plusDays(1);
-            LocalDate nowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
-            int result = nowDate.compareTo(dueDate);
-            if(result < 0) {
-                return true;
-            } else {
-                return false;
-            }
+            LocalDate tomorrowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
+            int result = tomorrowDate.compareTo(dueDate);
+            return result == 0;
         }
     }
 
@@ -204,13 +188,9 @@ public class NotificationManager {
                  zoneOffset = todo.getDueTimezone();
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
-            LocalDate nowDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
-            int result = nowDate.compareTo(dueDate);
-            if(result == 0) {
-                return true;
-            } else {
-                return false;
-            }
+            LocalDate todayDate = LocalDate.of(adjustedNow.getYear(), adjustedNow.getMonth(), adjustedNow.getDayOfMonth());
+            int result = todayDate.compareTo(dueDate);
+            return result == 0;
         }
     }
 
@@ -230,11 +210,7 @@ public class NotificationManager {
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
             int result = adjustedNow.compareTo(OffsetDateTime.of(dueDate, dueTime, zoneOffset));
-            if(result < 0) {
-                return true;
-            } else {
-                return false;
-            }
+            return result > 0;
         }
     }
 
