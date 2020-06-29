@@ -2,6 +2,7 @@
 - notification for overdue tasks
 - bugfixes:
     - notification sending
+    - biweekly scheduling missing from gui
 - dependencies
     - patternfly4 to 4.10.31
     - spring boot to 2.3.1
