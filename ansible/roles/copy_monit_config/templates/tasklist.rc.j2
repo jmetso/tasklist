@@ -1,0 +1,2 @@
+check process TaskList with pidfile {{ install_dir }}/pidfile
+    if failed port {{ service_port }} then alert
