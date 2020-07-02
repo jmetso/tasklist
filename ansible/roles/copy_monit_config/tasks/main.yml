@@ -1,0 +1,13 @@
+# roles/copy_monit_config/tasks/main.yml
+- name: Copy configuration file
+  template:
+    src: templates/tasklist.rc.j2
+    dest: /etc/monit.d/tasklist.rc
+    mode: 0640
+    owner: root
+    group: root
+
+- name: Restart monit
+  systemd:
+    name: monit
+    state: restarted
