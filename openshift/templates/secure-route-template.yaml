@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Template
+labels:
+  template: secure-route-template
+message: Created route for https://${APP_NAME}-${APP_NAMESPACE}.${APP_DOMAIN}/${APP_CONTEXT_ROOT}.
+metadata:
+  annotations:
+    description: Template for creating a https route.
+  creationTimestamp: null
+  name: route-template
+objects:
+- apiVersion: v1
+  kind: Route
+  metadata:
+    annotations:
+      openshift.io/generated-by: secure-route-template
+    creationTimestamp: null
+    labels:
+      app: ${APP_NAME}
+      pipeline: ${REVISION}
+    name: ${APP_NAME}-secure
+  spec:
+    host: ${APP_NAME}-${APP_NAMESPACE}.${APP_DOMAIN}
+    path: ${APP_CONTEXT_ROOT}
+    port:
+      targetPort: 8080-tcp
+    tls:
+      termination: edge
+    to:
+      kind: Service
+      name: ${APP_NAME}
+      weight: 100
+    wildcardPolicy: None
+parameters:
+- name: APP_NAME
+  description: Application name
+  required: true
+- name: APP_NAMESPACE
+  description: Namespace to deploy the appliction to
+  required: true
+- name: APP_DOMAIN
+  description: Base domain that is used to publish the routes.
+  required: true
+- name: APP_CONTEXT_ROOT
+  description: Http context root for the application
+  value: /
+  required: true
+- name: REVISION
+  description: Pipeline stage, default is release
+  value: release
+  required: true
