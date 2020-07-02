@@ -1,6 +1,6 @@
 #! groovy
 
-// used environment variables
+// used environment variables, those that are commented out are pulled from pipeline build config
 // GIT_URL
 // CLONE_BRANCH
 // PIPELINE_BRANCH
@@ -138,9 +138,13 @@ pipeline {
                             } // timeout
                             echo "5"
                             def devSvc = openshift.selector('svc', APP_NAME)
-                            openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/svc.yaml")
+                            if(devSvc.exists()) {
+                                openshift.replace('-f', "cicd/{$OBJECTS_FOLDER}/svc.yaml")
+                            } else {
+                                openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/svc.yaml")
+                            }
 
-                            createSecureRoute(DEV_NAMESPACE, APP_NAME, '/csv', APP_DOMAIN)
+                            createSecureRoute(DEV_NAMESPACE, APP_NAME, '/tasklist', APP_DOMAIN)
                         } // withProject
                     } // withCluster
                 } // script
@@ -208,13 +212,15 @@ def createPvc(namespace, name, appName, size) {
 def createSecureRoute(namespace, applicationName, contextRoot, appDomain) {
     openshift.withProject(namespace) {
         def route = openshift.selector('route', "${applicationName}-secure")
-        if(!route.exists()) {
-            def routeObj = openshift.process(readFile(file:'src/openshift/templates/secure-route-template.yaml'),
-                    '-p', "APP_NAME=${applicationName}",
-                    '-p', "APP_NAMESPACE=${namespace}",
-                    '-p', "APP_CONTEXT_ROOT=${contextRoot}",
-                    '-p', "APP_DOMAIN=${appDomain}")
-            openshift.create(routeObj)
+        if(route.exists()) {
+            openshift.delete('route', "${applicationName}-secure")
         }
+        def routeObj = openshift.process(readFile(file:'src/openshift/templates/secure-route-template.yaml'),
+                '-p', "APP_NAME=${applicationName}",
+                '-p', "APP_NAMESPACE=${namespace}",
+                '-p', "APP_CONTEXT_ROOT=${contextRoot}",
+                '-p', "APP_DOMAIN=${appDomain}",
+                '-p', "REVISION=development")
+        openshift.create(routeObj)
     }
 }
