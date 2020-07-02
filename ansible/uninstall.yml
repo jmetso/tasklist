@@ -6,6 +6,18 @@
   become: true
 
   tasks:
+  - name: Remove monit config
+    file:
+      path: /etc/monit.d/tasklist.rc
+      state: absent
+    when: setup_monit is defined and setup_monit
+
+  - name: Restart monit
+    systemd:
+      name: monit
+      state: restarted
+    when: setup_monit is defined and setup_monit
+
   - name: Stop and disable service
     systemd:
       name: tasklist
