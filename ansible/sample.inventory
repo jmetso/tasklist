@@ -4,6 +4,7 @@ localhost
 [tasklist:vars]
 install_dir=/opt/tasklist
 service_user=root
+setup_monit=true
 
 [openshift]
 localhost
