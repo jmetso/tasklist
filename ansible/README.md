@@ -15,6 +15,7 @@ files.
 |install_dir|Inventory|Installation directory on remote machine|
 |service_user|Inventory|Which user to run the linux service|
 |vault_smtp_password|Vault|Email server password|
+|setup_monit|Inventory|Whether to setup monit rule for monitoring tasklist|
 
 ### Procedure
 
@@ -22,6 +23,7 @@ files.
 2. Copy configuration file
 3. Copy jar file
 4. Install and start service
+5. Copy monit configuration and restart monit if setup_monit is True
 
 **Note** Installation playbook assumes that there is a built jar available in the target folder in the project root.
 
@@ -43,11 +45,13 @@ playbook uses the tasklist variables section in the [sample.inventory](sample.in
 |Variable name|Location|Description|
 | :--- | :--- | :--- |
 |install_dir|Inventory|Installation directory on remote machine|
+|setup_monit|Inventory|Whether to setup monit rule for monitoring tasklist|
 
 ### Procedure
 
-1. Stop and remove service
-2. Delete installation directory and it's contents
+1. Remove monit configuration if it was applied
+2. Stop and remove service
+3. Delete installation directory and it's contents
 
 ### How to run the playbook
 
