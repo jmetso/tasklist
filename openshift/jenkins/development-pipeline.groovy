@@ -116,7 +116,7 @@ pipeline {
                         openshift.withProject(DEV_NAMESPACE) {
                             openshift.tag("${BUILD_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:toDev", "${DEV_NAMESPACE}/${TARGET_IMAGESTREAM_NAME}:${TARGET_IMAGE_TAG}")
                             echo "1"
-                            createPvc(DEV_NAMESPACE, 'dev-tasklist-data', APP_NAME, '1Gi')
+                            createPvc(DEV_NAMESPACE)
                             echo "2"
                             def devDc = openshift.selector('dc', 'dev-tasklist')
                             if(devDc.exists()) {
@@ -191,11 +191,9 @@ def testEndpointResponse(url, text, wait=10, pollInterval=30) {
  * Creates a persistent volume claim (pvc)
  *
  * @param namespace namespace to create the pvc in
- * @param name name of pvc
- * @param appName name of application
- * @param size size of pvc
+
  */
-def createPvc(namespace, name, appName, size) {
+def createPvc(namespace) {
     openshift.withProject(namespace) {
         openshift.apply('-f', "cicd/${OBJECTS_FOLDER}/pvc.yaml")
     } // withProject
