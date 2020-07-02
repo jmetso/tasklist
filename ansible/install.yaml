@@ -60,3 +60,8 @@
   - name: Install and start service
     include_role:
       name: install_service
+
+  - name: Copy monit configuration file
+    include_role:
+      name: copy_monit_config
+    when: setup_monit is defined and setup_monit
