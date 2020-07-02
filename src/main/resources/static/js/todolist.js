@@ -8,6 +8,7 @@ var data = {
     user: "user",
     version: "n/a",
     showAbout: false,
+    showNewItemWizard: false,
     showEditItemWizard: false
 }
 
@@ -125,9 +126,9 @@ var app = new Vue({
             }
         },
         startNewItemWizard: function(event) {
-            //console.log('New item!')
+            console.debug('New item!')
             data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeating": "No", "dueDate": "", "dueTime": "", "dueTimezone": "" }
-            data.showEditItemWizard = true
+            data.showNewItemWizard = true
         },
         editWizardSave: function(event) {
             //console.log("Wizard save!")
@@ -189,7 +190,7 @@ var app = new Vue({
             //console.log("Wizard save!")
             saveTodo(data.newItem)
             data.newItemWizardPage = 1
-            document.getElementById('new-todo-wizard').style.display = "none"
+            data.showNewItemWizard = false
         },
         clickOnAlert: function(event) {
             if(event.target.tagName === "A") {
@@ -207,6 +208,10 @@ var app = new Vue({
         toggleEditItemWizard: function(event) {
             console.debug('Toggle edit item wizard!')
             data.showEditItemWizard = !data.showEditItemWizard
+        },
+        toggleNewItemWizard: function(event) {
+            console.debug('Toggle new item wizard!')
+            data.showNewItemWizard = !data.showNewItemWizard
         }
     }
 })
