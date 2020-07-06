@@ -12,6 +12,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
 import java.util.List;
 import java.util.Timer;
@@ -114,11 +115,11 @@ public class NotificationManager {
         } else if(this.isDueWithinSevenDays(now, todo) && (lastNotificationDate == null
                 || !hasAlreadyBeenNotifiedThisWeek(now, lastNotificationDate))) {
             logger.debug("Sending notification for next 7 days");
+            String text = "Task " + todo.getTitle() + " is due on "+todo.getDueDate().format(DateTimeFormatter.ISO_DATE)+"!";
             if(todo.getDescription() != null) {
-                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due in next 7 days", "Task " + todo.getTitle() + " is due in next 7 days!\n\n" + todo.getDescription(), user);
-            } else {
-                this.emailClient.sendNotification("Task " + todo.getTitle() + " is due in next 7 days", "Task " + todo.getTitle() + " is due in next 7 days", user);
+                text += "\n\n" + todo.getDescription();
             }
+            this.emailClient.sendNotification("Task " + todo.getTitle() + " is due in next 7 days", text, user);
             return true;
         }
         return false;
@@ -208,13 +209,16 @@ public class NotificationManager {
             ZoneOffset zoneOffset = now.getOffset();
             LocalTime dueTime = todo.getDueTime();
             if(dueTime == null) {
-                dueTime = LocalTime.of(now.getHour(), now.getMinute(), now.getSecond());
+                dueTime = LocalTime.of(now.getHour(), now.getMinute(), now.getSecond(), now.getNano());
             }
             if(todo.getDueTimezone() != null) {
                 zoneOffset = todo.getDueTimezone();
             }
             OffsetDateTime adjustedNow = now.plusSeconds((zoneOffset.get(ChronoField.OFFSET_SECONDS)-now.get(ChronoField.OFFSET_SECONDS)));
-            int result = adjustedNow.compareTo(OffsetDateTime.of(dueDate, dueTime, zoneOffset));
+            OffsetDateTime due = OffsetDateTime.of(dueDate, dueTime, zoneOffset);
+            logger.debug("Adjusted: "+adjustedNow);
+            logger.debug("Due: "+due);
+            int result = adjustedNow.compareTo(due);
             return result > 0;
         }
     }
