@@ -244,6 +244,76 @@ class NotificationManagerTest {
     }
 
     @Test
+    public void testTaskWithDueDateInNextSevenDaysAlreadyNotifiedNow() {
+        List<Todo> todos = new LinkedList<>();
+        Todo todo = new Todo(4, -1, "Five");
+        todo.setScheduled(true);
+        todo.setDueDate(LocalDate.now().plusDays(7));
+        todo.setLastNotification(OffsetDateTime.now());
+        todos.add(todo);
+
+        DatabaseManager databaseManager = mock(DatabaseManager.class);
+        when(databaseManager.getUsers()).thenReturn(userAccounts);
+        when(databaseManager.getUserList("user")).thenReturn(1);
+        when(databaseManager.getTodos(1)).thenReturn(todos);
+        when(databaseManager.updateTodo(1, todo)).thenReturn(true);
+
+        AtomicInteger sentNotifications = new AtomicInteger();
+
+        this.notificationManager.setEmailClient((subject, text, user1) -> {
+            sentNotifications.getAndIncrement();
+            assertEquals("user", user1.getUsername(), "Username");
+            assertEquals("Task Five is due in next 7 days", subject, "Subject");
+            assertEquals("Task Five is due in next 7 days", text, "Body");
+        });
+        this.notificationManager.setDatabaseManager(databaseManager);
+        this.notificationManager.init();
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(0, sentNotifications.get(), "Notifications");
+    }
+
+    @Test
+    public void testTaskWithDueDateInNextSevenDaysAlreadyNotifiedThreeDaysAgo() {
+        List<Todo> todos = new LinkedList<>();
+        Todo todo = new Todo(4, -1, "Five");
+        todo.setScheduled(true);
+        todo.setDueDate(LocalDate.now().plusDays(4));
+        todo.setLastNotification(OffsetDateTime.now().minusDays(3));
+        todos.add(todo);
+
+        DatabaseManager databaseManager = mock(DatabaseManager.class);
+        when(databaseManager.getUsers()).thenReturn(userAccounts);
+        when(databaseManager.getUserList("user")).thenReturn(1);
+        when(databaseManager.getTodos(1)).thenReturn(todos);
+        when(databaseManager.updateTodo(1, todo)).thenReturn(true);
+
+        AtomicInteger sentNotifications = new AtomicInteger();
+
+        this.notificationManager.setEmailClient((subject, text, user1) -> {
+            sentNotifications.getAndIncrement();
+            assertEquals("user", user1.getUsername(), "Username");
+            assertEquals("Task Five is due in next 7 days", subject, "Subject");
+            assertEquals("Task Five is due in next 7 days", text, "Body");
+        });
+        this.notificationManager.setDatabaseManager(databaseManager);
+        this.notificationManager.init();
+
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        assertEquals(0, sentNotifications.get(), "Notifications");
+    }
+
+    @Test
     public void testTaskWithDueDateInNextEightDays() {
         List<Todo> todos = new LinkedList<>();
         Todo todo = new Todo(4, -1, "Six");

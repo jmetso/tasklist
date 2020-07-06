@@ -126,17 +126,22 @@ public class NotificationManager {
 
     private boolean hasAlreadyBeenNotifiedThisWeek(final OffsetDateTime now, final OffsetDateTime notificationDate) {
         OffsetDateTime adjusted = now.minusDays(7);
-        boolean result = (notificationDate.getYear() >= adjusted.getYear()
-                && notificationDate.getMonthValue() >= adjusted.getMonthValue()
-                && notificationDate.getDayOfMonth() >= adjusted.getDayOfMonth());
+        int result = adjusted.compareTo(notificationDate);
         logger.debug("Has already been notified this week: "+result);
-        return result;
+        if(result > 0 ) {
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private boolean hasAlreadyBeenNotifiedToday(final OffsetDateTime now, final OffsetDateTime notificationDate) {
-        return (notificationDate.getYear() == now.getYear()
-                && notificationDate.getMonth() == now.getMonth()
-                && notificationDate.getDayOfMonth() == now.getDayOfMonth());
+        int result = now.toLocalDate().compareTo(notificationDate.toLocalDate());
+        if(result == 0) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private boolean isDueWithinSevenDays(final OffsetDateTime now, final Todo todo) {
