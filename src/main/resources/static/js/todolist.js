@@ -131,7 +131,7 @@ var app = new Vue({
             data.showNewItemWizard = true
         },
         editWizardSave: function(event) {
-            //console.log("Wizard save!")
+            //console.debug("Edit wizard save!")
             var proceed = true
             if(data.editItemWizardPage === 1) {
                 proceed = validateWizardPageOne('edit', data.editItem)
@@ -144,6 +144,7 @@ var app = new Vue({
             }
             if(!proceed) return
             saveTodo(data.editItem)
+            //console.debug('Hide wizard')
             data.showEditItemWizard = false
         },
         editWizardNext: function(event) {
@@ -241,7 +242,7 @@ function editItem(itemId) {
         if(data.todoItems[i].id == itemId) {
             //console.log("id: "+data.editItem.id)
             data.editItem = data.todoItems[i]
-            $('#edit-todo-wizard').show()
+            data.showEditItemWizard = true
             break;
         }
     }
