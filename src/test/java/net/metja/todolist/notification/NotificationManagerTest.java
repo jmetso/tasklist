@@ -11,10 +11,12 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -88,12 +90,14 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
 
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
             assertEquals("user", user1.getUsername(), "Username");
             assertEquals("Task Two is due today!", subject, "Subject");
             assertEquals("Task Two is due today!", text, "Body");
+            pass.set(true);
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -105,6 +109,7 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+        assertTrue(pass.get(), "Notification content");
     }
 
     @Test
@@ -122,11 +127,14 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
+
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
             assertEquals("user", user1.getUsername(), "Username");
             assertEquals("Task Three is due today!", subject, "Subject");
             assertEquals("Task Three is due today!", text, "Body");
+            pass.set(true);
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -138,6 +146,7 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+        assertTrue(pass.get(), "Notification content");
     }
 
     @Test
@@ -155,12 +164,14 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
 
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
             assertEquals("user", user1.getUsername(), "Username");
             assertEquals("Task Four is due tomorrow!", subject, "Subject");
             assertEquals("Task Four is due tomorrow!", text, "Body");
+            pass.set(true);
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -172,6 +183,7 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+        assertTrue(pass.get(), "Notification content");
     }
 
     @Test
@@ -190,12 +202,10 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
 
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
-            assertEquals("user", user1.getUsername(), "Username");
-            assertEquals("Task Four is due tomorrow!", subject, "Subject");
-            assertEquals("Task Four is due tomorrow!", text, "Body");
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -214,7 +224,8 @@ class NotificationManagerTest {
         List<Todo> todos = new LinkedList<>();
         Todo todo = new Todo(4, -1, "Five");
         todo.setScheduled(true);
-        todo.setDueDate(LocalDate.now().plusDays(7));
+        LocalDate due = LocalDate.now().plusDays(7);
+        todo.setDueDate(due);
         todos.add(todo);
 
         DatabaseManager databaseManager = mock(DatabaseManager.class);
@@ -224,12 +235,14 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
 
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
             assertEquals("user", user1.getUsername(), "Username");
             assertEquals("Task Five is due in next 7 days", subject, "Subject");
-            assertEquals("Task Five is due in next 7 days", text, "Body");
+            assertEquals("Task Five is due on "+due.format(DateTimeFormatter.ISO_DATE)+"!", text, "Body");
+            pass.set(true);
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -241,6 +254,7 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+        assertTrue(pass.get(), "Notification content");
     }
 
     @Test
@@ -248,7 +262,8 @@ class NotificationManagerTest {
         List<Todo> todos = new LinkedList<>();
         Todo todo = new Todo(4, -1, "Five");
         todo.setScheduled(true);
-        todo.setDueDate(LocalDate.now().plusDays(7));
+        LocalDate due = LocalDate.now().plusDays(7);
+        todo.setDueDate(due);
         todo.setLastNotification(OffsetDateTime.now());
         todos.add(todo);
 
@@ -262,9 +277,6 @@ class NotificationManagerTest {
 
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
-            assertEquals("user", user1.getUsername(), "Username");
-            assertEquals("Task Five is due in next 7 days", subject, "Subject");
-            assertEquals("Task Five is due in next 7 days", text, "Body");
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -297,9 +309,6 @@ class NotificationManagerTest {
 
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
-            assertEquals("user", user1.getUsername(), "Username");
-            assertEquals("Task Five is due in next 7 days", subject, "Subject");
-            assertEquals("Task Five is due in next 7 days", text, "Body");
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -328,6 +337,7 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
 
         this.notificationManager.setEmailClient((subject, text, user1) -> sentNotifications.getAndIncrement());
         this.notificationManager.setDatabaseManager(databaseManager);
@@ -387,11 +397,14 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
+
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
             assertEquals("user", user1.getUsername(), "Username");
             assertEquals("Task Eight is due today!", subject, "Subject");
             assertEquals("Task Eight is due today!\n\nDescription.", text, "Body");
+            pass.set(true);
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -403,6 +416,7 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+        assertTrue(pass.get(), "Notification content");
     }
 
     @Test
@@ -424,11 +438,9 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
-            assertEquals("user", user1.getUsername(), "Username");
-            assertEquals("Task Three is due today!", subject, "Subject");
-            assertEquals("Task Three is due today!", text, "Body");
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -457,11 +469,14 @@ class NotificationManagerTest {
         when(databaseManager.updateTodo(1, todo)).thenReturn(true);
 
         AtomicInteger sentNotifications = new AtomicInteger();
+        AtomicBoolean pass = new AtomicBoolean(false);
+
         this.notificationManager.setEmailClient((subject, text, user1) -> {
             sentNotifications.getAndIncrement();
             assertEquals("user", user1.getUsername(), "Username");
             assertEquals("Task Ten is overdue!", subject, "Subject");
             assertEquals("Task Ten is overdue!", text, "Body");
+            pass.set(true);
         });
         this.notificationManager.setDatabaseManager(databaseManager);
         this.notificationManager.init();
@@ -473,6 +488,7 @@ class NotificationManagerTest {
         }
 
         assertEquals(1, sentNotifications.get(), "Notifications");
+        assertTrue(pass.get(), "Notification content");
     }
 
 }
