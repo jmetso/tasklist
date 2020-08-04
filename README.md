@@ -15,13 +15,27 @@ How to build a jar with OpenShift profile:
 mvn -P openshift clean package
 ```
 
+## How to create a docker/podman image
+
+Podman:
+```
+cd docker
+podman build
+```
+
+Docker:
+```
+cd docker
+docker build
+```
+
 ## How to install with Ansible
 
-See [ansible/install.yaml](ansible/install.yaml). The playbook is described in the [README.md](ansible/README.md) file.
+See [ansible/install.yaml](ansible/install.yaml). The playbook is described in the [ansible/README.md](ansible/README.md) file.
 
 ## How to uninstall with Ansible
 
-See [ansible/uninstall.yml](ansible/uninstall.yml). The playbook is described in the [README.md](ansible/README.md) file.
+See [ansible/uninstall.yml](ansible/uninstall.yml). The playbook is described in the [ansible/README.md](ansible/README.md) file.
 
 ## Other stuff
 
