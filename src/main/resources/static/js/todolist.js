@@ -81,7 +81,7 @@ var app = new Vue({
     },
     methods: {
         activeItemClick: function(event) {
-            //console.log("active-todo-item");
+            console.log("active-todo-item");
             processActiveItemClick(event.target)
         },
         inactiveItemClick: function(event) {
@@ -103,7 +103,7 @@ var app = new Vue({
             }
         },
         logout: function(event) {
-            $.post('./api/v1/logout', function(result) {
+            $.post('./api/v1/logout'+window.location.search, function(result) {
                 data.user = ""
                 location.reload()
             }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -219,19 +219,25 @@ var app = new Vue({
 
 function processActiveItemClick(element) {
     //console.log(element)
+    var target = element
     var id = element.parentElement.parentElement.parentElement.id
-    if($(element).hasClass("pf-m-primary")) {
+    if("I" == element.tagName) {
+        //console.log(element.parentElement)
+        target = element.parentElement
+        id = target.parentElement.parentElement.parentElement.id
+    }
+    if($(target).hasClass("pf-m-primary")) {
         //console.log(id+" primary!")
         completeItem(id)
         getItems()
-    } else if($(element).hasClass("pf-m-secondary")) {
+    } else if($(target).hasClass("pf-m-secondary")) {
         //console.log(id+" secondary!")
         editItem(id)
-    } else if($(element).hasClass("pf-m-tertiary")) {
+    } else if($(target).hasClass("pf-m-tertiary")) {
         //console.log(id+" tertiary!")
         editItem(id)
         data.editItemWizardPage=2
-    } else if($(element).hasClass('pf-m-danger')) {
+    } else if($(target).hasClass('pf-m-danger')) {
         //console.log(id+" danger!")
         deactivateItem(id)
     }
@@ -250,7 +256,7 @@ function editItem(itemId) {
 
 function activateItem(id) {
     //console.log('/api/v1/items/'+id+'/activate')
-    $.getJSON('./api/v1/items/'+id+'/activate', function(result) {
+    $.getJSON('./api/v1/items/'+id+'/activate'+window.location.search, function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
                 publishSuccessAlert(id, data.todoItems[i].title+' activated!')
@@ -272,7 +278,7 @@ function activateItem(id) {
 
 function deactivateItem(id) {
     //console.log('/api/v1/items/'+id+'/deactivate')
-    $.getJSON('./api/v1/items/'+id+'/deactivate', function(result) {
+    $.getJSON('./api/v1/items/'+id+'/deactivate'+window.location.search, function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
                 publishSuccessAlert(id, data.todoItems[i].title+' activated!')
@@ -301,19 +307,25 @@ function deactivateItem(id) {
 
 function processInactiveItemClick(element) {
     //console.log(element)
+    var target = element
     var id = element.parentElement.parentElement.parentElement.id
-    if($(element).hasClass("pf-m-primary")) {
+    if("I" == element.tagName) {
+        //console.log(element.parentElement)
+        target = element.parentElement
+        id = target.parentElement.parentElement.parentElement.id
+    }
+    if($(target).hasClass("pf-m-primary")) {
         //console.log(id+" primary!")
         activateItem(id)
-    } else if($(element).hasClass("pf-m-secondary")) {
+    } else if($(target).hasClass("pf-m-secondary")) {
         //console.log(id+" secondary!")
         editItem(id)
-    } else if($(element).hasClass("pf-m-tertiary")) {
+    } else if($(target).hasClass("pf-m-tertiary")) {
         //console.log(id+" tertiary!")
-    } else if($(element).hasClass("pf-m-danger")) {
+    } else if($(target).hasClass("pf-m-danger")) {
         //console.log(id+" danger!")
         //console.log('/api/v1/items/'+id+'/delete')
-        $.getJSON('./api/v1/items/'+id+'/delete', function(result) {
+        $.getJSON('./api/v1/items/'+id+'/delete'+window.location.search, function(result) {
             for(var i=0; i < data.todoItems.length; ++i) {
                 if(data.todoItems[i].id == id) {
                     publishSuccessAlert(id, data.todoItems[i].title+' deleted!')
@@ -350,7 +362,7 @@ function publishAlert(html, itemId, delay) {
 
 function completeItem(id) {
     //console.log('/api/v1/items/'+id+'/done')
-    $.getJSON('./api/v1/items/'+id+'/done', function(result) {
+    $.getJSON('./api/v1/items/'+id+'/done'+window.location.search, function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
                 publishSuccessAlert(id, data.todoItems[i].title+' completed!')
@@ -372,14 +384,14 @@ function completeItem(id) {
 
 function getItems() {
     //console.log("./api/v1/items")
-    $.getJSON("./api/v1/items", function(result) {
+    $.getJSON("./api/v1/items"+window.location.search, function(result) {
         data.todoItems = result;
     }).fail(function(jqXHR, textStatus, errorThrown) {
         //console.log("Status: "+jqXHR.status)
         console.error("Failed to get items: "+textStatus)
         if(jqXHR.status == 404) {
             //console.log("./api/v/new")
-            $.getJSON("./api/v1/new", function(result) {
+            $.getJSON("./api/v1/new"+window.location.search, function(result) {
                 publishSuccessAlert('alertsn', 'Added new list!')
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.error("Failed to add new list: "+textStatus)
@@ -456,7 +468,7 @@ function saveTodo(item) {
     if(item.id < 0) {
         //console.log("./api/v1/items/add")
         $.ajax({
-            url: './api/v1/items/add',
+            url: './api/v1/items/add'+window.location.search,
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',
@@ -473,7 +485,7 @@ function saveTodo(item) {
     } else {
         //console.log("./api/v1/items/"+item.id+"/update")
         $.ajax({
-            url: './api/v1/items/'+item.id+'/update',
+            url: './api/v1/items/'+item.id+'/update'+window.location.search,
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',
@@ -531,7 +543,7 @@ function publishDangerAlert(id, message, timeout=0) {
 }
 
 function getUser() {
-    $.getJSON("./api/v1/user", function(result) {
+    $.getJSON("./api/v1/user"+window.location.search, function(result) {
         data.user = result.user;
     }, "json").fail(function(jqXHR, textStatus, errorThrown) {
         publishDangerAlert('alertdu', 'Failed to get user!', 5000)
@@ -541,7 +553,7 @@ function getUser() {
 getUser()
 
 function getVersion() {
-    $.getJSON("./api/v1/version", function(result) {
+    $.getJSON("./api/v1/version"+window.location.search, function(result) {
         data.version = result.version;
     }, "json").fail(function(jqXHR, textStatus, errorThrown) {
         publishDangerAlert('alertdv', 'Failed to get version!', 5000)
@@ -550,7 +562,7 @@ function getVersion() {
 }
 getVersion()
 
-function checkOverdueItems() {
+function checkOverdueItems() {
     var now = new Date()
     var nowDate = now.toISOString().split('T')[0]
     var tomorrow = new Date()
