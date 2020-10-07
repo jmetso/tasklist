@@ -407,11 +407,6 @@ getItems()
 // New item wizard shit
 function validateWizardPageOne(prefix, item) {
     if(item.title === "") {
-        $('#'+prefix+'-item-title').attr('aria-invalid', "true")
-        if($('#'+prefix+'-item-title-helper').length == 0) {
-            var helperText = '<p class="pf-c-form__helper-text pf-m-error" id="'+prefix+'-item-title-helper" aria-live="polite">You need to specify title for todo items.</p>'
-            $(helperText).insertAfter('#'+prefix+'-item-title')
-        }
         return false
     } else {
         $('#'+prefix+'-item-title').attr('aria-invalid', "false")
