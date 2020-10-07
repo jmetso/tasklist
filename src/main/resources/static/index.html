@@ -6,7 +6,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
   <link rel="icon" type="image/svg" href="./fontawesome-free-5.10.2-web/svgs/solid/tasks.svg" />
-  <link rel="stylesheet" href="./css/todolist.css">
+  <!--<link rel="stylesheet" href="./css/todolist.css">-->
   <link rel="stylesheet" href="./css/patternfly.css">
   <link rel="stylesheet" href="./css/patternfly-addons.css">
   <link rel="stylesheet" href="./fontawesome-free-5.10.2-web/css/all.css">
@@ -14,7 +14,7 @@
   <script src="./js/jquery-3.5.0.min.js"></script>
 </head>
 <body>
-  <div id="content">
+  <div class="ws-site-root" id="content">
     <div class="pf-c-background-image">
       <svg xmlns="http://www.w3.org/2000/svg" class="pf-c-background-image__filter" width="0" height="0">
         <filter id="image_overlay">
@@ -299,7 +299,7 @@
     </div>
     <div class="pf-c-backdrop" id="edit-todo-wizard" v-show="showEditItemWizard">
       <div class="pf-l-bullseye">
-        <div class="pf-c-wizard">
+        <div class="pf-c-wizard pf-u-h-33 pf-u-h-50-on-sm pf-u-w-50 pf-u-w-75-on-sm">
           <div class="pf-c-wizard__header">
             <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="toggleEditItemWizard">
               <i class="fas fa-times" aria-hidden="true"></i>
