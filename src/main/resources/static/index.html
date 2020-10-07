@@ -385,40 +385,38 @@
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.editItem.scheduled">
-                      <label class="pf-c-form__label pf-m-no-padding-top" for="edit-item-duedate-date">
-                        <span class="pf-c-form__label-text">Due Date</span>
-                      </label>
-                      <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-form__group">
-                          <label class="pf-c-form__label" for="edit-item-duedate-date">
-                            <span class="pf-c-form__label-text">Date</span>
-                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      <div class="pf-c-form__group-label">
+                        <label class="pf-c-form__label" for="edit-item-duedate-date-picker">
+                          <span class="pf-c-form__label-text">Due Date</span>
+                          <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                        </label>
+                      </div>
+                      <div class="pf-c-form__group-control">
+                        <div class="pf-c-input-group">
+                          <label class="pf-c-input-group__text" for="edit-item-duedate-date-picker">
+                            <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                           </label>
-                          <div class="pf-c-form__horizontal-group">
-                            <input class="pf-c-form-control" type="text" id="edit-item-duedate-date" name="edit-item-duedate-date" required v-model="data.editItem.dueDate" placeholder="yyyy-mm-hh" maxlength="10"/>
-                          </div>
+                          <input class="pf-c-form-control" type="date" id="edit-item-duedate-date-picker" name="edit-item-duedate-date-picker" aria-label="Task due date"  v-model="data.editItem.dueDate"/>
                         </div>
                       </div>
-                      <br />
-                      <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-form__group">
-                          <label class="pf-c-form__label" for="edit-item-duedate-time">
-                            <span class="pf-c-form__label-text">Time</span>
-                          </label>
-                          <div class="pf-c-form__horizontal-group">
-                            <input class="pf-c-form-control" type="text" id="edit-item-duedate-time" name="edit-item-duedate-time" v-model="data.editItem.dueTime" placeholder="HH:MM" maxlength="5"/>
-                          </div>
+                    </div>
+                    <div class="pf-c-form__horizontal-group" v-if="data.editItem.scheduled">
+                      <div class="pf-c-form__group">
+                        <label class="pf-c-form__label" for="edit-item-duedate-time">
+                          <span class="pf-c-form__label-text">Time</span>
+                        </label>
+                        <div class="pf-c-form__horizontal-group">
+                          <input class="pf-c-form-control" type="text" id="edit-item-duedate-time" name="edit-item-duedate-time" v-model="data.editItem.dueTime" placeholder="HH:MM" maxlength="5"/>
                         </div>
                       </div>
-                      <br />
-                      <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-form__group">
-                          <label class="pf-c-form__label" for="edit-item-duedate-tz">
-                            <span class="pf-c-form__label-text">Timezone</span>
-                          </label>
-                          <div class="pf-c-form__horizontal-group">
-                            <input class="pf-c-form-control" type="text" id="edit-item-duedate-tz" name="edit-item-duedate-tz" v-model="data.editItem.dueTimezone" placeholder="+02:00" maxlength="6"/>
-                          </div>
+                    </div>
+                    <div class="pf-c-form__horizontal-group" v-if="data.editItem.scheduled">
+                      <div class="pf-c-form__group">
+                        <label class="pf-c-form__label" for="edit-item-duedate-tz">
+                          <span class="pf-c-form__label-text">Timezone</span>
+                        </label>
+                        <div class="pf-c-form__horizontal-group">
+                          <input class="pf-c-form-control" type="text" id="edit-item-duedate-tz" name="edit-item-duedate-tz" v-model="data.editItem.dueTimezone" placeholder="+02:00" maxlength="6"/>
                         </div>
                       </div>
                     </div>
@@ -448,9 +446,15 @@
                           <label class="pf-c-radio__label" for="edit-item-repeating-radio-monthly">Montly</label>
                         </div>
                         <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.editItem.repaeting"/>
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.editItem.repeating"/>
                           <label class="pf-c-radio__label" for="edit-item-repeating-radio-yearly">Yearly</label>
                         </div>
+                        <!--
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-custom" name="exampleRadioSimple" value="Yearly"  v-model="data.editItem.repeating"/>
+                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-custom">Custom</label>
+                        </div>
+                        -->
                       </div>
                     </div>
                   </form>
