@@ -88,7 +88,7 @@
     </div>
     <div class="pf-c-backdrop" id="new-todo-wizard" v-show="showNewItemWizard">
       <div class="pf-l-bullseye">
-        <div class="pf-c-wizard">
+        <div class="pf-c-wizard pf-u-h-33 pf-u-h-50-on-sm pf-u-w-50 pf-u-w-75-on-sm">
           <div class="pf-c-wizard__header">
             <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="closeWizard">
               <i class="fas fa-times" aria-hidden="true"></i>
@@ -136,7 +136,9 @@
                         <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
-                        <input class="pf-c-form-control" type="text" id="new-item-title" name="new-item-title" aria-invalid="false" required v-model="data.newItem.title" placeholder="new item title"/>
+                        <input class="pf-c-form-control" type="text" id="new-item-title" name="new-item-title" :aria-invalid="data.newItem.title==''" required v-model="data.newItem.title" placeholder="new item title" v-bind:class="{ 'pf-m-success': data.newItem.title!='' }"/>
+                        <p class="pf-c-form__helper-text pf-m-error" id="new-item-title-error" aria-live="polite" v-show="data.newItem.title==''">You need to specify task title</p>
+                        <p class="pf-c-form__helper-text pf-m-success" id="new-item-title-success" aria-live="polite" v-show="data.newItem.title!=''"></p>
                       </div>
                     </div>
                     <div class="pf-c-form__group">
@@ -165,46 +167,47 @@
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.newItem.scheduled">
-                      <label class="pf-c-form__label pf-m-no-padding-top" for="new-item-duedate-date">
-                        <span class="pf-c-form__label-text">Due Date</span>
-                      </label>
-                      <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-form__group">
-                          <label class="pf-c-form__label" for="new-item-duedate-date">
-                            <span class="pf-c-form__label-text">Date</span>
-                            <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                      <div class="pf-c-form__group-label">
+                        <label class="pf-c-form__label" for="new-item-duedate-date-picker">
+                          <span class="pf-c-form__label-text">Due Date</span>
+                          <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
+                        </label>
+                      </div>
+                      <div class="pf-c-form__group-control">
+                        <div class="pf-c-input-group">
+                          <label class="pf-c-input-group__text" for="new-item-duedate-date-picker">
+                            <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                           </label>
-                          <div class="pf-c-form__horizontal-group">
-                            <input class="pf-c-form-control" type="text" id="new-item-duedate-date" name="new-item-duedate-date" required v-model="data.newItem.dueDate" placeholder="yyyy-mm-hh" maxlength="10"/>
-                          </div>
+                          <input class="pf-c-form-control" type="date" id="new-item-duedate-date-picker" name="new-item-duedate-date-picker" aria-label="Task due date"  :aria-invalid="data.newItem.dueDate==''" v-model="data.newItem.dueDate" v-bind:class="{ 'pf-m-success': data.newItem.dueDate!='' }"/>
+                        </div>
+                        <p class="pf-c-form__helper-text pf-m-error" id="new-item-duedate-date-picker-error" aria-live="polite" v-show="data.newItem.dueDate==''">You need to specify task due date</p>
+                        <p class="pf-c-form__helper-text pf-m-success" id="new-item-duedate-date-picker-success" aria-live="polite" v-show="data.newItem.dueDate!=''"></p>
+                      </div>
+                    </div>
+                    <div class="pf-c-form__horizontal-group" v-if="data.newItem.scheduled">
+                      <div class="pf-c-form__group">
+                        <label class="pf-c-form__label" for="new-item-duedate-time">
+                          <span class="pf-c-form__label-text">Time</span>
+                        </label>
+                        <div class="pf-c-form__horizontal-group">
+                          <input class="pf-c-form-control" type="text" id="new-item-duedate-time" name="new-item-duedate-time" v-model="data.newItem.dueTime" placeholder="HH:MM" maxlength="5"/>
                         </div>
                       </div>
-                      <br />
-                      <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-form__group">
-                          <label class="pf-c-form__label" for="new-item-duedate-time">
-                            <span class="pf-c-form__label-text">Time</span>
-                          </label>
-                          <div class="pf-c-form__horizontal-group">
-                            <input class="pf-c-form-control" type="text" id="new-item-duedate-time" name="new-item-duedate-time" v-model="data.newItem.dueTime" placeholder="HH:MM" maxlength="5"/>
-                          </div>
-                        </div>
-                      </div>
-                      <br />
-                      <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-form__group">
-                          <label class="pf-c-form__label" for="new-item-duedate-tz">
-                            <span class="pf-c-form__label-text">Timezone</span>
-                          </label>
-                          <div class="pf-c-form__horizontal-group">
-                            <input class="pf-c-form-control" type="text" id="new-item-duedate-tz" name="new-item-duedate-tz" v-model="data.newItem.dueTimezone" placeholder="+02:00" maxlength="6"/>
-                          </div>
+                    </div>
+                    <div class="pf-c-form__horizontal-group" v-if="data.newItem.scheduled">
+                      <div class="pf-c-form__group">
+                        <label class="pf-c-form__label" for="new-item-duedate-tz">
+                          <span class="pf-c-form__label-text">Timezone</span>
+                        </label>
+                        <div class="pf-c-form__horizontal-group">
+                          <input class="pf-c-form-control" type="text" id="new-item-duedate-tz" name="edit-item-duedate-tz" v-model="data.newItem.dueTimezone" placeholder="+02:00" maxlength="6"/>
                         </div>
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.newItem.scheduled">
                       <label class="pf-c-form__label pf-m-no-padding-top" for="new-item-repeating-radio-default">
                         <span class="pf-c-form__label-text">Repeating</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
                         <div class="pf-c-radio">
@@ -228,9 +231,15 @@
                           <label class="pf-c-radio__label" for="new-item-repeating-radio-monthly">Montly</label>
                         </div>
                         <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.newItem.repaeting"/>
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.newItem.repeating"/>
                           <label class="pf-c-radio__label" for="new-item-repeating-radio-yearly">Yearly</label>
                         </div>
+                        <!--
+                        <div class="pf-c-radio">
+                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-custom" name="exampleRadioSimple" value="Custom"  v-model="data.newItem.repeating"/>
+                          <label class="pf-c-radio__label" for="new-item-repeating-radio-custom">Custom</label>
+                        </div>
+                        -->
                       </div>
                     </div>
                   </form>
@@ -356,7 +365,9 @@
                         <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
-                        <input class="pf-c-form-control" type="text" id="edit-item-title" name="edit-item-title" aria-invalid="false" required v-model="data.editItem.title" placeholder="new item title"/>
+                        <input class="pf-c-form-control" type="text" id="edit-item-title" name="edit-item-title" :aria-invalid="data.editItem.title==''" required v-model="data.editItem.title" placeholder="new item title" v-bind:class="{ 'pf-m-success': data.editItem.title!='' }"/>
+                        <p class="pf-c-form__helper-text pf-m-error" id="edit-item-title-error" aria-live="polite" v-show="data.editItem.title==''">You need to specify task title</p>
+                        <p class="pf-c-form__helper-text pf-m-success" id="edit-item-title-success" aria-live="polite" v-show="data.editItem.title!=''"></p>
                       </div>
                     </div>
                     <div class="pf-c-form__group">
@@ -396,8 +407,10 @@
                           <label class="pf-c-input-group__text" for="edit-item-duedate-date-picker">
                             <i class="fas fa-calendar-alt" aria-hidden="true"></i>
                           </label>
-                          <input class="pf-c-form-control" type="date" id="edit-item-duedate-date-picker" name="edit-item-duedate-date-picker" aria-label="Task due date"  v-model="data.editItem.dueDate"/>
+                          <input class="pf-c-form-control" type="date" id="edit-item-duedate-date-picker" name="edit-item-duedate-date-picker" aria-label="Task due date" :aria-invalid="data.editItem.dueDate==''" v-model="data.editItem.dueDate" v-bind:class="{ 'pf-m-success': data.editItem.title!='' }"/>
                         </div>
+                        <p class="pf-c-form__helper-text pf-m-error" id="edit-item-duedate-date-picker-error" aria-live="polite" v-show="data.newItem.dueDate==''">You need to specify task due date</p>
+                        <p class="pf-c-form__helper-text pf-m-success" id="edit-item-duedate-date-picker-success" aria-live="polite" v-show="data.newItem.dueDate!=''"></p>
                       </div>
                     </div>
                     <div class="pf-c-form__horizontal-group" v-if="data.editItem.scheduled">
@@ -423,6 +436,7 @@
                     <div class="pf-c-form__group" v-if="data.editItem.scheduled">
                       <label class="pf-c-form__label pf-m-no-padding-top" for="edit-item-repeating-radio-default">
                         <span class="pf-c-form__label-text">Repeating</span>
+                        <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
                         <div class="pf-c-radio">
