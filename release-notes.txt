@@ -1,3 +1,12 @@
+0.2.4
+- date picker for date selection in wizards
+- dependencies:
+    - patternfly to 4.42.2
+    - sqlite to 3.32.3.2
+    - spring security to 5.3.4
+    - spring jdbc to 5.2.9
+    - jquery to 3.5.1
+
 0.2.3
 - notification for overdue tasks
 - bugfixes:
