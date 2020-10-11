@@ -5,8 +5,8 @@
   <meta charset="UTF-8">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="mobile-web-app-capable" content="yes">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg" href="./fontawesome-free-5.10.2-web/svgs/solid/tasks.svg" />
-  <!--<link rel="stylesheet" href="./css/todolist.css">-->
   <link rel="stylesheet" href="./css/patternfly.css">
   <link rel="stylesheet" href="./css/patternfly-addons.css">
   <link rel="stylesheet" href="./fontawesome-free-5.10.2-web/css/all.css">
@@ -31,43 +31,66 @@
     <ul class="pf-c-alert-group pf-m-toast" id="alerts" v-on:click="clickOnAlert">
     </ul>
     <div class="pf-c-page">
-      <header role="banner" class="pf-c-page__header">
+      <header class="pf-c-page__header">
         <div class="pf-c-page__header-brand">
-          <a class="pf-c-page__header-brand-link" href="./">
-            <i class="fas fa-tasks"></i><div>&nbsp;Task List</div>
-          </a>
+          <i class="fas fa-tasks"></i><div>&nbsp;Task List</div>
         </div>
+        <div class="pf-c-page__header-nav"></div>
         <div class="pf-c-page__header-tools">
-          <div v-on:click="toggleAbout"><i class="far fa-question-circle"></i></div>
-          <div class="pf-c-dropdown" id="user-menu">
-              <button class="pf-c-dropdown__toggle pf-m-plain" id="dropdown-user-menu-button" aria-expanded="false"  v-on:click="userMenuClick">
-                <span class="pf-c-dropdown__toggle-text">
-                  &nbsp;&nbsp;{{ data.user }}
-                </span>
-                <i class="fas fa-caret-down pf-c-dropdown__toggle-icon" aria-hidden="true"></i>
-              </button>
-              <ul class="pf-c-dropdown__menu pf-m-align-right" aria-labelledby="dropdown-align-right-button" hidden>
-                <li>
-                  <a class="pf-c-dropdown__menu-item" href="#" v-on:click="logout">Sign out</a>
-                </li>
-              </ul>
+          <div v-on:click="toggleAbout"><i class="far fa-question-circle"></i>&nbsp;&nbsp;&nbsp;</div>
+          <div class="pf-c-dropdown" v-bind:class="{ 'pf-m-expanded': data.userMenuOpen }">
+            <button class="pf-c-dropdown__toggle" type="button" id="dropdown-button" aria-expanded="true" v-on:click="userMenuClick">
+              <span class="pf-c-dropdown__toggle-text">{{ data.user }}</span>
+              <span class="pf-c-dropdown__toggle-icon">
+                <i class="fas fa-caret-down" aria-hidden="true"></i>
+              </span>
+            </button>
+            <ul class="pf-c-dropdown__menu" aria-labelledby="dropdown-button" :hidden="!data.userMenuOpen">
+              <li>
+                <a class="pf-c-dropdown__menu-item" href="#" v-on:click="logout">Sign out</a>
+              </li>
+            </ul>
           </div>
           <img class="pf-c-avatar" src="./images/img_avatar.svg" alt="Avatar image">
         </div>
       </header>
       <main role="main" class="pf-c-page__main" tabindex="-1">
-        <section class="pf-c-page__main-section pf-m-fill pf-m-light">
-          <h1 class="pf-c-title pf-m-xl" v-if="activeItems.length > 0">Active</h1>
-          <div id="active" v-if="activeItems.length > 0">
-            <ul class="pf-c-data-list" role="list" aria-label="Active items" v-on:click="activeItemClick">
+        <section class="pf-c-page__main-section pf-m-light pf-m-fill" v-if="data.todoItems.length!=0">
+          <div id="active" v-if="activeItems.length > 0" v-on:click="activeItemClick">
+            <h1 class="pf-c-title pf-m-xl" v-if="activeItems.length > 0">Active</h1><br />
+            <div class="pf-l-grid pf-m-gutter pf-m-all-12-col">
+              <div class="pf-l-grid__item">
+                <div class="pf-l-grid pf-m-gutter">
+                  <div class="pf-l-grid__item pf-m-12-col pf-m-5-col-on-lg pf-m-6-col-on-xl pf-m-8-col-on-2xl">
+                    <div class="pf-l-flex">
+                      <div class="pf-l-flex__item"><b>Title</b></div><div class="pf-l-flex__item"><b>-</b></div><div class="pf-l-flex__item"><b>Descirption</b></div>
+                    </div>
+                  </div>
+                  <div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl"><b>Repeat</b></div>
+                  <div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-2-col-on-xl pf-m-1-col-on-2xl"><b>Due Date</b></div>
+                  <div class="pf-l-grid__item pf-m-12 pf-m-6-col-on-sm pf-m-3-col-on-lg pf-m-3-col-on-xl pf-m-2-col-on-2xl"></div>
+                </div>
+              </div>
               <todoitem v-for="item in activeItems" v-bind:item="item" v-bind:id="item.id" v-bind:key="item.id"></todoitem>
-            </ul>
+            </div>
           </div>
-          <h1 class="pf-c-title pf-m-xl" v-if="inactiveItems.length > 0"><br/>Completed/Inactive</h1>
-          <div id="completed" v-if="inactiveItems.length > 0">
-            <ul class="pf-c-data-list" role="list" aria-label="Completed items" v-on:click="inactiveItemClick">
+          <h1 class="pf-c-title pf-m-xl" v-if="inactiveItems.length > 0"><br/>Completed/Inactive</h1><br />
+          <div id="completed" v-if="inactiveItems.length > 0" v-on:click="inactiveItemClick">
+            <div class="pf-l-grid pf-m-gutter pf-m-all-12-col">
+              <div class="pf-l-grid__item">
+                <div class="pf-l-grid pf-m-gutter">
+                  <div class="pf-l-grid__item pf-m-12-col pf-m-5-col-on-lg pf-m-6-col-on-xl pf-m-8-col-on-2xl">
+                    <div class="pf-l-flex">
+                      <div class="pf-l-flex__item"><b>Title</b></div><div class="pf-l-flex__item"><b>-</b></div><div class="pf-l-flex__item"><b>Descirption</b></div>
+                    </div>
+                  </div>
+                  <div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl"><b>Repeat</b></div>
+                  <div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-2-col-on-xl pf-m-1-col-on-2xl"><b>Due Date</b></div>
+                  <div class="pf-l-grid__item pf-m-12 pf-m-6-col-on-sm pf-m-3-col-on-lg pf-m-3-col-on-xl pf-m-2-col-on-2xl"></div>
+                </div>
+              </div>
               <todoitem v-for="item in inactiveItems" v-bind:item="item" v-bind:id="item.id" v-bind:key="item.id"></todoitem>
-            </ul>
+            </div>
           </div>
           <div class="pf-c-empty-state" v-if="data.todoItems.length == 0">
             <div class="pf-c-empty-state__content">
@@ -80,7 +103,6 @@
         </section>
         <section class="pf-c-page__main-section pf-m-light pf-m-no-fill" v-if="data.todoItems.length > 0">
           <button class="pf-c-button pf-m-primary" type="button" id="add-item" v-on:click="startNewItemWizard">
-            <!--<i class="fas fa-plus"></i>-->
             <i class="fas fa-plus-circle"></i>
           </button>
         </section>
@@ -88,7 +110,7 @@
     </div>
     <div class="pf-c-backdrop" id="new-todo-wizard" v-show="showNewItemWizard">
       <div class="pf-l-bullseye">
-        <div class="pf-c-wizard pf-u-h-33 pf-u-h-50-on-sm pf-u-w-50 pf-u-w-75-on-sm">
+        <div class="pf-c-wizard pf-u-w-100 pf-u-w-75-on-md pf-u-w-50-on-2xl pf-u-h-100 pf-u-h-75-on-lg pf-u-h-50-on-2xl">
           <div class="pf-c-wizard__header">
             <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="closeWizard">
               <i class="fas fa-times" aria-hidden="true"></i>
@@ -308,7 +330,7 @@
     </div>
     <div class="pf-c-backdrop" id="edit-todo-wizard" v-show="showEditItemWizard">
       <div class="pf-l-bullseye">
-        <div class="pf-c-wizard pf-u-h-33 pf-u-h-50-on-sm pf-u-w-50 pf-u-w-75-on-sm">
+        <div class="pf-c-wizard pf-u-w-100 pf-u-w-75-on-md pf-u-w-50-on-2xl pf-u-h-100 pf-u-h-75-on-lg pf-u-h-50-on-2xl">
           <div class="pf-c-wizard__header">
             <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="toggleEditItemWizard">
               <i class="fas fa-times" aria-hidden="true"></i>
@@ -548,6 +570,9 @@
     <div class="pf-c-backdrop" id="about" v-show="showAbout" v-on:click="toggleAbout">
       <div class="pf-l-bullseye">
         <div class="pf-c-about-modal-box" role="dialog" aria-modal="true" aria-labelledby="about-modal-title">
+          <div class="pf-c-about-modal-box__brand">
+            <i class="fas fa-tasks"></i>
+          </div>
           <div class="pf-c-about-modal-box__close">
             <button class="pf-c-button pf-m-plain" type="button" aria-label="Close dialog">
               <i class="fas fa-times" aria-hidden="true"></i>
@@ -556,6 +581,7 @@
           <div class="pf-c-about-modal-box__header">
             <h1 class="pf-c-title pf-m-4xl" id="about-modal-title">Task List</h1>
           </div>
+          <div class="pf-c-about-modal-box__hero"></div>
           <div class="pf-c-about-modal-box__content">
             <div class="pf-c-about-modal-box__body">
               Version: {{ data.version }}<br />
@@ -565,7 +591,7 @@
             </div>
             <p class="pf-c-about-modal-box__strapline">
               &copy 2019-2020 Janne Metso<br />
-              Built with <a href="https://www.patternfly.org/v4/">PatternFly v4</a> and <a href="https://vuejs.org/">Vue.js</a>
+              Built with <a href="https://www.patternfly.org/v4/">PatternFly</a> and <a href="https://vuejs.org/">Vue.js</a>
             </p>
           </div>
         </div>
