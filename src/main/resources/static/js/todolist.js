@@ -9,7 +9,8 @@ var data = {
     version: "n/a",
     showAbout: false,
     showNewItemWizard: false,
-    showEditItemWizard: false
+    showEditItemWizard: false,
+    userMenuOpen: false
 }
 
 Vue.component('todoitem', {
@@ -26,39 +27,50 @@ Vue.component('todoitem', {
             return this.item.repeating != 'No'
         }
     },
-    template:
-    '<li class="pf-c-data-list__item">'+
-      '<div class="pf-c-data-list__item-row">'+
-        '<div class="pf-c-data-list__item-content">'+
-          '<div class="pf-c-data-list__cell item-title">'+
-            '{{ item.title }}'+
-          '</div>'+
-          '<div v-if="item.description.length > 0" class="pf-c-data-list__cell pf-c-data-list__item-action pf-m-hidden pf-m-visible-on-lg">'+
-            '{{ item.description }}'+
-          '</div>'+
-          '<div v-if="isRepeating" class="pf-c-data-list__cell pf-m-hidden pf-c-data-list__item-action pf-m-visible-on-lg repeat-type">'+
-            '{{ item.repeating }}'+
-          '</div>'+
-          '<div v-if="item.scheduled" class="pf-c-data-list__cell due-date">'+
-            'Due: {{ dueDateString }}'+
-          '</div>'+
-        '</div>'+
-        '<div class="pf-c-data-list__item-action">'+
-          '<button v-if="!item.done" class="pf-c-button pf-m-primary" type="button">'+
-            '<i class="fas fa-check-circle"></i>'+
-          '</button>'+
-          '<button v-else class="pf-c-button pf-m-primary" type="button">'+
-            '<i class="fas fa-play"></i>'+
-          '</button>'+
-          '<button class="pf-c-button pf-m-secondary" type="button">'+
-            '<i class="fas fa-edit"></i>'+
-          '</button>'+
-          '<button v-if="item.repeating != \'No\' || item.done" class="pf-c-button pf-m-danger" type="button">'+
-            '<i class="fas fa-minus-circle"></i>'+
-          '</button>'+
-        '</div>'+
-      '</div>'+
-    '</li>'
+    template: '<div class="pf-l-grid__item">'+
+                '<div class="pf-l-grid pf-m-gutter">'+
+                '<div class="pf-l-grid__item pf-m-12-col pf-m-5-col-on-lg pf-m-6-col-on-xl pf-m-8-col-on-2xl">'+
+                  '<div class="pf-l-flex">'+
+                    '<div class="pf-l-flex__item">{{ item.title }}</div>'+
+                    '<div class="pf-l-flex__item" v-if="item.description != null && item.description.length > 0">-</div>'+
+                    '<div class="pf-l-flex__item" v-if="item.description != null && item.description.length > 0">{{ item.description }}</div>'+
+                  '</div>'+
+                '</div>'+
+                '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl" v-if="isRepeating">{{ item.repeating }}</div>'+
+                '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl" v-else>&nbsp;</div>'+
+                '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-2-col-on-xl pf-m-1-col-on-2xl">{{ dueDateString }}</div>'+
+                '<div class="pf-l-grid__item pf-m-12 pf-m-6-col-on-sm pf-m-3-col-on-lg pf-m-3-col-on-xl pf-m-2-col-on-2xl">'+
+                  '<div class="pf-l-flex">'+
+                    '<div class="pf-l-flex__item pf-m-align-right">'+
+                      '<button class="pf-c-button pf-m-primary" type="button" v-if="!item.done">'+
+                        '<span class="pf-c-button__icon">'+
+                          '<i class="fas fa-check-circle"></i>'+
+                        '</span>'+
+                      '</button>'+
+                      '<button type="button" v-else class="pf-c-button pf-m-primary">'+
+                        '<span class="pf-c-button__icon">'+
+                          '<i class="fas fa-play"></i>'+
+                        '</span>'+
+                      '</button>'+
+                    '</div>'+
+                    '<div class="pf-l-flex__item">'+
+                      '<button class="pf-c-button pf-m-secondary" type="button">'+
+                        '<span class="pf-c-button__icon">'+
+                          '<i class="fas fa-edit"></i>'+
+                        '</span>'+
+                      '</button>'+
+                    '</div>'+
+                    '<div class="pf-l-flex__item">'+
+                      '<button class="pf-c-button pf-m-danger" type="button" :disabled="!isRepeating && !item.done">'+
+                        '<span class="pf-c-button__icon">'+
+                          '<i class="fas fa-minus-circle"></i>'+
+                        '</span>'+
+                      '</button>'+
+                    '</div>'+
+                  '</div>'+
+                '</div>'+
+                '</div>'+
+              '</div>'
 })
 
 var app = new Vue({
@@ -81,7 +93,7 @@ var app = new Vue({
     },
     methods: {
         activeItemClick: function(event) {
-            console.log("active-todo-item");
+            //console.log("active-todo-item");
             processActiveItemClick(event.target)
         },
         inactiveItemClick: function(event) {
@@ -90,17 +102,7 @@ var app = new Vue({
         },
         userMenuClick: function(event) {
             //console.log("Menu click!")
-            if($(event.target.parentElement).hasClass('pf-m-expanded')) {
-                //console.log("Menu close!")
-                event.target.setAttribute('aria-expanded', false)
-                event.target.parentElement.classList.remove('pf-m-expanded')
-                event.target.parentElement.children[1].hidden = true
-            } else {
-                //console.log("Menu open!")
-                event.target.setAttribute('aria-expanded', true)
-                event.target.parentElement.classList.add('pf-m-expanded')
-                event.target.parentElement.children[1].hidden = false
-            }
+            data.userMenuOpen = !data.userMenuOpen
         },
         logout: function(event) {
             $.post('./api/v1/logout'+window.location.search, function(result) {
@@ -222,9 +224,10 @@ function processActiveItemClick(element) {
     var target = element
     var id = element.parentElement.parentElement.parentElement.id
     if("I" == element.tagName) {
-        //console.log(element.parentElement)
-        target = element.parentElement
-        id = target.parentElement.parentElement.parentElement.id
+        //console.log(element.parentElement.parentElement)
+        target = element.parentElement.parentElement
+        id = target.parentElement.parentElement.parentElement.parentElement.parentElement.id
+        //console.log('ID: '+id)
     }
     if($(target).hasClass("pf-m-primary")) {
         //console.log(id+" primary!")
@@ -310,9 +313,10 @@ function processInactiveItemClick(element) {
     var target = element
     var id = element.parentElement.parentElement.parentElement.id
     if("I" == element.tagName) {
-        //console.log(element.parentElement)
-        target = element.parentElement
-        id = target.parentElement.parentElement.parentElement.id
+        //console.log(element.parentElement.parentElement)
+        target = element.parentElement.parentElement
+        id = target.parentElement.parentElement.parentElement.parentElement.parentElement.id
+        //console.log('ID: '+id)
     }
     if($(target).hasClass("pf-m-primary")) {
         //console.log(id+" primary!")
@@ -564,13 +568,13 @@ function checkOverdueItems() {
     tomorrow.setDate(tomorrow.getDate()+1)
     var tomorrowDate = tomorrow.toISOString().split('T')[0]
     for(var i=0; i < data.todoItems.length; ++i) {
-        console.log("Item: "+data.todoItems[i].id)
+        //console.log("Item: "+data.todoItems[i].id)
         if(!data.todoItems[i].done && data.todoItems[i].scheduled) {
             var due = new Date(data.todoItems[i].dueDate)
             var dueDate = due.toISOString().split('T')[0]
-            console.log("Now: "+nowDate+" Due: "+dueDate)
+            //console.log("Now: "+nowDate+" Due: "+dueDate)
             if(nowDate === dueDate) {
-                console.log(data.todoItems[i].id+' due today!')
+                //console.log(data.todoItems[i].id+' due today!')
 
                 var alert =  '<li class="pf-c-alert-group__item" id=alerti'+data.todoItems[i].id+'>'+
                         '<div class="pf-c-alert pf-m-info" aria-label="Information alert">'+
@@ -593,7 +597,7 @@ function checkOverdueItems() {
 
                 publishAlert(alert, 'alerti'+data.todoItems[i].id, 0)
             } else if(due < now && data.todoItems[i].repeating !== "No") {
-                console.log(data.todoItems[i].id+' overdue!')
+                //console.log(data.todoItems[i].id+' overdue!')
 
                 var alert = '<li class="pf-c-alert-group__item" id=alertw'+data.todoItems[i].id+'>'+
                         '<div class="pf-c-alert pf-m-warning" aria-label="Warning alert">'+
@@ -616,7 +620,7 @@ function checkOverdueItems() {
 
                 publishAlert(alert, 'alertw'+data.todoItems[i].id, 0)
             } else if(tomorrowDate == dueDate){
-                console.log("Due tomorrow!");
+                //console.log("Due tomorrow!");
 
                 var alert =  '<li class="pf-c-alert-group__item" id=alerti'+data.todoItems[i].id+'>'+
                         '<div class="pf-c-alert pf-m-info" aria-label="Information alert">'+
