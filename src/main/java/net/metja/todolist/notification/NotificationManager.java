@@ -78,7 +78,7 @@ public class NotificationManager {
                 }
                 logger.info("Checking notifications done");
             }
-        }, 0, 3600000);
+        }, 0, 7200000);
         logger.info("Configuring email notifications done");
     }
 
