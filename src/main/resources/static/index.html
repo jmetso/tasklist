@@ -55,7 +55,7 @@
         </div>
       </header>
       <main role="main" class="pf-c-page__main" tabindex="-1">
-        <section class="pf-c-page__main-section pf-m-light pf-m-fill" v-if="data.todoItems.length!=0">
+        <section class="pf-c-page__main-section pf-m-fill" v-if="data.todoItems.length!=0">
           <div id="active" v-if="activeItems.length > 0" v-on:click="activeItemClick">
             <h1 class="pf-c-title pf-m-xl" v-if="activeItems.length > 0">Active</h1><br />
             <div class="pf-l-grid pf-m-gutter pf-m-all-12-col">
@@ -101,10 +101,11 @@
             </div>
           </div>
         </section>
-        <section class="pf-c-page__main-section pf-m-light pf-m-no-fill" v-if="data.todoItems.length > 0">
+        <section class="pf-c-page__main-section pf-m-no-fill" v-if="data.todoItems.length > 0">
           <button class="pf-c-button pf-m-primary" type="button" id="add-item" v-on:click="startNewItemWizard">
             <i class="fas fa-plus-circle"></i>
           </button>
+          <br /><br />
         </section>
       </main>
     </div>
