@@ -65,3 +65,8 @@
     include_role:
       name: copy_monit_config
     when: setup_monit is defined and setup_monit
+
+  - name: Add nginx configuration
+    include_role:
+      name: add-nginx-configuration
+    when: setup_nginx is defined and setup_nginx
