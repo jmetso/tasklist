@@ -5,6 +5,7 @@ localhost
 install_dir=/opt/tasklist
 service_user=root
 setup_monit=true
+setup_nginx=true
 
 [openshift]
 localhost
