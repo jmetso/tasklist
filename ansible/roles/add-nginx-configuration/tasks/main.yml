@@ -1,0 +1,13 @@
+# roles/add-nginx-configuration/tasks/main.yml
+- name: Copy nginx location configuration
+  template:
+    src: templates/tasklist.conf.j2
+    dest: /etc/nginx/default.d/tasklist.conf
+    mode: 0644
+    owner: root
+    group: root
+
+- name: Restart nginx
+  service:
+    name: nginx
+    state: restarted
