@@ -24,7 +24,6 @@ import java.util.List;
 @RestController
 public class RESTController {
 
-    private DatabaseManager databaseManager;
     private static Logger logger = LoggerFactory.getLogger(RESTController.class);
 
     @PreAuthorize("hasAnyRole('ADMIN','USER', 'VIEW')")
@@ -55,11 +54,6 @@ public class RESTController {
     @RequestMapping(value="/api/v1/version",produces = MediaType.APPLICATION_JSON_VALUE,method = RequestMethod.GET)
     public ResponseEntity<String> version() {
         return new ResponseEntity<>("{\"version\":\""+getClass().getPackage().getImplementationVersion()+"\"}", HttpStatus.OK);
-    }
-
-    @Autowired
-    void setDatabaseManager(DatabaseManager databaseManager) {
-        this.databaseManager = databaseManager;
     }
 
 }
