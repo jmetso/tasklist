@@ -407,7 +407,6 @@ function getItems() {
         }
     })
 }
-getItems()
 
 // New item wizard shit
 function validateWizardPageOne(prefix, item) {
@@ -545,6 +544,8 @@ function publishDangerAlert(id, message, timeout=0) {
 function getUser() {
     $.getJSON("./api/v1/user"+window.location.search, function(result) {
         data.user = result.user;
+        getVersion()
+        getItems()
     }, "json").fail(function(jqXHR, textStatus, errorThrown) {
         publishDangerAlert('alertdu', 'Failed to get user!', 5000)
         console.error("Failed to get user: "+textStatus);
@@ -560,7 +561,6 @@ function getVersion() {
         console.error("Failed to get version: "+textStatus);
     });
 }
-getVersion()
 
 function checkOverdueItems() {
     var now = new Date()
