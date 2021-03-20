@@ -389,7 +389,7 @@ function completeItem(id) {
 function getItems() {
     //console.log("./api/v1/items")
     $.getJSON("./api/v1/items"+window.location.search, function(result) {
-        data.todoItems = result;
+        data.todoItems = result
     }).fail(function(jqXHR, textStatus, errorThrown) {
         //console.log("Status: "+jqXHR.status)
         console.error("Failed to get items: "+textStatus)
@@ -403,6 +403,7 @@ function getItems() {
             })
         } else {
             publishDangerAlert('alertdi', 'Failed to get items!', 5000)
+            data.todoItems = []
         }
     })
 }
