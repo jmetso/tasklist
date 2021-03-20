@@ -1,4 +1,14 @@
 # roles/install_service/tasks/main.yml
+- name: Set CORS hosts
+  set_fact:
+    cors_hosts_env: "-DCORS_HOSTS={{ cors_hosts }}"
+  when: cors_hosts is defined
+
+- name: Set CORS hosts
+  set_fact:
+    cors_hosts_env: ""
+  when: cors_hosts is undefined
+
 - name: Copy start script
   template:
     src: templates/start.sh.j2
