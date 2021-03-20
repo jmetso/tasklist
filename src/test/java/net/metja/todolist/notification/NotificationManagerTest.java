@@ -80,7 +80,7 @@ class NotificationManagerTest {
         todo.setScheduled(true);
         todo.setDueDate(LocalDate.now());
         todo.setDueTime(LocalTime.now());
-        todo.setDueTimezone(ZoneOffset.of("+0200"));
+        todo.setDueTimezone(ZoneOffset.of("+0000"));
         todos.add(todo);
 
         DatabaseManager databaseManager = mock(DatabaseManager.class);
