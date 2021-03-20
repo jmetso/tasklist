@@ -6,7 +6,9 @@
   become: true
   vars:
     service_group: "{{ service_user }}"
+    smtp_username: "{{ vault_smtp_username | default('default_smtp_username') }}"
     smtp_password: "{{ vault_smtp_password }}"
+    ansible_become_password: "{{ vault_ansible_become_password | default('') }}"
 
   tasks:
   - name: Create install directory
