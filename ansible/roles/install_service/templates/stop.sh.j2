@@ -5,7 +5,8 @@ NAME=tasklist
 
 cd ${INSTALL_DIR}
 
-PID=$(cat ${INSTALL_DIR}/${NAME}.pid)
+#PID=$(cat ${INSTALL_DIR}/${NAME}.pid)
+PID=${ps ax | grep tasklist | awk 'NR==1{ print $1 }'}
 kill $PID
 
 echo "" > ${INSTALL_DIR}/${NAME}.pid
