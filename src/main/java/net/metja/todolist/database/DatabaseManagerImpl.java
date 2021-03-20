@@ -269,7 +269,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         List<String> roles = new LinkedList<>();
         StringTokenizer st = new StringTokenizer(rs.getString("Roles"), ",");
         while(st.hasMoreTokens()) {
-            roles.add(st.nextToken());
+            roles.add(st.nextToken().toUpperCase());
         }
         return new UserAccount(rs.getInt("ID"), rs.getString("Username"), rs.getString("Password"), roles, rs.getString("Email"));
     }

@@ -367,7 +367,7 @@ public class DatabaseManagerImplTest {
 
     @Test
     public void getUsers() {
-        this.jdbcTemplate.execute("INSERT INTO UserAccounts (ID, Username, Password, Roles, Email) VALUES (1, 'user', 'user', 'ADMIN,USER', 'test@example.com')");
+        this.jdbcTemplate.execute("INSERT INTO UserAccounts (ID, Username, Password, Roles, Email) VALUES (1, 'user', 'user', 'admin,user', 'test@example.com')");
 
         List<UserAccount> users = this.impl.getUsers();
         assertNotNull("Users", users);
