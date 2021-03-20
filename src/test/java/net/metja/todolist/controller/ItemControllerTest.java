@@ -144,6 +144,19 @@ public class ItemControllerTest {
 
     @Test
     @WithUserDetails("user")
+    public void getTodoItems_NoItems() throws Exception {
+        given(databaseManager.getUserList("user")).willReturn(1);
+        given(databaseManager.getTodos(1)).willReturn(null);
+
+        mvc.perform(MockMvcRequestBuilders.get("/api/v1/items")
+                .with(httpBasic("user", "user"))
+                .accept(MediaType.APPLICATION_JSON_VALUE))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath("$", hasSize(0)));
+    }
+
+    @Test
+    @WithUserDetails("user")
     public void addTodoListItemAsUser() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("user")).willReturn(1);

@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -33,7 +34,11 @@ public class ItemController {
         int listID = this.databaseManager.getUserList(principal.getName());
         if(listID > 0) {
             List<Todo> todos = this.databaseManager.getTodos(listID);
-            return new ResponseEntity<>(todos, HttpStatus.OK);
+            if(todos != null) {
+                return new ResponseEntity<>(todos, HttpStatus.OK);
+            } else {
+                return new ResponseEntity<>(new LinkedList<>(), HttpStatus.OK);
+            }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
