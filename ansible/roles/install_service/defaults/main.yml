@@ -3,3 +3,4 @@ install_dir: /opt/tasklist
 service_user: root
 service_group: root
 #cors_hosts:
+enable_notifications: false

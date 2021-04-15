@@ -7,4 +7,5 @@ cd ${INSTALL_DIR}
 
 /usr/bin/java  -DDB_URL=jdbc:sqlite:${INSTALL_DIR}/db/${NAME}.db \
                {{ cors_hosts_env }} \
+	       -DENABLE_NOTIFICATIONS={{ enable_notifications }}
                -DconfigFile=$INSTALL_DIR/conf/config.properties -jar ${NAME}.jar
