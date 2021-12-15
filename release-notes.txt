@@ -9,6 +9,7 @@
     - patternfly to 2021.16
 
 0.2.5
+- patternfly login page
 - dependencies:
     - spring boot to 2.4.5
     - spring security to 5.4.6
