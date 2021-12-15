@@ -1,3 +1,13 @@
+0.2.6
+- dependencies:
+    - spring boot to 2.6.1
+    - sqlite to 3.36.0.3
+    - spring security to 5.6.0
+    - spring jdbc to 5.3.13
+    - spring test to 5.3.13
+    - junit to 5.8.2
+    - patternfly to 2021.16
+
 0.2.5
 - dependencies:
     - spring boot to 2.4.5
