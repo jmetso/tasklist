@@ -4,10 +4,8 @@ import net.metja.todolist.configuration.TestSecurityConfiguration;
 import net.metja.todolist.database.DatabaseManager;
 import net.metja.todolist.database.bean.Repeating;
 import net.metja.todolist.database.bean.Todo;
-import org.junit.Test;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -15,24 +13,20 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithUserDetails;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 
-import static junit.framework.TestCase.assertTrue;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsNull.notNullValue;
 import static org.hamcrest.core.IsNull.nullValue;
-import static org.junit.Assert.assertFalse;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyObject;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.httpBasic;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -42,7 +36,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * @author Janne Metso @copy; 2020
  * @since 2020-03-23
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest(ItemController.class)
 @AutoConfigureMockMvc
 @ContextConfiguration(classes = {TestSecurityConfiguration.class, ItemController.class})
@@ -160,7 +154,7 @@ public class ItemControllerTest {
     public void addTodoListItemAsUser() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("user")).willReturn(1);
-        given(databaseManager.addTodo(eq(1), anyObject())).willReturn(1);
+        given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/add")
                 .content("{\"id\":1,\"parentId\":-1,\"Title\":\"Title\"}")
@@ -176,7 +170,7 @@ public class ItemControllerTest {
     public void failAddTodoListItemAsUser() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("user")).willReturn(1);
-        given(databaseManager.addTodo(eq(1), anyObject())).willReturn(-1);
+        given(databaseManager.addTodo(eq(1), any())).willReturn(-1);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/add")
                 .content("{\"id\":1,\"parentId\":-1,\"Title\":\"Title\"}")
@@ -191,7 +185,7 @@ public class ItemControllerTest {
     public void addTodoListItemAsAdmin() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("admin")).willReturn(1);
-        given(databaseManager.addTodo(eq(1), anyObject())).willReturn(1);
+        given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/add")
                 .content("{\"id\":1,\"parentId\":-1,\"Title\":\"Title\"}")
@@ -206,7 +200,7 @@ public class ItemControllerTest {
     public void addTodoListItem_UnknownUser() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("unknown")).willReturn(-1);
-        given(databaseManager.addTodo(eq(1), anyObject())).willReturn(1);
+        given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/add")
                 .content("{\"id\":1,\"parentId\":-1,\"Title\":\"Title\"}")
@@ -221,7 +215,7 @@ public class ItemControllerTest {
     public void addTodoListItem_InappropriateRole() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("view")).willReturn(-1);
-        given(databaseManager.addTodo(eq(1), anyObject())).willReturn(1);
+        given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/add")
                 .content("{\"id\":1,\"parentId\":-1,\"Title\":\"Title\"}")
@@ -305,7 +299,7 @@ public class ItemControllerTest {
     public void updateTodoListItemAsUser() throws Exception {
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(new Todo(1, -1, "Title"));
-        given(databaseManager.updateTodo(eq(1), anyObject())).willReturn(true);
+        given(databaseManager.updateTodo(eq(1), any())).willReturn(true);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/1/update")
                 .content("{\"id\":1,\"parentId\":-1,\"title\":\"New title\"}")
@@ -320,7 +314,7 @@ public class ItemControllerTest {
     public void updateTodoListItemAsAdmin() throws Exception {
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(new Todo(1, -1, "Title"));
-        given(databaseManager.updateTodo(eq(1), anyObject())).willReturn(true);
+        given(databaseManager.updateTodo(eq(1), any())).willReturn(true);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/1/update")
                 .content("{\"id\":1,\"parentId\":-1,\"title\":\"New title\"}")
@@ -335,7 +329,7 @@ public class ItemControllerTest {
     public void updateTodoListItem_InappropriateRole() throws Exception {
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(new Todo(1, -1, "Title"));
-        given(databaseManager.updateTodo(eq(1), anyObject())).willReturn(true);
+        given(databaseManager.updateTodo(eq(1), any())).willReturn(true);
 
         mvc.perform(MockMvcRequestBuilders.post("/api/v1/items/1/update")
                 .content("{\"id\":1,\"parentId\":-1,\"title\":\"New title\"}")
@@ -401,7 +395,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertTrue("Status", todo.isDone());
+        assertTrue(todo.isDone(), "Status");
     }
 
     @Test
@@ -422,8 +416,8 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
-        assertTrue("Due date", LocalDate.of(2019, 12, 1).toString().equalsIgnoreCase(todo.getDueDate().toString()));
+        assertFalse(todo.isDone(), "Status");
+        assertTrue(LocalDate.of(2019, 12, 1).toString().equalsIgnoreCase(todo.getDueDate().toString()), "Due date");
     }
 
     @Test
@@ -444,8 +438,8 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
-        assertTrue("Due date", LocalDate.of(2019, 12, 7).toString().equalsIgnoreCase(todo.getDueDate().toString()));
+        assertFalse(todo.isDone(), "Status");
+        assertTrue(LocalDate.of(2019, 12, 7).toString().equalsIgnoreCase(todo.getDueDate().toString()), "Due date");
     }
 
     @Test
@@ -466,8 +460,8 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
-        assertTrue("Due date", LocalDate.of(2019, 12, 14).toString().equalsIgnoreCase(todo.getDueDate().toString()));
+        assertFalse(todo.isDone(), "Status");
+        assertTrue(LocalDate.of(2019, 12, 14).toString().equalsIgnoreCase(todo.getDueDate().toString()), "Due date");
     }
 
     @Test
@@ -488,8 +482,8 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
-        assertTrue("Due date", LocalDate.of(2019, 12, 30).toString().equalsIgnoreCase(todo.getDueDate().toString()));
+        assertFalse(todo.isDone(), "Status");
+        assertTrue(LocalDate.of(2019, 12, 30).toString().equalsIgnoreCase(todo.getDueDate().toString()), "Due date");
     }
 
     @Test
@@ -510,8 +504,8 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
-        assertTrue("Due date", LocalDate.of(2020, 11, 30).toString().equalsIgnoreCase(todo.getDueDate().toString()));
+        assertFalse(todo.isDone(), "Status");
+        assertTrue(LocalDate.of(2020, 11, 30).toString().equalsIgnoreCase(todo.getDueDate().toString()), "Due date");
     }
 
     @Test
@@ -528,7 +522,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertTrue("Status", todo.isDone());
+        assertTrue(todo.isDone(), "Status");
     }
 
     @Test
@@ -543,7 +537,7 @@ public class ItemControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isForbidden());
 
-        assertTrue("Status", !todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -584,7 +578,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -604,7 +598,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -672,7 +666,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -692,7 +686,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertFalse("Status", todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -758,7 +752,7 @@ public class ItemControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest());
 
-        assertFalse("Status", todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -776,7 +770,7 @@ public class ItemControllerTest {
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isBadRequest());
 
-        assertFalse("Status", todo.isDone());
+        assertFalse(todo.isDone(), "Status");
     }
 
     @Test
@@ -844,7 +838,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertTrue("Status", todo.isDone());
+        assertTrue(todo.isDone(), "Status");
     }
 
     @Test
@@ -864,7 +858,7 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$", notNullValue()))
                 .andExpect(jsonPath("$", is(true)));
 
-        assertTrue("Status", todo.isDone());
+        assertTrue(todo.isDone(), "Status");
     }
 
     @Test

@@ -3,9 +3,11 @@ package net.metja.todolist.database;
 import net.metja.todolist.database.bean.Repeating;
 import net.metja.todolist.database.bean.Todo;
 import net.metja.todolist.database.bean.UserAccount;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 
@@ -16,7 +18,7 @@ import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * @author Janne Metso, @copy; 2019
@@ -27,7 +29,7 @@ public class DatabaseManagerImplTest {
     private DatabaseManagerImpl impl;
     private JdbcTemplate jdbcTemplate;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         SingleConnectionDataSource dataSource = new SingleConnectionDataSource();
         dataSource.setDriverClassName("org.sqlite.JDBC");
@@ -44,7 +46,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.execute(DatabaseManagerImpl.CREATE_TODO_LISTS_TABLE);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         this.impl = null;
     }
@@ -56,20 +58,20 @@ public class DatabaseManagerImplTest {
         Todo todo = new Todo(1, -1, "Title");
 
         int id = this.impl.addTodo(1, todo);
-        assertEquals("ID", 1, id);
+        assertEquals(1, id, "ID");
 
         Todo result = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ID=1", this::mapTodoItem);
-        assertNotNull("Result", result);
-        assertEquals("ID", 1, result.getId());
+        assertNotNull(result, "Result");
+        assertEquals(1, result.getId(), "ID");
         assertEquals("Title", "Title", result.getTitle());
-        assertFalse("Done", todo.isDone());
-        assertNull("Description", todo.getDescription());
-        assertFalse("Scheduled", todo.isScheduled());
-        assertNull("DueDate", todo.getDueDate());
-        assertNull("DueTime", todo.getDueTime());
-        assertNull("DueTimezone", todo.getDueTimezone());
-        assertNull("Repeating", todo.getRepeating());
-        assertNull("LastNotification", todo.getLastNotification());
+        assertFalse(todo.isDone(), "Done");
+        assertNull(todo.getDescription(), "Description");
+        assertFalse(todo.isScheduled(), "Scheduled");
+        assertNull(todo.getDueDate(), "DueDate");
+        assertNull(todo.getDueTime(), "DueTime");
+        assertNull(todo.getDueTimezone(), "DueTimezone");
+        assertNull(todo.getRepeating(), "Repeating");
+        assertNull(todo.getLastNotification(), "LastNotification");
     }
 
     @Test
@@ -91,21 +93,21 @@ public class DatabaseManagerImplTest {
         todo.setLastNotification(lastNotification);
 
         int id = this.impl.addTodo(1, todo);
-        assertEquals("ID", 2, id);
+        assertEquals(2, id, "ID");
 
         Todo result = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ID=2", this::mapTodoItem);
-        assertNotNull("Result", result);
-        assertEquals("ID", 2, result.getId());
+        assertNotNull(result, "Result");
+        assertEquals(2, result.getId(), "ID");
         assertEquals("Title", "Title", result.getTitle());
         assertEquals("Description", "Description", result.getDescription());
-        assertTrue("Done", result.isDone());
-        assertTrue("Scheduled", result.isScheduled());
-        assertEquals("DueDate", LocalDate.of(2019, 4, 21), result.getDueDate());
-        assertEquals("DueTime", LocalTime.of(12, 0, 0), result.getDueTime());
-        assertEquals("DueTimezone", ZoneOffset.of("+02:30"), result.getDueTimezone());
-        assertEquals("Repeating", Repeating.Weekly, result.getRepeating());
-        assertNotNull("LastNotification", result.getLastNotification());
-        assertEquals("LastNotification", lastNotification.toString(), result.getLastNotification().toString());
+        assertTrue(result.isDone(), "Done");
+        assertTrue(result.isScheduled(), "Scheduled");
+        assertEquals(LocalDate.of(2019, 4, 21), result.getDueDate(), "DueDate");
+        assertEquals(LocalTime.of(12, 0, 0), result.getDueTime(), "DueTime");
+        assertEquals(ZoneOffset.of("+02:30"), result.getDueTimezone(), "DueTimezone");
+        assertEquals(Repeating.Weekly, result.getRepeating(), "Repeating");
+        assertNotNull(result.getLastNotification(), "LastNotification");
+        assertEquals(lastNotification.toString(), result.getLastNotification().toString(), "LastNotification");
     }
 
     @Test
@@ -115,19 +117,19 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating, LastNotification) VALUES (1, 1, -1, \"Parent\", \"Description\", 0, 1, '2019-11-23', '14:56', '+02:00', 'No', '2020-03-26T16:26:00+02:00')");
 
         Todo todo = this.impl.getTodo(1, 1);
-        assertNotNull("Todo", todo);
-        assertEquals("ID", 1, todo.getId());
-        assertEquals("ParentID", -1, todo.getParentId());
-        assertEquals("Title", "Parent", todo.getTitle());
-        assertEquals("Description", "Description", todo.getDescription());
-        assertFalse("Done", todo.isDone());
-        assertTrue("Scheduled", todo.isScheduled());
-        assertEquals("DueDate", LocalDate.of(2019, 11, 23), todo.getDueDate());
-        assertEquals("DueTime", LocalTime.of(14, 56, 0), todo.getDueTime());
-        assertEquals("DueTimezone", ZoneOffset.of("+02:00"), todo.getDueTimezone());
-        assertEquals("Repeating", Repeating.No, todo.getRepeating());
-        assertNotNull("LastNotification", todo.getLastNotification());
-        assertEquals("LastNotification", "2020-03-26T16:26+02:00", todo.getLastNotification().toString());
+        assertNotNull(todo, "Todo");
+        assertEquals(1, todo.getId(), "ID");
+        assertEquals(-1, todo.getParentId(), "ParentID");
+        assertEquals("Parent", todo.getTitle(), "Title");
+        assertEquals("Description", todo.getDescription(), "Description");
+        assertFalse(todo.isDone(), "Done");
+        assertTrue(todo.isScheduled(), "Scheduled");
+        assertEquals(LocalDate.of(2019, 11, 23), todo.getDueDate(), "DueDate");
+        assertEquals(LocalTime.of(14, 56, 0), todo.getDueTime(), "DueTime");
+        assertEquals(ZoneOffset.of("+02:00"), todo.getDueTimezone(), "DueTimezone");
+        assertEquals(Repeating.No, todo.getRepeating(), "Repeating");
+        assertNotNull(todo.getLastNotification(), "LastNotification");
+        assertEquals("2020-03-26T16:26+02:00", todo.getLastNotification().toString(), "LastNotification");
     }
     @Test
     public void addTodo_IDClash() {
@@ -137,10 +139,10 @@ public class DatabaseManagerImplTest {
 
         Todo todo = new Todo(1, -1, "Title");
         int id = this.impl.addTodo(1, todo);
-        assertEquals("ID", 2, id);
+        assertEquals(2, id, "ID");
         Todo result = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems where ID=2", this::mapTodoItem);
-        assertNotNull("Result", result);
-        assertEquals("ID", 2, result.getId());
+        assertNotNull(result, "Result");
+        assertEquals(2, result.getId(), "ID");
     }
 
     @Test
@@ -153,11 +155,11 @@ public class DatabaseManagerImplTest {
 
         Todo todo = new Todo(1, -1, "Title");
         int id = this.impl.addTodo(2, todo);
-        assertEquals("ID", 1, id);
+        assertEquals(1, id, "ID");
 
         Todo result = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ID=1 AND ListID=2", this::mapTodoItem);
-        assertNotNull("Result", result);
-        assertEquals("ID", 1, result.getId());
+        assertNotNull(result, "Result");
+        assertEquals(1, result.getId(), "ID");
         assertEquals("Title", "Title", result.getTitle());
     }
 
@@ -172,22 +174,22 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 2, -1, \"Title\")");
 
         List<Todo> todos = this.impl.getTodos(1);
-        assertNotNull("Todos", todos);
-        assertEquals("Size", 2, todos.size());
-        assertEquals("1 ID", 1, todos.get(0).getId());
-        assertEquals("1 Parent", -1, todos.get(0).getParentId());
-        assertEquals("1 Title", "Parent", todos.get(0).getTitle());
-        assertFalse("Done", todos.get(0).isDone());
-        assertNotNull("1 Children", todos.get(0).getChildren());
-        assertEquals("1 Children size", 1, todos.get(0).getChildren().size());
-        assertEquals("1 Children ID", 2, todos.get(0).getChildren().get(0).getId());
-        assertEquals("1 Children Parent", 1, todos.get(0).getChildren().get(0).getParentId());
-        assertEquals("1 Children Title", "Child", todos.get(0).getChildren().get(0).getTitle());
+        assertNotNull(todos, "Todos");
+        assertEquals(2, todos.size(), "Size");
+        assertEquals(1, todos.get(0).getId(), "1 ID");
+        assertEquals(-1, todos.get(0).getParentId(), "1 Parent");
+        assertEquals("Parent", todos.get(0).getTitle(), "1 Title");
+        assertFalse(todos.get(0).isDone(), "Done");
+        assertNotNull(todos.get(0).getChildren(), "1 Children");
+        assertEquals(1, todos.get(0).getChildren().size(), "1 Children size");
+        assertEquals(2, todos.get(0).getChildren().get(0).getId(), "1 Children ID");
+        assertEquals(1, todos.get(0).getChildren().get(0).getParentId(), "1 Children Parent");
+        assertEquals("Child", todos.get(0).getChildren().get(0).getTitle(), "1 Children Title");
 
-        assertEquals("2 ID", 2, todos.get(1).getId());
-        assertEquals("2 Parent", 1, todos.get(1).getParentId());
-        assertEquals("2 Title", "Child", todos.get(1).getTitle());
-        assertFalse("Done", todos.get(1).isDone());
+        assertEquals(2, todos.get(1).getId(), "2 ID");
+        assertEquals(1, todos.get(1).getParentId(), "2 Parent");
+        assertEquals("Child", todos.get(1).getTitle(), "2 Title");
+        assertFalse(todos.get(1).isDone(), "Done");
     }
 
     @Test
@@ -198,8 +200,8 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (2, 1, 1, \"Child\")");
 
         List<Todo> todos = this.impl.getTodos(2);
-        assertNotNull("Todos", todos);
-        assertEquals("Size", 0, todos.size());
+        assertNotNull(todos, "Todos");
+        assertEquals(0, todos.size(), "Size");
     }
 
     @Test
@@ -212,11 +214,11 @@ public class DatabaseManagerImplTest {
         Todo todo = new Todo(2, -1, "Task2");
         boolean result = this.impl.updateTodo(1, todo);
 
-        assertTrue("Result", result);
+        assertTrue(result, "Result");
         Todo todoUpd = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ListID=1 and ID=2", this::mapTodoItem);
-        assertNotNull("Todo", todoUpd);
-        assertEquals("ParentID", -1, todoUpd.getParentId());
-        assertEquals("Title", "Task2", todoUpd.getTitle());
+        assertNotNull(todoUpd, "Todo");
+        assertEquals(-1, todoUpd.getParentId(), "ParentID");
+        assertEquals("Task2", todoUpd.getTitle(), "Title");
     }
 
     @Test
@@ -231,34 +233,36 @@ public class DatabaseManagerImplTest {
         todo.setLastNotification(now);
         boolean result = this.impl.updateTodo(1, todo);
 
-        assertTrue("Result", result);
+        assertTrue(result, "Result");
         Todo todoUpd = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ListID=1 and ID=2", this::mapTodoItem);
-        assertNotNull("Todo", todoUpd);
-        assertEquals("ParentID", -1, todoUpd.getParentId());
-        assertEquals("Title", "Task2", todoUpd.getTitle());
-        assertEquals("Last updated", now, todoUpd.getLastNotification());
+        assertNotNull(todoUpd, "Todo");
+        assertEquals(-1, todoUpd.getParentId(), "ParentID");
+        assertEquals("Task2", todoUpd.getTitle(), "Title");
+        assertEquals(now, todoUpd.getLastNotification(), "Last updated");
     }
 
-    @Test(expected = org.springframework.dao.EmptyResultDataAccessException.class)
-    public void updateTodo_NonExisting() throws Exception {
-        this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'UserOne')");
-        this.jdbcTemplate.update("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
-        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
+    @Test
+    public void updateTodo_NonExisting() {
+        EmptyResultDataAccessException thrown = Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+            this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'UserOne')");
+            this.jdbcTemplate.update("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
+            this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
-        Todo todo = new Todo(2, -1, "Task2");
-        boolean result = this.impl.updateTodo(1, todo);
+            Todo todo = new Todo(2, -1, "Task2");
+            boolean result = this.impl.updateTodo(1, todo);
 
-        assertFalse("Result", result);
-        Todo todoUpd = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ListID=1 and ID=2", this::mapTodoItem);
+            assertFalse(result, "Result");
+            Todo todoUpd = this.jdbcTemplate.queryForObject("SELECT * FROM TodoItems WHERE ListID=1 and ID=2", this::mapTodoItem);
+        }, "EmptyResultDataAccessException expected.");
     }
 
     @Test
     public void addList() {
         this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'User')");
         int id = this.impl.addList("User");
-        assertEquals("ID", 1, id);
-        assertEquals("ID", 1, (int)this.jdbcTemplate.queryForObject("SELECT ID FROM TodoLists WHERE UserID=?", Integer.class, 1));
-        assertEquals("UserID", 1, (int)this.jdbcTemplate.queryForObject("SELECT UserID FROM TodoLists WHERE ID=?", Integer.class, 1));
+        assertEquals(1, id, "ID");
+        assertEquals(1, (int)this.jdbcTemplate.queryForObject("SELECT ID FROM TodoLists WHERE UserID=?", Integer.class, 1), "ID");
+        assertEquals(1, (int)this.jdbcTemplate.queryForObject("SELECT UserID FROM TodoLists WHERE ID=?", Integer.class, 1), "UserID");
     }
 
     @Test
@@ -267,9 +271,9 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (2,'User')");
         this.jdbcTemplate.update("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
         int id = this.impl.addList("User");
-        assertEquals("ID", 2, id);
-        assertEquals("ID", 2, (int)this.jdbcTemplate.queryForObject("SELECT ID FROM TodoLists WHERE UserID=?", Integer.class, 2));
-        assertEquals("User", 2, (int)this.jdbcTemplate.queryForObject("SELECT UserID FROM TodoLists WHERE ID=?", Integer.class, 2));
+        assertEquals(2, id, "ID");
+        assertEquals(2, (int)this.jdbcTemplate.queryForObject("SELECT ID FROM TodoLists WHERE UserID=?", Integer.class, 2), "ID");
+        assertEquals(2, (int)this.jdbcTemplate.queryForObject("SELECT UserID FROM TodoLists WHERE ID=?", Integer.class, 2), "User");
     }
 
     @Test
@@ -277,7 +281,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'User')");
         this.jdbcTemplate.update("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
         int id = this.impl.addList("User");
-        assertEquals("ID", 1, id);
+        assertEquals(1, id, "ID");
     }
 
     @Test
@@ -286,24 +290,26 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
 
         int id = this.impl.getUserList("UserOne");
-        assertEquals("ID", 1, id);
+        assertEquals(1, id, "ID");
     }
 
     @Test
     public void getUserList_UnknownUser() {
         int id = this.impl.getUserList("UserOne");
-        assertEquals("ID", -1, id);
+        assertEquals(-1, id, "ID");
     }
 
-    @Test(expected = org.springframework.dao.EmptyResultDataAccessException.class)
-    public void deleteTodo() throws Exception {
-        this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'Test')");
-        this.jdbcTemplate.execute("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
-        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
+    @Test
+    public void deleteTodo() {
+        EmptyResultDataAccessException thrown = Assertions.assertThrows(EmptyResultDataAccessException.class, () -> {
+            this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'Test')");
+            this.jdbcTemplate.execute("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
+            this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
-        boolean result = this.impl.deleteTodo(1, 1);
-        assertTrue("Result", result);
-        this.jdbcTemplate.queryForObject("SELECT ID FROM TodoItems WHERE ID=? AND ListID=?", Integer.class, 1, 1);
+            boolean result = this.impl.deleteTodo(1, 1);
+            assertTrue(result, "Result");
+            this.jdbcTemplate.queryForObject("SELECT ID FROM TodoItems WHERE ID=? AND ListID=?", Integer.class, 1, 1);
+        }, "EmptyResultDataAccessException expected");
     }
 
     @Test
@@ -313,7 +319,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
         boolean result = this.impl.deleteTodo(1, 2);
-        assertFalse("Result", result);
+        assertFalse(result, "Result");
     }
 
     @Test
@@ -323,7 +329,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
         boolean result = this.impl.deleteTodo(2, 2);
-        assertFalse("Result", result);
+        assertFalse(result, "Result");
     }
 
     @Test
@@ -333,16 +339,16 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
         Todo todo = this.impl.getTodo(1, 1);
-        assertNotNull("Todo", todo);
-        assertEquals("ID", 1, todo.getId());
-        assertEquals("ParentID", -1, todo.getParentId());
-        assertEquals("Title", "Parent", todo.getTitle());
-        assertNull("DueDate", todo.getDueDate());
-        assertNull("DueTime", todo.getDueTime());
-        assertNull("Description", todo.getDescription());
-        assertFalse("Done", todo.isDone());
-        assertNotNull("Children", todo.getChildren());
-        assertEquals("Size", 0, todo.getChildren().size());
+        assertNotNull(todo, "Todo");
+        assertEquals(1, todo.getId(), "ID");
+        assertEquals(-1, todo.getParentId(), "ParentID");
+        assertEquals("Parent", todo.getTitle(), "Title");
+        assertNull(todo.getDueDate(), "DueDate");
+        assertNull(todo.getDueTime(), "DueTime");
+        assertNull(todo.getDescription(), "Description");
+        assertFalse(todo.isDone(), "Done");
+        assertNotNull(todo.getChildren(), "Children");
+        assertEquals(0, todo.getChildren().size(), "Size");
     }
 
     @Test
@@ -352,7 +358,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
         Todo todo = this.impl.getTodo(2, 1);
-        assertNull("Todo", todo);
+        assertNull(todo, "Todo");
     }
 
     @Test
@@ -362,7 +368,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title) VALUES (1, 1, -1, \"Parent\")");
 
         Todo todo = this.impl.getTodo(1, 2);
-        assertNull("Todo", todo);
+        assertNull(todo, "Todo");
     }
 
     @Test
@@ -370,16 +376,16 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.execute("INSERT INTO UserAccounts (ID, Username, Password, Roles, Email) VALUES (1, 'user', 'user', 'admin,user', 'test@example.com')");
 
         List<UserAccount> users = this.impl.getUsers();
-        assertNotNull("Users", users);
-        assertEquals("Size", 1, users.size());
-        assertEquals("ID", 1, users.get(0).getId());
-        assertEquals("Username", "user", users.get(0).getUsername());
-        assertEquals("Password", "user", users.get(0).getPassword());
-        assertNotNull("Roles", users.get(0).getRoles());
-        assertEquals("Roles size", 2, users.get(0).getRoles().size());
-        assertEquals("Role one", "ADMIN", users.get(0).getRoles().get(0));
-        assertEquals("Role two", "USER", users.get(0).getRoles().get(1));
-        assertEquals("Email", "test@example.com", users.get(0).getEmail());
+        assertNotNull(users, "Users");
+        assertEquals(1, users.size(), "Size");
+        assertEquals(1, users.get(0).getId(), "ID");
+        assertEquals("user", users.get(0).getUsername(), "Username");
+        assertEquals("user", users.get(0).getPassword(), "Password");
+        assertNotNull(users.get(0).getRoles(), "Roles");
+        assertEquals(2, users.get(0).getRoles().size(), "Roles size");
+        assertEquals("ADMIN", users.get(0).getRoles().get(0), "Role one");
+        assertEquals("USER", users.get(0).getRoles().get(1), "Role two");
+        assertEquals("test@example.com", users.get(0).getEmail(), "Email");
     }
 
     private Todo mapTodoItem(ResultSet rs, int rowNum) throws java.sql.SQLException {
@@ -431,7 +437,7 @@ public class DatabaseManagerImplTest {
         this.jdbcTemplate.execute(CREATE_TODO_LISTS_TABLE_V1);
         this.jdbcTemplate.update(INSERT_VERSION, 1);
 
-        assertEquals("Version number", 1, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class));
+        assertEquals(1, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class), "Version number");
         this.impl = new DatabaseManagerImpl();
         this.impl.setDataSource(dataSource);
         this.impl.migrateDatabaseToLatestVersion();
@@ -441,18 +447,18 @@ public class DatabaseManagerImplTest {
         final String SELECT_LAST_NOTIFICATION = "SELECT LastNotification FROM TodoItems WHERE ID=?";
         final String SELECT_EMAIL = "SELECT Email FROM UserAccounts WHERE ID=?";
 
-        assertEquals("Version number", 2, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class));
-        assertEquals("User insert", 1, this.jdbcTemplate.update(INSERT_USER, 1, "user", "pwd", "ADMIN, USER", "test@example.com"));
-        assertEquals("Todo item insert", 1, this.jdbcTemplate.update(INSERT_TODO_ITEM, 1, 1, -1, "Title", "Description", 0, 0, "2020-03-26T16:10:00+0200"));
-        assertEquals("Email", "test@example.com", this.jdbcTemplate.queryForObject(SELECT_EMAIL, String.class, 1));
-        assertEquals("Last notification", "2020-03-26T16:10:00+0200", this.jdbcTemplate.queryForObject(SELECT_LAST_NOTIFICATION, String.class, 1));
+        assertEquals(2, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class), "Version number");
+        assertEquals(1, this.jdbcTemplate.update(INSERT_USER, 1, "user", "pwd", "ADMIN, USER", "test@example.com"), "User insert");
+        assertEquals(1, this.jdbcTemplate.update(INSERT_TODO_ITEM, 1, 1, -1, "Title", "Description", 0, 0, "2020-03-26T16:10:00+0200"), "Todo item insert");
+        assertEquals("test@example.com", this.jdbcTemplate.queryForObject(SELECT_EMAIL, String.class, 1), "Email");
+        assertEquals("2020-03-26T16:10:00+0200", this.jdbcTemplate.queryForObject(SELECT_LAST_NOTIFICATION, String.class, 1), "Last notification");
     }
 
     @Test
     public void checkDatabaseVersion() {
         final String SELECT_VERSION = "SELECT Version FROM Settings";
         this.impl.checkDatabaseVersion();
-        assertEquals("Version", 2, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class));
+        assertEquals(2, (int)this.jdbcTemplate.queryForObject(SELECT_VERSION, Integer.class), "Version");
     }
 
 }

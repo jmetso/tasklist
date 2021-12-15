@@ -1,12 +1,11 @@
 package net.metja.todolist.configuration;
 
-import net.metja.todolist.controller.ItemController;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -19,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
  * @author Janne Metso @copy; 2019
  * @since 2020-03-23
  */
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {TestSecurityConfiguration.class})
 public class ConfigUtilTest {
 
@@ -30,7 +29,7 @@ public class ConfigUtilTest {
 
     }
 
-    @Before
+    @BeforeEach
     public void setUp() {
         File config = new File("test.properties");
         try {
@@ -48,7 +47,7 @@ public class ConfigUtilTest {
 
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         this.configUtil = null;
         File config = new File("test.properties");
