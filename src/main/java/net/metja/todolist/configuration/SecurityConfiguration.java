@@ -91,6 +91,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .and()
             .csrf().disable()
             .authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers("/api/v1/password/generate/**").permitAll()
                 .antMatchers("/css/**").permitAll()
                 .antMatchers("/fontawesome-free-5.10.2-web/**").permitAll()
