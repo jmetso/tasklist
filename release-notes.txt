@@ -1,4 +1,6 @@
 0.2.6
+- availability probes
+- prometheus metrics
 - dependencies:
     - spring boot to 2.6.1
     - sqlite to 3.36.0.3
