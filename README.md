@@ -17,6 +17,8 @@ mvn -P local clean package
 
 ## How to create a docker/podman image
 
+Build a jar first.
+
 Podman:
 ```
 cd docker
