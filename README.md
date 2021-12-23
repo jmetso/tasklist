@@ -10,9 +10,9 @@ How to build a jar:
 mvn clean package
 ```
 
-How to build a jar with OpenShift profile:
+How to build a jar with local profile:
 ```
-mvn -P openshift clean package
+mvn -P local clean package
 ```
 
 ## How to create a docker/podman image
