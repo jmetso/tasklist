@@ -23,7 +23,7 @@ public class Todo {
     private List<Todo> children;
     private boolean done = false;
     private boolean scheduled = false;
-    private Repeating repeating;
+    private Repeat repeat;
     private OffsetDateTime lastNotification;
 
     public Todo() {}
@@ -121,12 +121,12 @@ public class Todo {
         this.dueTimezone = dueTimezone;
     }
 
-    public Repeating getRepeating() {
-        return repeating;
+    public Repeat getRepeat() {
+        return repeat;
     }
 
-    public void setRepeating(Repeating repeating) {
-        this.repeating = repeating;
+    public void setRepeat(Repeat repeat) {
+        this.repeat = repeat;
     }
 
     public OffsetDateTime getLastNotification() {

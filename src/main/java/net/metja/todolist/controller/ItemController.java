@@ -1,7 +1,7 @@
 package net.metja.todolist.controller;
 
 import net.metja.todolist.database.DatabaseManager;
-import net.metja.todolist.database.bean.Repeating;
+import net.metja.todolist.database.bean.Repeat;
 import net.metja.todolist.database.bean.Todo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -89,7 +89,7 @@ public class ItemController {
             Todo todo = this.databaseManager.getTodo(listId, id);
             if(todo != null) {
                 if(!todo.isDone()) {
-                    if(todo.getRepeating() == null || todo.getRepeating() == Repeating.No) {
+                    if(todo.getRepeat() == null || todo.getRepeat().getPeriod() == Repeat.TimePeriod.None) {
                         todo.setDone(true);
                         if(this.databaseManager.updateTodo(listId, todo)) {
                             return new ResponseEntity<>(true, HttpStatus.OK);
@@ -97,12 +97,11 @@ public class ItemController {
                             return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
                         }
                     } else {
-                        switch (todo.getRepeating()) {
-                            case Daily: todo.setDueDate(todo.getDueDate().plusDays(1)); break;
-                            case Weekly: todo.setDueDate(todo.getDueDate().plusWeeks(1)); break;
-                            case BiWeekly: todo.setDueDate(todo.getDueDate().plusWeeks(2)); break;
-                            case Monthly: todo.setDueDate(todo.getDueDate().plusMonths(1)); break;
-                            case Yearly: todo.setDueDate(todo.getDueDate().plusYears(1)); break;
+                        switch (todo.getRepeat().getPeriod()) {
+                            case Days: todo.setDueDate(todo.getDueDate().plusDays(todo.getRepeat().getTimes())); break;
+                            case Weeks: todo.setDueDate(todo.getDueDate().plusWeeks(todo.getRepeat().getTimes())); break;
+                            case Months: todo.setDueDate(todo.getDueDate().plusMonths(todo.getRepeat().getTimes())); break;
+                            case Years: todo.setDueDate(todo.getDueDate().plusYears(todo.getRepeat().getTimes())); break;
                         }
                         this.databaseManager.updateTodo(listId, todo);
                         return new ResponseEntity<>(true, HttpStatus.OK);
@@ -125,7 +124,7 @@ public class ItemController {
         if(listId > 0) {
             Todo todo = this.databaseManager.getTodo(listId, id);
             if(todo != null) {
-                logger.debug("Scheduled: "+todo.isScheduled()+" Repeating: "+todo.getRepeating());
+                logger.debug("Scheduled: "+todo.isScheduled()+" Repeating: "+todo.getRepeat());
                 if(todo.isDone()) {
                     todo.setDone(false);
                     if(this.databaseManager.updateTodo(listId, todo)) {
@@ -151,7 +150,7 @@ public class ItemController {
         if(listId > 0) {
             Todo todo = this.databaseManager.getTodo(listId, id);
             if(todo != null) {
-                if(!todo.isDone() && todo.isScheduled() && todo.getRepeating() != null && todo.getRepeating() != Repeating.No) {
+                if(!todo.isDone() && todo.isScheduled() && todo.getRepeat() != null && todo.getRepeat().getPeriod() != Repeat.TimePeriod.None) {
                     todo.setDone(true);
                     if (this.databaseManager.updateTodo(listId, todo)) {
                         return new ResponseEntity<>(true, HttpStatus.OK);

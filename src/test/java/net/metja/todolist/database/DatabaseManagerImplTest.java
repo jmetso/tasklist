@@ -1,6 +1,6 @@
 package net.metja.todolist.database;
 
-import net.metja.todolist.database.bean.Repeating;
+import net.metja.todolist.database.bean.Repeat;
 import net.metja.todolist.database.bean.Todo;
 import net.metja.todolist.database.bean.UserAccount;
 import org.junit.jupiter.api.AfterEach;
@@ -70,7 +70,7 @@ public class DatabaseManagerImplTest {
         assertNull(todo.getDueDate(), "DueDate");
         assertNull(todo.getDueTime(), "DueTime");
         assertNull(todo.getDueTimezone(), "DueTimezone");
-        assertNull(todo.getRepeating(), "Repeating");
+        assertNull(todo.getRepeat(), "Repeating");
         assertNull(todo.getLastNotification(), "LastNotification");
     }
 
@@ -88,7 +88,7 @@ public class DatabaseManagerImplTest {
         todo.setDueDate(LocalDate.of(2019, 4, 21));
         todo.setDueTime(LocalTime.of(12, 0, 0));
         todo.setDueTimezone(ZoneOffset.of("+02:30"));
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         OffsetDateTime lastNotification = OffsetDateTime.now();
         todo.setLastNotification(lastNotification);
 
@@ -105,7 +105,8 @@ public class DatabaseManagerImplTest {
         assertEquals(LocalDate.of(2019, 4, 21), result.getDueDate(), "DueDate");
         assertEquals(LocalTime.of(12, 0, 0), result.getDueTime(), "DueTime");
         assertEquals(ZoneOffset.of("+02:30"), result.getDueTimezone(), "DueTimezone");
-        assertEquals(Repeating.Weekly, result.getRepeating(), "Repeating");
+        assertEquals(Repeat.TimePeriod.Weeks, result.getRepeat().getPeriod(), "Repeating");
+        assertEquals(1, result.getRepeat().getTimes(), "Repeating");
         assertNotNull(result.getLastNotification(), "LastNotification");
         assertEquals(lastNotification.toString(), result.getLastNotification().toString(), "LastNotification");
     }
@@ -127,10 +128,35 @@ public class DatabaseManagerImplTest {
         assertEquals(LocalDate.of(2019, 11, 23), todo.getDueDate(), "DueDate");
         assertEquals(LocalTime.of(14, 56, 0), todo.getDueTime(), "DueTime");
         assertEquals(ZoneOffset.of("+02:00"), todo.getDueTimezone(), "DueTimezone");
-        assertEquals(Repeating.No, todo.getRepeating(), "Repeating");
+        assertEquals(Repeat.TimePeriod.None, todo.getRepeat().getPeriod(), "Repeating");
         assertNotNull(todo.getLastNotification(), "LastNotification");
         assertEquals("2020-03-26T16:26+02:00", todo.getLastNotification().toString(), "LastNotification");
     }
+
+
+    @Test
+    public void readTodo_AllData_MonthlyRepeat() {
+        this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'Test')");
+        this.jdbcTemplate.execute("INSERT INTO TodoLists (ID, UserID) VALUES (1, 1)");
+        this.jdbcTemplate.update("INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating, LastNotification) VALUES (1, 1, -1, \"Parent\", \"Description\", 0, 1, '2019-11-23', '14:56', '+02:00', 'Every 1 Months', '2020-03-26T16:26:00+02:00')");
+
+        Todo todo = this.impl.getTodo(1, 1);
+        assertNotNull(todo, "Todo");
+        assertEquals(1, todo.getId(), "ID");
+        assertEquals(-1, todo.getParentId(), "ParentID");
+        assertEquals("Parent", todo.getTitle(), "Title");
+        assertEquals("Description", todo.getDescription(), "Description");
+        assertFalse(todo.isDone(), "Done");
+        assertTrue(todo.isScheduled(), "Scheduled");
+        assertEquals(LocalDate.of(2019, 11, 23), todo.getDueDate(), "DueDate");
+        assertEquals(LocalTime.of(14, 56, 0), todo.getDueTime(), "DueTime");
+        assertEquals(ZoneOffset.of("+02:00"), todo.getDueTimezone(), "DueTimezone");
+        assertEquals(Repeat.TimePeriod.Months, todo.getRepeat().getPeriod(), "Repeating");
+        assertEquals(1, todo.getRepeat().getTimes(), "Repeating");
+        assertNotNull(todo.getLastNotification(), "LastNotification");
+        assertEquals("2020-03-26T16:26+02:00", todo.getLastNotification().toString(), "LastNotification");
+    }
+
     @Test
     public void addTodo_IDClash() {
         this.jdbcTemplate.update("INSERT INTO UserAccounts (ID,Username) VALUES (1,'Test')");
@@ -407,7 +433,7 @@ public class DatabaseManagerImplTest {
             todo.setDueTimezone(ZoneOffset.of(rs.getString("DueTimezone")));
         }
         if(rs.getString("Repeating") != null) {
-            todo.setRepeating(Repeating.getRepeating(rs.getString("Repeating")));
+            todo.setRepeat(Repeat.parse(rs.getString("Repeating")));
         }
         if(rs.getString("LastNotification") != null) {
             todo.setLastNotification(OffsetDateTime.parse(rs.getString("LastNotification")));

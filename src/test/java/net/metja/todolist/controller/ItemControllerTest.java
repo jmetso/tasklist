@@ -2,7 +2,7 @@ package net.metja.todolist.controller;
 
 import net.metja.todolist.configuration.TestSecurityConfiguration;
 import net.metja.todolist.database.DatabaseManager;
-import net.metja.todolist.database.bean.Repeating;
+import net.metja.todolist.database.bean.Repeat;
 import net.metja.todolist.database.bean.Todo;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -404,7 +404,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setScheduled(true);
         todo.setDueDate(LocalDate.of(2019, 11, 30));
-        todo.setRepeating(Repeating.Daily);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Days));
 
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
@@ -426,7 +426,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setScheduled(true);
         todo.setDueDate(LocalDate.of(2019, 11, 30));
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
 
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
@@ -448,7 +448,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setScheduled(true);
         todo.setDueDate(LocalDate.of(2019, 11, 30));
-        todo.setRepeating(Repeating.BiWeekly);
+        todo.setRepeat(new Repeat(2, Repeat.TimePeriod.Weeks));
 
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
@@ -470,7 +470,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setScheduled(true);
         todo.setDueDate(LocalDate.of(2019, 11, 30));
-        todo.setRepeating(Repeating.Monthly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Months));
 
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
@@ -492,7 +492,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setScheduled(true);
         todo.setDueDate(LocalDate.of(2019, 11, 30));
-        todo.setRepeating(Repeating.Yearly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Years));
 
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
@@ -567,7 +567,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(true);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(eq(1), eq(1))).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -587,7 +587,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(true);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -630,7 +630,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
 
@@ -655,7 +655,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(true);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.No);
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(eq(1), eq(1))).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -675,7 +675,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(true);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.No);
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -718,7 +718,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(true);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.No);
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
 
@@ -743,7 +743,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.No);
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -761,7 +761,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.No);
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -802,7 +802,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.No);
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
 
@@ -827,7 +827,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -847,7 +847,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.getTodo(eq(1), eq(1))).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -890,7 +890,7 @@ public class ItemControllerTest {
         Todo todo = new Todo(1, -1, "Title");
         todo.setDone(false);
         todo.setScheduled(true);
-        todo.setRepeating(Repeating.Weekly);
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
 

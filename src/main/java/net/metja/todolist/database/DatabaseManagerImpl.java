@@ -1,6 +1,6 @@
 package net.metja.todolist.database;
 
-import net.metja.todolist.database.bean.Repeating;
+import net.metja.todolist.database.bean.Repeat;
 import net.metja.todolist.database.bean.Todo;
 import net.metja.todolist.database.bean.UserAccount;
 import org.slf4j.Logger;
@@ -55,7 +55,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             this.jdbcTemplate.queryForObject(SELECT, Integer.class, listID);
             this.jdbcTemplate.update(INSERT, id, listID, todo.getParentId(), todo.getTitle(), todo.getDescription(),
                     todo.isDone(), todo.isScheduled(), todo.getDueDate(), todo.getDueTime(), dueTimezone,
-                    todo.getRepeating(), todo.getLastNotification());
+                    todo.getRepeat(), todo.getLastNotification());
             return id;
         } catch(org.springframework.dao.DataAccessException e) {
             logger.warn("Unable to add list item "+todo.getTitle()+" to list "+listID, e);
@@ -94,7 +94,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
         try {
             if(this.jdbcTemplate.queryForObject(SELECT, this::mapTodoItem, listId, todo.getId()) != null) {
                 final String UPDATE = "UPDATE TodoItems SET ParentID=?, DueDate=?, DueTime=?, Title=?, Description=?, Done=?, DueTimezone=?, Scheduled=?, Repeating=?, LastNotification=? WHERE ID=? AND ListID=?";
-                this.jdbcTemplate.update(UPDATE, todo.getParentId(), todo.getDueDate(), todo.getDueTime(), todo.getTitle(), todo.getDescription(), todo.isDone(), todo.getDueTimezone(), todo.isScheduled(), todo.getRepeating(), todo.getLastNotification(), todo.getId(), listId);
+                this.jdbcTemplate.update(UPDATE, todo.getParentId(), todo.getDueDate(), todo.getDueTime(), todo.getTitle(), todo.getDescription(), todo.isDone(), todo.getDueTimezone(), todo.isScheduled(), todo.getRepeat(), todo.getLastNotification(), todo.getId(), listId);
                 return true;
             }
         } catch(org.springframework.dao.DataAccessException e) {
@@ -257,7 +257,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             todo.setDueTimezone(ZoneOffset.of(rs.getString("DueTimezone")));
         }
         if(rs.getString("Repeating") != null) {
-            todo.setRepeating(Repeating.getRepeating(rs.getString("Repeating")));
+            todo.setRepeat(Repeat.parse(rs.getString("Repeating")));
         }
         if(rs.getString("LastNotification") != null) {
             todo.setLastNotification(OffsetDateTime.parse(rs.getString("LastNotification")));
