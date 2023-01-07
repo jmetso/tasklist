@@ -52,6 +52,7 @@ public class ItemControllerTest {
     @WithUserDetails("user")
     public void getTodoItemsAsUser() throws Exception {
         Todo todo = new Todo(1, -1, "Task");
+        todo.setRepeat(new Repeat(1, Repeat.TimePeriod.Weeks));
         List<Todo> todoList = Arrays.asList(todo);
 
         given(databaseManager.getUserList("user")).willReturn(1);
@@ -66,6 +67,10 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$[0].title", is(todo.getTitle())))
                 .andExpect(jsonPath("$[0].dueDate", nullValue()))
                 .andExpect(jsonPath("$[0].dueTime", nullValue()))
+                .andExpect(jsonPath("$[0].repeat", notNullValue()))
+                .andExpect(jsonPath("$[0].repeat.times", is(1)))
+                .andExpect(jsonPath("$[0].repeat.period", is("Weeks")))
+                .andExpect(jsonPath("$[0].repeat", notNullValue()))
                 .andExpect(jsonPath("$[0].description", nullValue()));
     }
 
@@ -73,6 +78,7 @@ public class ItemControllerTest {
     @WithUserDetails("admin")
     public void getTodoItemsAsAdmin() throws Exception {
         Todo todo = new Todo(1, -1, "Task");
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         List<Todo> todoList = Arrays.asList(todo);
 
         given(databaseManager.getUserList("admin")).willReturn(1);
@@ -87,6 +93,9 @@ public class ItemControllerTest {
                 .andExpect(jsonPath("$[0].title", is(todo.getTitle())))
                 .andExpect(jsonPath("$[0].dueDate", nullValue()))
                 .andExpect(jsonPath("$[0].dueTime", nullValue()))
+                .andExpect(jsonPath("$[0].repeat", notNullValue()))
+                .andExpect(jsonPath("$[0].repeat.times", is(0)))
+                .andExpect(jsonPath("$[0].repeat.period", is("None")))
                 .andExpect(jsonPath("$[0].description", nullValue()));
     }
 
@@ -94,6 +103,7 @@ public class ItemControllerTest {
     @WithUserDetails("view")
     public void getTodoItemsAsView() throws Exception {
         Todo todo = new Todo(1, -1, "Task");
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         List<Todo> todoList = Arrays.asList(todo);
 
         given(databaseManager.getUserList("view")).willReturn(1);
@@ -125,6 +135,7 @@ public class ItemControllerTest {
     @WithUserDetails("user")
     public void getTodoItems_NoList() throws Exception {
         Todo todo = new Todo(1, -1, "Task");
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         List<Todo> todoList = Arrays.asList(todo);
 
         given(databaseManager.getUserList("user")).willReturn(-1);
@@ -152,7 +163,6 @@ public class ItemControllerTest {
     @Test
     @WithUserDetails("user")
     public void addTodoListItemAsUser() throws Exception {
-        Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("user")).willReturn(1);
         given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
@@ -183,7 +193,6 @@ public class ItemControllerTest {
     @Test
     @WithUserDetails("admin")
     public void addTodoListItemAsAdmin() throws Exception {
-        Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
@@ -213,7 +222,6 @@ public class ItemControllerTest {
     @Test
     @WithUserDetails("view")
     public void addTodoListItem_InappropriateRole() throws Exception {
-        Todo todo = new Todo(1, -1, "Title");
         given(databaseManager.getUserList("view")).willReturn(-1);
         given(databaseManager.addTodo(eq(1), any())).willReturn(1);
 
@@ -512,6 +520,7 @@ public class ItemControllerTest {
     @WithUserDetails("admin")
     public void markTodoListItemAsDoneAsAdmin() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("admin")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
@@ -529,6 +538,7 @@ public class ItemControllerTest {
     @WithUserDetails("view")
     public void markTodoListItemAsDone_InappropriateRole() throws Exception {
         Todo todo = new Todo(1, -1, "Title");
+        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodo(1, 1)).willReturn(todo);
         given(databaseManager.updateTodo(1, todo)).willReturn(true);
