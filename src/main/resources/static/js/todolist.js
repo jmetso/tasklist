@@ -1,7 +1,7 @@
 var data = {
     todoItems: [],
     newItem: { },
-    newItemBase: { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeating": "No", "dueDate": "", "dueTime": "", "dueTimezone": ""  },
+    newItemBase: { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeat": { "times": 0, "period": "None" }, "dueDate": "", "dueTime": "", "dueTimezone": ""  },
     editItem: {  },
     newItemWizardPage: 1,
     editItemWizardPage: 1,
@@ -10,7 +10,9 @@ var data = {
     showAbout: false,
     showNewItemWizard: false,
     showEditItemWizard: false,
-    userMenuOpen: false
+    userMenuOpen: false,
+    editScheduleTimesMenuOpen: false,
+    newScheduleTimesMenuOpen: false
 }
 
 Vue.component('todoitem', {
@@ -24,7 +26,7 @@ Vue.component('todoitem', {
             return result
         },
         isRepeating: function() {
-            return this.item.repeating != 'No'
+            return this.item.repeat.period != 'None'
         }
     },
     template: '<div class="pf-l-grid__item">'+
@@ -36,7 +38,7 @@ Vue.component('todoitem', {
                     '<div class="pf-l-flex__item" v-if="item.description != null && item.description.length > 0">{{ item.description }}</div>'+
                   '</div>'+
                 '</div>'+
-                '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl" v-if="isRepeating">{{ item.repeating }}</div>'+
+                '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl" v-if="isRepeating">Every {{ item.repeat.times }} {{ item.repeat.period }}</div>'+
                 '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-1-col-on-xl" v-else>&nbsp;</div>'+
                 '<div class="pf-l-grid__item pf-m-6-col pf-m-3-col-on-sm pf-m-2-col-on-lg pf-m-2-col-on-xl pf-m-1-col-on-2xl">{{ dueDateString }}</div>'+
                 '<div class="pf-l-grid__item pf-m-12 pf-m-6-col-on-sm pf-m-3-col-on-lg pf-m-3-col-on-xl pf-m-2-col-on-2xl">'+
@@ -115,7 +117,7 @@ var app = new Vue({
         closeWizard: function(event) {
             //console.log("Close wizard!")
             $('#new-todo-wizard').hide()
-            data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeating": "No", "dueDate": "", "dueTime": "", "dueTimezone": "" }
+            data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeat": { "times": 0, "period": "None" }, "dueDate": "", "dueTime": "", "dueTimezone": "" }
             data.newItemWizardPage = 1
             data.showEditItemWizard = false
             data.editItemWizardPage = 1
@@ -129,7 +131,7 @@ var app = new Vue({
         },
         startNewItemWizard: function(event) {
             console.debug('New item!')
-            data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeating": "No", "dueDate": "", "dueTime": "", "dueTimezone": "" }
+            data.newItem = { "id": -1, "parentId": -1, "title": "", "description": "", "done": false, "scheduled": false, "dueDate": "", "repeat": { "times": 0, "period": "None" }, "dueDate": "", "dueTime": "", "dueTimezone": "" }
             data.showNewItemWizard = true
         },
         editWizardSave: function(event) {
@@ -148,6 +150,7 @@ var app = new Vue({
             saveTodo(data.editItem)
             //console.debug('Hide wizard')
             data.showEditItemWizard = false
+            data.editItemWizardPage = 1
         },
         editWizardNext: function(event) {
             //console.log("Wizard next!")
@@ -215,32 +218,46 @@ var app = new Vue({
         toggleNewItemWizard: function(event) {
             console.debug('Toggle new item wizard!')
             data.showNewItemWizard = !data.showNewItemWizard
+        },
+        toggleEditScheduleTimesMenu: function(event) {
+            data.editScheduleTimesMenuOpen = !data.editScheduleTimesMenuOpen
+        },
+        toggleNewScheduleTimesMenu: function(event) {
+            data.newScheduleTimesMenuOpen = !data.newScheduleTimesMenuOpen
         }
     }
 })
 
 function processActiveItemClick(element) {
     //console.log(element)
-    var target = element
-    var id = element.parentElement.parentElement.parentElement.id
-    if("I" == element.tagName) {
-        //console.log(element.parentElement.parentElement)
-        target = element.parentElement.parentElement
-        id = target.parentElement.parentElement.parentElement.parentElement.parentElement.id
-        //console.log('ID: '+id)
+    var current = element
+    var id = -1
+    var action = 'none'
+    while(current.parentElement != null) {
+        console.log(current.id)
+        console.log(current.parentElement)
+        if(current.classList.contains('pf-m-primary')) {
+            action = 'complete'
+        } else if(current.classList.contains('pf-m-secondary')) {
+            action = 'edit'
+        } else if(current.classList.contains('pf-m-danger')) {
+            action = 'deactivate'
+        }
+        if(current.id != "") {
+            id = current.id
+            break
+        }
+        current = current.parentElement
     }
-    if($(target).hasClass("pf-m-primary")) {
+
+    if(action == 'complete') {
         //console.log(id+" primary!")
         completeItem(id)
         getItems()
-    } else if($(target).hasClass("pf-m-secondary")) {
+    } else if(action == 'edit') {
         //console.log(id+" secondary!")
         editItem(id)
-    } else if($(target).hasClass("pf-m-tertiary")) {
-        //console.log(id+" tertiary!")
-        editItem(id)
-        data.editItemWizardPage=2
-    } else if($(target).hasClass('pf-m-danger')) {
+    } else if(action == 'deactivate') {
         //console.log(id+" danger!")
         deactivateItem(id)
     }
@@ -284,7 +301,7 @@ function deactivateItem(id) {
     $.getJSON('./api/v1/items/'+id+'/deactivate'+window.location.search, function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
-                publishSuccessAlert(id, data.todoItems[i].title+' activated!')
+                publishSuccessAlert(id, data.todoItems[i].title+' deactivated!')
                 break;
             }
         }
@@ -292,20 +309,13 @@ function deactivateItem(id) {
     }).fail(function(jqXHR, textStatus, errorThrown) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
-                publishDangerAlert(id, 'Failed to activate '+data.todoItems[i].title)
+                publishDangerAlert(id, 'Failed to deactivate '+data.todoItems[i].title)
                 break;
             }
         }
         console.error('Failed set event '+id+' done: '+textStatus);
         getItems()
     });
-    for(var i=0; i < data.todoItems.length; ++i) {
-        if(data.todoItems[i].id == id) {
-            publishSuccessAlert(id, data.todoItems[i].title+' deactivated!')
-            publishDangerAlert(id, 'Failed to deactivate '+data.todoItems[i].title)
-            break;
-        }
-    }
 }
 
 function processInactiveItemClick(element) {
@@ -460,7 +470,7 @@ function cleanSchedulingInfo(item) {
     item.dueDate = ""
     item.dueTime = ""
     item.dueTimezone = ""
-    item.repeating = "No"
+    item.repeat = { "times": 0, "period": "None" }
 }
 
 function saveTodo(item) {
@@ -597,7 +607,7 @@ function checkOverdueItems() {
                         '</li>'
 
                 publishAlert(alert, 'alerti'+data.todoItems[i].id, 0)
-            } else if(due < now && data.todoItems[i].repeating !== "No") {
+            } else if(due < now && data.todoItems[i].repeat.period !== "None") {
                 //console.log(data.todoItems[i].id+' overdue!')
 
                 var alert = '<li class="pf-c-alert-group__item" id=alertw'+data.todoItems[i].id+'>'+
