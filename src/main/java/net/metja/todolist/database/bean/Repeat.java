@@ -49,8 +49,6 @@ public class Repeat {
         } else if(text != null && text.startsWith("Every ")) {
             String timesValue = text.substring(6, text.indexOf(" ", 6));
             String periodValue = text.substring(text.indexOf(" ", 6)+1);
-            System.out.println("Times value: "+timesValue);
-            System.out.println("Period value: "+periodValue);
             int times = Integer.parseInt(timesValue);
             if("Days".equalsIgnoreCase(periodValue)) {
                 return new Repeat(times, TimePeriod.Days);
