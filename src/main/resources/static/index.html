@@ -7,11 +7,11 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="icon" type="image/svg" href="./fontawesome-free-5.10.2-web/svgs/solid/tasks.svg" />
-  <link rel="stylesheet" href="./webjars/patternfly__patternfly/4.50.2/patternfly.min.css">
-  <link rel="stylesheet" href="./webjars/patternfly__patternfly/4.50.2/patternfly-addons.css">
-  <link rel="stylesheet" href="./fontawesome-free-5.10.2-web/css/all.css">
-  <script src="./webjars/vue/2.6.10/vue.min.js"></script>
-  <script src="./webjars/jquery/3.5.1/jquery.min.js"></script>
+  <link rel="stylesheet" href="./webjars/patternfly__patternfly/4.214.1/patternfly.min.css" type="text/css">
+  <link rel="stylesheet" href="./webjars/patternfly__patternfly/4.214.1/patternfly-addons.css" type="text/css">
+  <link rel="stylesheet" href="./fontawesome-free-5.10.2-web/css/all.css" type="text/css">
+  <script src="./js/vue.min.js"></script>
+  <script src="./webjars/jquery/3.6.1/jquery.min.js"></script>
 </head>
 <body>
   <div class="ws-site-root" id="content">
@@ -238,41 +238,96 @@
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.newItem.scheduled">
-                      <label class="pf-c-form__label pf-m-no-padding-top" for="new-item-repeating-radio-default">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="new-repeat-times-input">
                         <span class="pf-c-form__label-text">Repeating</span>
                         <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-default" name="exampleRadioSimple" value="No" v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-default">No</label>
+                        Every <div class="pf-c-input-group">
+                          <input class="pf-c-form-control"
+                                 type="text"
+                                 id="new-repeat-times-input"
+                                 name="editRepeatTimesInput"
+                                 :disabled="data.newItem.repeat.period == 'None'"
+                                 v-model="data.newItem.repeat.times"
+                                 v-bind:class="{ 'pf-m-disabled': data.newItem.repeat.period == 'None' }"
+                                 aria-label="Input task repeat"
+                                 aria-describedby="edit-select-repeat-toggle" />
+                          <div class="pf-c-select" style="width: 100px;" v-bind:class="{ 'pf-m-expanded': data.newScheduleTimesMenuOpen }">
+                            <span id="new-repeat-times-input-label" hidden>Choose one</span>
+                            <div class="pf-c-options-menu" v-bind:class="{ 'pf-m-expanded': data.newScheduleTimesMenuOpen }">
+                              <button
+                                      class="pf-c-options-menu__toggle"
+                                      type="button"
+                                      id="new-repeat-options-menu-toggle"
+                                      aria-haspopup="listbox"
+                                      :aria-expanded="data.newScheduleTimesMenuOpen"
+                                      v-on:click="toggleNewScheduleTimesMenu"
+                              >
+                                <span class="pf-c-options-menu__toggle-text">{{ data.newItem.repeat.period }}</span>
+                                <div class="pf-c-options-menu__toggle-icon">
+                                  <i class="fas fa-caret-down" aria-hidden="true"></i>
+                                </div>
+                              </button>
+                              <ul
+                                      class="pf-c-options-menu__menu"
+                                      aria-labelledby="new-repeat-options-menu-toggle"
+                                      :hidden="!data.newScheduleTimesMenuOpen"
+                              >
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.newItem.repeat.period == 'None' }"
+                                          v-on:click="data.newItem.repeat.period = 'None', data.newScheduleTimesMenuOpen=false">
+                                    None
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="newItem.repeat.period == 'None'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.newItem.repeat.period == 'Days' }"
+                                          v-on:click="data.newItem.repeat.period = 'Days', data.newScheduleTimesMenuOpen=false">
+                                    Days
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="newItem.repeat.period == 'Days'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.newItem.repeat.period == 'Weeks' }"
+                                          v-on:click="data.newItem.repeat.period = 'Weeks', data.newScheduleTimesMenuOpen=false">
+                                    Weeks
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="newItem.repeat.period == 'Weeks'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.newItem.repeat.period == 'Months' }"
+                                          v-on:click="data.newItem.repeat.period = 'Months', data.newScheduleTimesMenuOpen=false">
+                                    Months
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="newItem.repeat.period == 'Months'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.newItem.repeat.period == 'Years' }"
+                                          v-on:click="data.newItem.repeat.period = 'Years', data.newScheduleTimesMenuOpen=false">
+                                    Years
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="newItem.repeat.period == 'Years'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
                         </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-daily" name="exampleRadioSimple" value="Daily"  v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-daily">Daily</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-weekly" name="exampleRadioSimple" value="Weekly"  v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-weekly">Weekly</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-biweekly" name="exampleRadioSimple" value="BiWeekly"  v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-biweekly">Bi-Weekly</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-monthly" name="exampleRadioSimple" value="Monthly"  v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-monthly">Montly</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-yearly">Yearly</label>
-                        </div>
-                        <!--
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="new-item-repeating-radio-custom" name="exampleRadioSimple" value="Custom"  v-model="data.newItem.repeating"/>
-                          <label class="pf-c-radio__label" for="new-item-repeating-radio-custom">Custom</label>
-                        </div>
-                        -->
                       </div>
                     </div>
                   </form>
@@ -317,11 +372,12 @@
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.newItem.scheduled">
-                      <label class="pf-c-form__label" for="new-item-repeating-overview">
+                      <label class="pf-c-form__label" for="new-item-repeating-overview-none">
                         <span class="pf-c-form__label-text">Repeating</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
-                        <p class="pf-c-form-control" id="new-item-repeating-overview" name="new-item-repeating-overview">{{ data.newItem.repeating }}</p>
+                        <p class="pf-c-form-control" id="new-item-repeating-overview-none" name="new-item-repeating-overview" v-if="data.newItem.repeat.period=='None'">None</p>
+                        <p class="pf-c-form-control" id="new-item-repeating-overview-else" name="new-item-repeating-overview" v-else>Every {{ data.newItem.repeat.times }} {{ data.newItem.repeat.period }}</p>
                       </div>
                     </div>
                   </form>
@@ -343,7 +399,7 @@
       <div class="pf-l-bullseye">
         <div class="pf-c-wizard pf-u-w-100 pf-u-w-75-on-md pf-u-w-50-on-2xl pf-u-h-100 pf-u-h-75-on-lg pf-u-h-50-on-2xl">
           <div class="pf-c-wizard__header">
-            <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click="toggleEditItemWizard">
+            <button class="pf-c-button pf-m-plain pf-c-wizard__close" type="button" aria-label="Close" v-on:click.self="toggleEditItemWizard">
               <i class="fas fa-times" aria-hidden="true"></i>
             </button>
             <h1 class="pf-c-title pf-m-3xl pf-c-wizard__title">Edit Task</h1>
@@ -467,41 +523,96 @@
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.editItem.scheduled">
-                      <label class="pf-c-form__label pf-m-no-padding-top" for="edit-item-repeating-radio-default">
+                      <label class="pf-c-form__label pf-m-no-padding-top" for="edit-repeat-times-input">
                         <span class="pf-c-form__label-text">Repeating</span>
                         <span class="pf-c-form__label-required" aria-hidden="true">&#42;</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-default" name="exampleRadioSimple" value="No" v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-default">No</label>
+                        Every <div class="pf-c-input-group">
+                          <input class="pf-c-form-control"
+                                 type="text"
+                                 id="edit-repeat-times-input"
+                                 name="editRepeatTimesInput"
+                                 :disabled="data.editItem.repeat.period == 'None'"
+                                 v-model="data.editItem.repeat.times"
+                                 v-bind:class="{ 'pf-m-disabled': data.editItem.repeat.period == 'None' }"
+                                 aria-label="Input task repeat"
+                                 aria-describedby="edit-select-repeat-toggle" />
+                          <div class="pf-c-select" style="width: 100px;" v-bind:class="{ 'pf-m-expanded': data.editScheduleTimesMenuOpen }">
+                            <span id="edit-repeat-times-input-label" hidden>Choose one</span>
+                            <div class="pf-c-options-menu" v-bind:class="{ 'pf-m-expanded': data.editScheduleTimesMenuOpen }">
+                              <button
+                                      class="pf-c-options-menu__toggle"
+                                      type="button"
+                                      id="edit-repeat-options-menu-toggle"
+                                      aria-haspopup="listbox"
+                                      :aria-expanded="data.editScheduleTimesMenuOpen"
+                                      v-on:click="toggleEditScheduleTimesMenu"
+                              >
+                                <span class="pf-c-options-menu__toggle-text">{{ data.editItem.repeat.period }}</span>
+                                <div class="pf-c-options-menu__toggle-icon">
+                                  <i class="fas fa-caret-down" aria-hidden="true"></i>
+                                </div>
+                              </button>
+                              <ul
+                                      class="pf-c-options-menu__menu"
+                                      aria-labelledby="edit-repeat-options-menu-toggle"
+                                      :hidden="!data.editScheduleTimesMenuOpen"
+                              >
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.editItem.repeat.period == 'None' }"
+                                          v-on:click="data.editItem.repeat.period = 'None', data.editScheduleTimesMenuOpen=false">
+                                    None
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="editItem.repeat.period == 'None'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.editItem.repeat.period == 'Days' }"
+                                          v-on:click="data.editItem.repeat.period = 'Days', data.editScheduleTimesMenuOpen=false">
+                                    Days
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="editItem.repeat.period == 'Days'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.editItem.repeat.period == 'Weeks' }"
+                                          v-on:click="data.editItem.repeat.period = 'Weeks', data.editScheduleTimesMenuOpen=false">
+                                    Weeks
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="editItem.repeat.period == 'Weeks'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.editItem.repeat.period == 'Months' }"
+                                          v-on:click="data.editItem.repeat.period = 'Months', data.editScheduleTimesMenuOpen=false">
+                                    Months
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="editItem.repeat.period == 'Months'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                                <li>
+                                  <button class="pf-c-options-menu__menu-item" type="button"
+                                          v-bind:class="{ 'pf-m-selected': data.editItem.repeat.period == 'Years' }"
+                                          v-on:click="data.editItem.repeat.period = 'Years', data.editScheduleTimesMenuOpen=false">
+                                    Years
+                                    <div class="pf-c-options-menu__menu-item-icon">
+                                      <i class="fas fa-check" aria-hidden="true" v-if="editItem.repeat.period == 'Years'"></i>
+                                    </div>
+                                  </button>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
                         </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-daily" name="exampleRadioSimple" value="Daily"  v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-daily">Daily</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-weekly" name="exampleRadioSimple" value="Weekly"  v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-weekly">Weekly</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-biweekly" name="exampleRadioSimple" value="BiWeekly"  v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-biweekly">Bi-Weekly</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-monthly" name="exampleRadioSimple" value="Monthly"  v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-monthly">Montly</label>
-                        </div>
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-yearly" name="exampleRadioSimple" value="Yearly"  v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-yearly">Yearly</label>
-                        </div>
-                        <!--
-                        <div class="pf-c-radio">
-                          <input class="pf-c-radio__input" type="radio" id="edit-item-repeating-radio-custom" name="exampleRadioSimple" value="Yearly"  v-model="data.editItem.repeating"/>
-                          <label class="pf-c-radio__label" for="edit-item-repeating-radio-custom">Custom</label>
-                        </div>
-                        -->
                       </div>
                     </div>
                   </form>
@@ -555,11 +666,12 @@
                       </div>
                     </div>
                     <div class="pf-c-form__group" v-if="data.editItem.scheduled">
-                      <label class="pf-c-form__label" for="edit-item-repeating-overview">
+                      <label class="pf-c-form__label" for="edit-item-repeating-overview-none">
                         <span class="pf-c-form__label-text">Repeating</span>
                       </label>
                       <div class="pf-c-form__horizontal-group">
-                        <p class="pf-c-form-control" id="edit-item-repeating-overview" name="edit-item-repeating-overview">{{ data.editItem.repeating }}</p>
+                        <p class="pf-c-form-control" id="edit-item-repeating-overview-none" name="edit-item-repeating-overview" v-if="data.editItem.repeat.period == 'None'">None</p>
+                        <p class="pf-c-form-control" id="edit-item-repeating-overview-else" name="edit-item-repeating-overview" v-else>Every {{ data.editItem.repeat.times }} {{ data.editItem.repeat.period }}</p>
                       </div>
                     </div>
                   </form>
