@@ -61,6 +61,12 @@ public class ItemController {
                         return -1;
                     } else if (t1.getDueDate().isAfter(t2.getDueDate())) {
                         return 1;
+                    } else if(t1.getDueDate().isEqual(t2.getDueDate())) {
+                        if(t1.getDueTime().isBefore(t2.getDueTime())) {
+                            return -1;
+                        } else if (t1.getDueTime().isAfter(t2.getDueTime())) {
+                            return 1;
+                        }
                     }
                 }
                 return 0;
