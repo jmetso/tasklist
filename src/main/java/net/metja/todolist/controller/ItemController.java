@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -34,6 +35,9 @@ public class ItemController {
         int listID = this.databaseManager.getUserList(principal.getName());
         if(listID > 0) {
             List<Todo> todos = this.databaseManager.getTodos(listID);
+            if(todos != null && todos.size() > 1) {
+                this.sortTodosByDueDate(todos);
+            }
             if(todos != null) {
                 return new ResponseEntity<>(todos, HttpStatus.OK);
             } else {
@@ -42,6 +46,26 @@ public class ItemController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
+    }
+
+    private void sortTodosByDueDate(List<Todo> todos) {
+        todos.sort(new Comparator<Todo>() {
+            @Override
+            public int compare(Todo t1, Todo t2) {
+                if(t1.isScheduled() || t2.isScheduled()) {
+                    if (t1.getDueDate() != null && t2.getDueDate() == null) {
+                        return -1;
+                    } else if (t1.getDueDate() == null && t2.getDueDate() != null) {
+                        return 1;
+                    } else if (t1.getDueDate().isBefore(t2.getDueDate())) {
+                        return -1;
+                    } else if (t1.getDueDate().isAfter(t2.getDueDate())) {
+                        return 1;
+                    }
+                }
+                return 0;
+            }
+        });
     }
 
     @PreAuthorize("hasAnyRole('ADMIN','USER')")

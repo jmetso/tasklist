@@ -102,9 +102,16 @@ public class ItemControllerTest {
     @Test
     @WithUserDetails("view")
     public void getTodoItemsAsView() throws Exception {
-        Todo todo = new Todo(1, -1, "Task");
-        todo.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
-        List<Todo> todoList = Arrays.asList(todo);
+        Todo t1 = new Todo(1, -1, "Task");
+        t1.setScheduled(true);
+        t1.setDueDate(LocalDate.parse("2023-04-10"));
+        t1.setRepeat(new Repeat(0, Repeat.TimePeriod.None));
+        Todo t2 = new Todo(2, -1, "Task2");
+        t2.setScheduled(true);
+        t2.setDueDate(LocalDate.parse("2023-03-10"));
+        Todo t3 = new Todo(2, -1, "Task3");
+        Todo t4 = new Todo(2, -1, "Task4");
+        List<Todo> todoList = Arrays.asList(t3, t4, t1, t2);
 
         given(databaseManager.getUserList("view")).willReturn(1);
         given(databaseManager.getTodos(1)).willReturn(todoList);
@@ -112,13 +119,31 @@ public class ItemControllerTest {
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/items")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$", hasSize(1)))
-                .andExpect(jsonPath("$[0].id", is(todo.getId())))
-                .andExpect(jsonPath("$[0].parentId", is(todo.getParentId())))
-                .andExpect(jsonPath("$[0].title", is(todo.getTitle())))
-                .andExpect(jsonPath("$[0].dueDate", nullValue()))
+                .andExpect(jsonPath("$", hasSize(4)))
+                .andExpect(jsonPath("$[0].id", is(t2.getId())))
+                .andExpect(jsonPath("$[0].parentId", is(t2.getParentId())))
+                .andExpect(jsonPath("$[0].title", is(t2.getTitle())))
+                .andExpect(jsonPath("$[0].dueDate", is("2023-03-10")))
                 .andExpect(jsonPath("$[0].dueTime", nullValue()))
-                .andExpect(jsonPath("$[0].description", nullValue()));
+                .andExpect(jsonPath("$[0].description", nullValue()))
+                .andExpect(jsonPath("$[1].id", is(t1.getId())))
+                .andExpect(jsonPath("$[1].parentId", is(t1.getParentId())))
+                .andExpect(jsonPath("$[1].title", is(t1.getTitle())))
+                .andExpect(jsonPath("$[1].dueDate", is("2023-04-10")))
+                .andExpect(jsonPath("$[1].dueTime", nullValue()))
+                .andExpect(jsonPath("$[1].description", nullValue()))
+                .andExpect(jsonPath("$[2].id", is(t3.getId())))
+                .andExpect(jsonPath("$[2].parentId", is(t3.getParentId())))
+                .andExpect(jsonPath("$[2].title", is(t3.getTitle())))
+                .andExpect(jsonPath("$[2].dueDate", nullValue()))
+                .andExpect(jsonPath("$[2].dueTime", nullValue()))
+                .andExpect(jsonPath("$[2].description", nullValue()))
+                .andExpect(jsonPath("$[3].id", is(t4.getId())))
+                .andExpect(jsonPath("$[3].parentId", is(t4.getParentId())))
+                .andExpect(jsonPath("$[3].title", is(t4.getTitle())))
+                .andExpect(jsonPath("$[3].dueDate", nullValue()))
+                .andExpect(jsonPath("$[3].dueTime", nullValue()))
+                .andExpect(jsonPath("$[3].description", nullValue()));
     }
 
     @Test
