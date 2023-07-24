@@ -1,7 +1,7 @@
 0.2.7
 - bugfix for item date sort
 - dependencies:
-    - spring boot to 2.6.1
+    - spring boot to 2.7.14
     - sqlite to 3.42.0.0
     - commons-configuration2 to 2.9.0
     - junit to 5.9.3
