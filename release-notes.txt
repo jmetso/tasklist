@@ -1,3 +1,6 @@
+0.2.7
+- bugfix for item date sort
+
 0.2.6
 - availability probes (issue #5)
 - prometheus metrics (issue #6)
