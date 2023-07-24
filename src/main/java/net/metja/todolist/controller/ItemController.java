@@ -53,7 +53,9 @@ public class ItemController {
             @Override
             public int compare(Todo t1, Todo t2) {
                 if(t1.isScheduled() || t2.isScheduled()) {
-                    if (t1.getDueDate() != null && t2.getDueDate() == null) {
+                    if(t1.getDueDate() == null && t1.getDueDate() == null) {
+                        return 0;
+                    } else if (t1.getDueDate() != null && t2.getDueDate() == null) {
                         return -1;
                     } else if (t1.getDueDate() == null && t2.getDueDate() != null) {
                         return 1;
@@ -62,10 +64,10 @@ public class ItemController {
                     } else if (t1.getDueDate().isAfter(t2.getDueDate())) {
                         return 1;
                     } else if(t1.getDueDate().isEqual(t2.getDueDate())) {
-                        if(t1.getDueDate() == null && t2.getDueDate() == null) {
-                        } else if(t1.getDueDate() != null && t2.getDueDate() == null) {
+                        if(t1.getDueTime() == null && t2.getDueTime() == null) {
+                        } else if(t1.getDueTime() != null && t2.getDueTime() == null) {
                             return -1;
-                        } else if(t1.getDueDate() == null && t2.getDueDate() != null) {
+                        } else if(t1.getDueTime() == null && t2.getDueTime() != null) {
                             return 1;
                         } else if(t1.getDueTime().isBefore(t2.getDueTime())) {
                             return -1;
