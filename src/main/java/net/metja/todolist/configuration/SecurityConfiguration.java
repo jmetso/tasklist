@@ -97,7 +97,6 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/webjars/jquery/**").permitAll()
                 .antMatchers("/fontawesome-free-5.10.2-web/**").permitAll()
                 .antMatchers("/images/**").permitAll()
-                .antMatchers("/webjars/vue/2.6.10/**").permitAll()
                 .antMatchers("/js/**").permitAll()
                 .antMatchers("/login.html").permitAll()
                 .antMatchers("/api/v1/hello/**").permitAll()
