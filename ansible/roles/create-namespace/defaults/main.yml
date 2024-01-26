@@ -1,2 +1,0 @@
-# roles/create-namespace/defaults/main.yml
-namespace_name: namespace

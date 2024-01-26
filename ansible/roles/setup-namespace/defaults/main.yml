@@ -1,3 +1,0 @@
-# roles/setup-namespace/defaults/main.yml
-jenkins_namespace: jenkins
-namespace_name: namespace

@@ -1,9 +1,0 @@
-# installation variables
-vault_smtp_password: ""
-
-# cicd setup variables
-vault_ssh_private_key_value: ""
-vault_source_clone_username: ""
-vault_source_clone_password: ""
-vault_image_pull_password: ""
-vault_image_pull_username: ""
