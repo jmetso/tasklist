@@ -1,16 +1,5 @@
 package net.metja.todolist.database;
 
-import net.metja.todolist.database.bean.Repeat;
-import net.metja.todolist.database.bean.Todo;
-import net.metja.todolist.database.bean.UserAccount;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.stereotype.Component;
-
-import javax.annotation.PostConstruct;
-import javax.sql.DataSource;
 import java.sql.ResultSet;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -19,6 +8,19 @@ import java.time.ZoneOffset;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
+
+import javax.annotation.PostConstruct;
+import javax.sql.DataSource;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Component;
+
+import net.metja.todolist.database.bean.Repeat;
+import net.metja.todolist.database.bean.Todo;
+import net.metja.todolist.database.bean.UserAccount;
 
 /**
  * @author Janne Metso @copy; 2019
@@ -30,7 +32,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     static final String CREATE_SCHEMA_VERSION_TABLE = "CREATE TABLE IF NOT EXISTS Settings ( Version INTEGER )";
     static final String CREATE_PERSISTENT_LOGINS_TABLE = "CREATE TABLE IF NOT EXISTS persistent_logins (username varchar(64) not null, series varchar(64) primary key, token varchar(64) not null, last_used timestamp not null)";
     static final String CREATE_TODO_LISTS_TABLE = "CREATE TABLE IF NOT EXISTS TodoLists (ID INTEGER, UserID INTEGER, FOREIGN KEY (UserID) REFERENCES UserAccounts(ID), PRIMARY KEY(ID))";
-    static final String CREATE_TODO_ITEMS_TABLE = "CREATE TABLE IF NOT EXISTS TodoItems (ID INTEGER, ListID INTEGER, ParentID INTEGER, Title TEXT, Description TEXT, Done BOOLEAN, Scheduled BOOLEAN, DueDate TEXT, DueTime TEXT, DueTimezone TEXT, Repeating TEXT, LastNotification TEXT, FOREIGN KEY (ListID) REFERENCES TodoList(ID), PRIMARY KEY (ID, ListID))";
+    static final String CREATE_TODO_ITEMS_TABLE = "CREATE TABLE IF NOT EXISTS TodoItems (ID INTEGER, ListID INTEGER, ParentID INTEGER, Title TEXT, Description TEXT, Done BOOLEAN, Scheduled BOOLEAN, DueDate TEXT, DueTime TEXT, DueTimezone TEXT, Repeating TEXT, LastNotification TEXT, FOREIGN KEY (ListID) REFERENCES TodoLists(ID), PRIMARY KEY (ID, ListID))";
     static final String CREATE_USER_ACCOUNTS_TABLE = "CREATE TABLE IF NOT EXISTS UserAccounts (ID INTEGER PRIMARY KEY, Username VARCHAR(64), Password VARCHAR(60), Roles TEXT, Email TEXT)";
     private static final int SCHEMA_VERSION_MIN = 1;
     private static final int SCHEMA_VERSION_MAX = 2;
