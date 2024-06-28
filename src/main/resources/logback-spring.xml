@@ -55,8 +55,8 @@
   <springProfile name="prod">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
-      <!- - encoders are assigned the type
-           ch.qos.logback.classic.encoder.PatternLayoutEncoder by default - ->
+      <!-- encoders are assigned the type
+           ch.qos.logback.classic.encoder.PatternLayoutEncoder by default -->
       <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
         <level>WARN</level>
       </filter>
