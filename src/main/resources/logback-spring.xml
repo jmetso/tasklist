@@ -34,7 +34,7 @@
     </root>
   </springProfile>
 
-  <springProfile name="dev">
+  <springProfile name="ocp">
 
     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
       <!-- encoders are assigned the type
@@ -51,11 +51,6 @@
         <appender-ref ref="STDOUT" />
     </root>
   </springProfile>
-
-</configuration>
-
-<!--
-  
 
   <springProfile name="prod">
 
@@ -74,4 +69,5 @@
         <appender-ref ref="STDOUT" />
     </root>
   </springProfile>
--->
+
+</configuration>
