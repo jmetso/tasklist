@@ -55,10 +55,12 @@ public class TodoList {
         if(this.dataSource == null) {
             logger.debug("Database url: "+this.databaseUrl);
             if(this.databaseUrl.contains("sqlite")) {
+                logger.info("Using sqlite driver");
                 this.dataSource = new SingleConnectionDataSource();
                 this.dataSource.setDriverClassName("org.sqlite.JDBC");
                 this.dataSource.setUrl(this.databaseUrl);
             } else if(databaseUrl.contains("postgresql")) {
+                logger.info("Using postgresql driver");
                 this.dataSource = new SingleConnectionDataSource();
                 this.dataSource.setDriverClassName("org.postgresql.Driver");
                 this.dataSource.setUrl(this.databaseUrl);
