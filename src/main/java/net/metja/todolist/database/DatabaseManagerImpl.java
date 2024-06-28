@@ -49,6 +49,10 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
         final String SELECT = "SELECT ID FROM TodoLists WHERE ID=?";
         final String INSERT = "INSERT INTO TodoItems (ID, ListID, ParentID, Title, Description, Done, Scheduled, DueDate, DueTime, DueTimezone, Repeating, LastNotification) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String repeatString = "No";
+        if(todo.getRepeat()!=null) {
+            repeatString = todo.getRepeat().toString();
+        }
         try {
             String dueTimezone = null;
             if(todo.getDueTimezone() != null) {
@@ -57,7 +61,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
             this.jdbcTemplate.queryForObject(SELECT, Integer.class, listID);
             this.jdbcTemplate.update(INSERT, id, listID, todo.getParentId(), todo.getTitle(), todo.getDescription(),
                     todo.isDone(), todo.isScheduled(), todo.getDueDate(), todo.getDueTime(), dueTimezone,
-                    todo.getRepeat(), todo.getLastNotification());
+                    repeatString, todo.getLastNotification());
             return id;
         } catch(org.springframework.dao.DataAccessException e) {
             logger.warn("Unable to add list item "+todo.getTitle()+" to list "+listID, e);
