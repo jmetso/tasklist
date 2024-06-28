@@ -33,7 +33,7 @@ public class DatabaseManagerImpl implements DatabaseManager {
     static final String CREATE_PERSISTENT_LOGINS_TABLE = "CREATE TABLE IF NOT EXISTS persistent_logins (username varchar(64) not null, series varchar(64) primary key, token varchar(64) not null, last_used timestamp not null)";
     static final String CREATE_TODO_LISTS_TABLE = "CREATE TABLE IF NOT EXISTS TodoLists (ID INTEGER, UserID INTEGER, FOREIGN KEY (UserID) REFERENCES UserAccounts(ID), PRIMARY KEY(ID))";
     static final String CREATE_TODO_ITEMS_TABLE = "CREATE TABLE IF NOT EXISTS TodoItems (ID INTEGER, ListID INTEGER, ParentID INTEGER, Title TEXT, Description TEXT, Done BOOLEAN, Scheduled BOOLEAN, DueDate TEXT, DueTime TEXT, DueTimezone TEXT, Repeating TEXT, LastNotification TEXT, FOREIGN KEY (ListID) REFERENCES TodoLists(ID), PRIMARY KEY (ID, ListID))";
-    static final String CREATE_USER_ACCOUNTS_TABLE = "CREATE TABLE IF NOT EXISTS UserAccounts (ID INTEGER PRIMARY KEY, Username VARCHAR(64), Password VARCHAR(60), Roles TEXT, Email TEXT)";
+    static final String CREATE_USER_ACCOUNTS_TABLE = "CREATE TABLE IF NOT EXISTS UserAccounts (ID INTEGER PRIMARY KEY, Username VARCHAR(64), Password VARCHAR(120), Roles TEXT, Email TEXT)";
     private static final int SCHEMA_VERSION_MIN = 1;
     private static final int SCHEMA_VERSION_MAX = 2;
 
