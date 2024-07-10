@@ -88,9 +88,14 @@ public class RestControllerIT {
         HttpEntity<MultiValueMap<String, String>> authRequest = new HttpEntity<>(params, this.httpHeaders);
         ResponseEntity<String> authResult = this.restTemplate.postForEntity("http://"+targetHost+":"+targetPort+"/tasklist/authentication", authRequest, String.class);
         assertEquals(HttpStatus.FOUND, authResult.getStatusCode(), "Auth status");
-        String cookie = authResult.getHeaders().getFirst(HttpHeaders.SET_COOKIE).substring(0, 43);
+        String session = null;
+        for(String cookie: authResult.getHeaders().get(HttpHeaders.SET_COOKIE)) {
+            if(cookie.contains("JSESSIONID")) {
+                session = cookie.substring(0, 43);
+            }
+        }
         this.httpHeaders.setContentType(null);
-        return  cookie;
+        return session;
     }
 
 }
