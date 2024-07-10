@@ -403,7 +403,7 @@ function getItems() {
     }).fail(function(jqXHR, textStatus, errorThrown) {
         //console.log("Status: "+jqXHR.status)
         console.error("Failed to get items: "+textStatus)
-        publishDangerAlert('alertdi', 'Failed to get items!', 5000)
+        //publishDangerAlert('alertdi', 'Failed to get items!', 5000)
         if(jqXHR.status == 404) {
             //console.log("./api/v/new")
             $.getJSON("./api/v1/new"+window.location.search, function(result) {
