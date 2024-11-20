@@ -1,9 +1,7 @@
 package net.metja.todolist;
 
-import net.metja.todolist.configuration.ConfigUtil;
-import net.metja.todolist.notification.NotificationClient;
-import net.metja.todolist.notification.EmailNotificationClient;
-import net.metja.todolist.notification.NotificationManager;
+import javax.sql.DataSource;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,7 +13,10 @@ import org.springframework.jdbc.datasource.SingleConnectionDataSource;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 
-import javax.sql.DataSource;
+import net.metja.todolist.configuration.ConfigUtil;
+import net.metja.todolist.notification.EmailNotificationClient;
+import net.metja.todolist.notification.NotificationClient;
+import net.metja.todolist.notification.NotificationManager;
 
 /**
  * @author Janne Metso &copy; 2019
@@ -54,8 +55,14 @@ public class TodoList {
         if(this.dataSource == null) {
             logger.debug("Database url: "+this.databaseUrl);
             if(this.databaseUrl.contains("sqlite")) {
+                logger.info("Using sqlite driver");
                 this.dataSource = new SingleConnectionDataSource();
                 this.dataSource.setDriverClassName("org.sqlite.JDBC");
+                this.dataSource.setUrl(this.databaseUrl);
+            } else if(databaseUrl.contains("postgresql")) {
+                logger.info("Using postgresql driver");
+                this.dataSource = new SingleConnectionDataSource();
+                this.dataSource.setDriverClassName("org.postgresql.Driver");
                 this.dataSource.setUrl(this.databaseUrl);
             } else {
                 logger.error("Unsupported database connection: "+databaseUrl);
