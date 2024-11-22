@@ -3,15 +3,16 @@ package net.metja.todolist.configuration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -24,9 +25,10 @@ import static org.springframework.security.config.Customizer.withDefaults;
  * @author Janne Metso @copy; 2019
  * @since 2019-11-19
  */
+@Configuration
 @EnableWebSecurity()
 @EnableGlobalMethodSecurity(securedEnabled = true)
-public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
+public class TestSecurityConfiguration{
 
     private static final Logger logger = LoggerFactory.getLogger(TestSecurityConfiguration.class);
 
@@ -55,25 +57,23 @@ public class TestSecurityConfiguration extends WebSecurityConfigurerAdapter {
         return source;
     }
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    protected SecurityFilterChain configure(HttpSecurity http) throws Exception {
         http
-            .csrf().disable()
-            .authorizeRequests()
-                .antMatchers("/api/v1/password/generate/**").permitAll()
-                .antMatchers("/api/v1/items").hasAnyRole("ADMIN","USER","VIEW")
-                .antMatchers("/api/v1/items/**").hasAnyRole("ADMIN","USER")
-                .antMatchers("/api/v1/new").hasAnyRole("ADMIN","USER")
-                .antMatchers("/api/v1/logout").hasAnyRole("ADMIN","USER","VIEW")
-                .anyRequest().authenticated()
-                .and()
-            .rememberMe()
-                .tokenValiditySeconds(1209600)
-            .and()
-                .httpBasic()
-            .and()
-                .formLogin(withDefaults());
+            .csrf((csrf) -> csrf.disable())
+            .authorizeHttpRequests((authorizeRequests) -> authorizeRequests
+                .requestMatchers("/api/v1/password/generate/**").permitAll()
+                .requestMatchers("/api/v1/items").hasAnyRole("ADMIN", "USER", "VIEW")
+                .requestMatchers("/api/v1/items/**").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/api/v1/new").hasAnyRole("ADMIN", "USER")
+                .requestMatchers("/api/v1/logout").hasAnyRole("ADMIN", "USER", "VIEW")
+                .requestMatchers("/*").authenticated()
+            )
+            .rememberMe((rememberMe) -> rememberMe.tokenValiditySeconds(1209600))
+            .httpBasic(withDefaults())
+            .formLogin(withDefaults());
 
+        return http.build();
     }
 
 }
