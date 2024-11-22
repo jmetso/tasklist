@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 /**
  * @author Janne Metso &copy; 2020
@@ -27,7 +27,7 @@ public class SessionController {
         try {
             request.logout();
             return new ResponseEntity<>(true, HttpStatus.OK);
-        } catch(javax.servlet.ServletException e) {
+        } catch(jakarta.servlet.ServletException e) {
             logger.error("Unable to perform logout.", e);
             return new ResponseEntity<>(false, HttpStatus.INTERNAL_SERVER_ERROR);
         }
