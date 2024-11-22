@@ -1,3 +1,10 @@
+0.3.0
+- java 17
+- dependencies:
+    - spring boot 3.3.6
+    - sqlite 3.47.0.0
+    - junit 5.11.3
+
 0.2.8
 - dependencies;
     - jquery 3.7.1
