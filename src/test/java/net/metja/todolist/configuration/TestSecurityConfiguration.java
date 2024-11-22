@@ -67,7 +67,7 @@ public class TestSecurityConfiguration{
                 .requestMatchers("/api/v1/items/**").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/api/v1/new").hasAnyRole("ADMIN", "USER")
                 .requestMatchers("/api/v1/logout").hasAnyRole("ADMIN", "USER", "VIEW")
-                .requestMatchers("/*").authenticated()
+                .anyRequest().authenticated()
             )
             .rememberMe((rememberMe) -> rememberMe.tokenValiditySeconds(1209600))
             .httpBasic(withDefaults())
