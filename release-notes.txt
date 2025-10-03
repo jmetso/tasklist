@@ -1,3 +1,6 @@
+0.4.0
+- oidc integration
+
 0.3.0
 - java 21
 - dependencies:
