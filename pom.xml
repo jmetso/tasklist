@@ -204,7 +204,7 @@
                         </configuration>
                     </plugin>
                 </plugins>
-                <finalName>${project.artifactId}-${project.version}-${buildNumber}</finalName>
+                <finalName>${project.artifactId}-${project.version}</finalName>
             </build>
         </profile>
         <profile>
