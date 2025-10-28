@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -29,10 +30,18 @@ public class ItemController {
     private DatabaseManager databaseManager;
     private static final Logger logger = LoggerFactory.getLogger(ItemController.class);
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER', 'VIEW')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER', 'VIEW')")
     @RequestMapping(value = "/api/v1/items", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<List<Todo>> getTodoItems(Principal principal) {
-        int listID = this.databaseManager.getUserList(principal.getName());
+        String user = "";
+        if(principal instanceof OAuth2AuthenticationToken) {
+            OAuth2AuthenticationToken token = (OAuth2AuthenticationToken)principal;
+            user = (String)token.getPrincipal().getAttributes().get("preferred_username");
+        } else {
+            user = principal.getName();
+        }
+        logger.debug("User: "+user);
+        int listID = this.databaseManager.getUserList(user);
         if(listID > 0) {
             List<Todo> todos = this.databaseManager.getTodos(listID);
             if(todos != null && todos.size() > 1) {
@@ -81,7 +90,7 @@ public class ItemController {
         });
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value="/api/v1/items/add", produces=MediaType.APPLICATION_JSON_VALUE, method=RequestMethod.POST, consumes=MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Integer> addTodoListItem(@RequestBody Todo todo, Principal principal) {
         int listId = this.databaseManager.getUserList(principal.getName());
@@ -97,7 +106,7 @@ public class ItemController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/api/v1/items/{id}/update", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.POST)
     public ResponseEntity updateTodoListItem(@RequestBody Todo todo, @PathVariable(value="id") int id, Principal principal) {
         int listId = this.databaseManager.getUserList(principal.getName());
@@ -118,7 +127,7 @@ public class ItemController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/api/v1/items/{id}/done", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<Boolean> markTodoListItemAsDone(@PathVariable(value="id") int id, Principal principal){
         int listId = this.databaseManager.getUserList(principal.getName());
@@ -154,7 +163,7 @@ public class ItemController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/api/v1/items/{id}/activate", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<Boolean> markTodoListItemAsActive(@PathVariable(value="id") int id, Principal principal){
         int listId = this.databaseManager.getUserList(principal.getName());
@@ -180,7 +189,7 @@ public class ItemController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/api/v1/items/{id}/deactivate", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<Boolean> markTodoListItemAsInactive(@PathVariable(value="id") int id, Principal principal){
         int listId = this.databaseManager.getUserList(principal.getName());
@@ -205,7 +214,7 @@ public class ItemController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','USER')")
+    //@PreAuthorize("hasAnyRole('ADMIN','USER')")
     @RequestMapping(value = "/api/v1/items/{id}/delete", produces = MediaType.APPLICATION_JSON_VALUE, method = RequestMethod.GET)
     public ResponseEntity<Boolean> deleteTodoListItem(@PathVariable(value="id") int id, Principal principal) {
         int listId = this.databaseManager.getUserList(principal.getName());
