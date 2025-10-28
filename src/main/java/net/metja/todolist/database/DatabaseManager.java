@@ -21,6 +21,7 @@ public interface DatabaseManager {
     boolean deleteTodo(int listId, int todoId);
 
     List<UserAccount> getUsers();
+    int addUser(String username, String email);
 
     boolean migrateDatabaseToLatestVersion();
 }
