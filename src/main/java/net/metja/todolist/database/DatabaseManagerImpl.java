@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import javax.sql.DataSource;
 
 import org.slf4j.Logger;
@@ -180,6 +180,30 @@ public class DatabaseManagerImpl implements DatabaseManager {
     }
 
     @Override
+    public int addUser(String username, String email) {
+        int userID = this.getNextUserID();
+        final String INSERT = "INSERT INTO UserAccounts (ID,Username, Email) values (?, ?, ?)";
+        try {
+            this.jdbcTemplate.update(INSERT, userID, username, email);
+        } catch(org.springframework.dao.DataAccessException e) {
+            logger.error("Unable to add new user \""+username+"\".");
+            return  -1;
+        }
+        return userID;
+    }
+
+    private int getNextUserID() {
+        final String SELECT = "SELECT ID FROM UserAccounts ORDER BY ID DESC LIMIT 1";
+        try {
+            int id = this.jdbcTemplate.queryForObject(SELECT, Integer.class);
+            return id;
+        } catch (org.springframework.dao.DataAccessException e) {
+            logger.warn("Unable to determine last user id, returning 1");
+            return 1;
+        }
+    }
+
+    @Override
     public boolean migrateDatabaseToLatestVersion() {
         logger.info("Migrating database version ...");
         final String SELECT = "SELECT Version FROM Settings";
@@ -273,9 +297,12 @@ public class DatabaseManagerImpl implements DatabaseManager {
 
     private UserAccount mapUserAccount(ResultSet rs, int rowNum) throws java.sql.SQLException {
         List<String> roles = new LinkedList<>();
-        StringTokenizer st = new StringTokenizer(rs.getString("Roles"), ",");
-        while(st.hasMoreTokens()) {
-            roles.add(st.nextToken().toUpperCase());
+        String rolesStr = rs.getString("Roles");
+        if(rolesStr != null) {
+            StringTokenizer st = new StringTokenizer(rolesStr, ",");
+            while (st.hasMoreTokens()) {
+                roles.add(st.nextToken().toUpperCase());
+            }
         }
         return new UserAccount(rs.getInt("ID"), rs.getString("Username"), rs.getString("Password"), roles, rs.getString("Email"));
     }

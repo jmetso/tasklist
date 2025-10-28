@@ -107,7 +107,7 @@ var app = new Vue({
             data.userMenuOpen = !data.userMenuOpen
         },
         logout: function(event) {
-            $.post('./api/v1/logout'+window.location.search, function(result) {
+            $.post('./api/v1/logout', function(result) {
                 data.user = ""
                 location.reload()
             }).fail(function(jqXHR, textStatus, errorThrown) {
@@ -276,7 +276,7 @@ function editItem(itemId) {
 
 function activateItem(id) {
     //console.log('/api/v1/items/'+id+'/activate')
-    $.getJSON('./api/v1/items/'+id+'/activate'+window.location.search, function(result) {
+    $.getJSON('./api/v1/items/'+id+'/activate', function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
                 publishSuccessAlert(id, data.todoItems[i].title+' activated!')
@@ -298,7 +298,7 @@ function activateItem(id) {
 
 function deactivateItem(id) {
     //console.log('/api/v1/items/'+id+'/deactivate')
-    $.getJSON('./api/v1/items/'+id+'/deactivate'+window.location.search, function(result) {
+    $.getJSON('./api/v1/items/'+id+'/deactivate', function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
                 publishSuccessAlert(id, data.todoItems[i].title+' deactivated!')
@@ -339,7 +339,7 @@ function processInactiveItemClick(element) {
     } else if($(target).hasClass("pf-m-danger")) {
         //console.log(id+" danger!")
         //console.log('/api/v1/items/'+id+'/delete')
-        $.getJSON('./api/v1/items/'+id+'/delete'+window.location.search, function(result) {
+        $.getJSON('./api/v1/items/'+id+'/delete', function(result) {
             for(var i=0; i < data.todoItems.length; ++i) {
                 if(data.todoItems[i].id == id) {
                     publishSuccessAlert(id, data.todoItems[i].title+' deleted!')
@@ -376,7 +376,7 @@ function publishAlert(html, itemId, delay) {
 
 function completeItem(id) {
     //console.log('/api/v1/items/'+id+'/done')
-    $.getJSON('./api/v1/items/'+id+'/done'+window.location.search, function(result) {
+    $.getJSON('./api/v1/items/'+id+'/done', function(result) {
         for(var i=0; i < data.todoItems.length; ++i) {
             if(data.todoItems[i].id == id) {
                 publishSuccessAlert(id, data.todoItems[i].title+' completed!')
@@ -398,7 +398,7 @@ function completeItem(id) {
 
 function getItems() {
     //console.log("./api/v1/items")
-    $.getJSON("./api/v1/items"+window.location.search, function(result) {
+    $.getJSON("./api/v1/items", function(result) {
         data.todoItems = result
     }).fail(function(jqXHR, textStatus, errorThrown) {
         //console.log("Status: "+jqXHR.status)
@@ -406,7 +406,7 @@ function getItems() {
         //publishDangerAlert('alertdi', 'Failed to get items!', 5000)
         if(jqXHR.status == 404) {
             //console.log("./api/v/new")
-            $.getJSON("./api/v1/new"+window.location.search, function(result) {
+            $.getJSON("./api/v1/new", function(result) {
                 publishSuccessAlert('alertsn', 'Added new list!')
             }).fail(function(jqXHR, textStatus, errorThrown) {
                 console.error("Failed to add new list: "+textStatus)
@@ -478,7 +478,7 @@ function saveTodo(item) {
     if(item.id < 0) {
         //console.log("./api/v1/items/add")
         $.ajax({
-            url: './api/v1/items/add'+window.location.search,
+            url: './api/v1/items/add',
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',
@@ -495,7 +495,7 @@ function saveTodo(item) {
     } else {
         //console.log("./api/v1/items/"+item.id+"/update")
         $.ajax({
-            url: './api/v1/items/'+item.id+'/update'+window.location.search,
+            url: './api/v1/items/'+item.id+'/update',
             type: 'post',
             dataType: 'json',
             contentType: 'application/json',
@@ -553,7 +553,7 @@ function publishDangerAlert(id, message, timeout=0) {
 }
 
 function getUser() {
-    $.getJSON("./api/v1/user"+window.location.search, function(result) {
+    $.getJSON("./api/v1/user", function(result) {
         data.user = result.user;
         getVersion()
         getItems()
@@ -565,7 +565,7 @@ function getUser() {
 getUser()
 
 function getVersion() {
-    $.getJSON("./api/v1/version"+window.location.search, function(result) {
+    $.getJSON("./api/v1/version", function(result) {
         data.version = result.version;
     }, "json").fail(function(jqXHR, textStatus, errorThrown) {
         publishDangerAlert('alertdv', 'Failed to get version!', 5000)

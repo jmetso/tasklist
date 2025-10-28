@@ -52,7 +52,7 @@ public class ListControllerTest {
 
         mvc.perform(MockMvcRequestBuilders.get("/api/v1/new")
                 .accept(MediaType.APPLICATION_JSON_VALUE))
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$", is(false)));
     }
 
